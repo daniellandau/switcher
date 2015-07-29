@@ -1,0 +1,8 @@
+{
+    "name": "switcher",
+    "uuid": "switcher@landau.fi",
+    "description": "Switch windows quickly by typing",
+    "shell-version": [
+        "3.16.3"
+    ]
+}
