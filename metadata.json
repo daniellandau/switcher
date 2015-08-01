@@ -1,8 +1,9 @@
 {
-    "name": "switcher",
-    "uuid": "switcher@landau.fi",
-    "description": "Switch windows quickly by typing",
-    "shell-version": [
-        "3.16.3"
-    ]
+  "name": "switcher",
+  "uuid": "switcher@landau.fi",
+  "settings-schema": "org.gnome.shell.extensions.switcher",
+  "description": "Switch windows quickly by typing",
+  "shell-version": [
+    "3.16.3"
+  ]
 }

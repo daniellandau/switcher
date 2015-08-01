@@ -4,6 +4,11 @@ const Clutter = imports.gi.Clutter;
 const Main = imports.ui.main;
 const Tweener = imports.ui.tweener;
 const Shell = imports.gi.Shell;
+const Meta = imports.gi.Meta;
+const Lang = imports.lang;
+const ExtensionUtils = imports.misc.extensionUtils;
+const Config = imports.misc.config;
+const Gio = imports.gi.Gio;
 
 let boxes, button, container, filteredApps, width, background;
 
@@ -47,7 +52,7 @@ function makeBox(app) {
 }
 
 // function description(w) { return w.meta_window.get_description().replace(/.*\((.*)\)/, "$1"); }
-function description(app) { return app.meta_window.get_title(); }
+function description(app) { return app.meta_window.get_title().substring(0, 100); }
 
 function _showUI() {
   'use strict';
@@ -115,6 +120,7 @@ function _showUI() {
    boxes.forEach(box => box.set_width(width));
   container.show();
   background.show();
+
   // background.connect('clicked', () => print('foo'));
 
   // Tweener.addTween(container,
@@ -139,7 +145,28 @@ function init() {
 }
 
 function enable() {
-    Main.panel._rightBox.insert_child_at_index(button, 0);
+  Main.panel._rightBox.insert_child_at_index(button, 0);
+  let extension = ExtensionUtils.getCurrentExtension();
+  let schema = extension.metadata['settings-schema'];
+  const GioSSS = Gio.SettingsSchemaSource;
+  let schemaDir = extension.dir.get_child('schemas');
+  let schemaSource = GioSSS.get_default();
+  schemaSource = GioSSS.new_from_directory(schemaDir.get_path(),
+                                           GioSSS.get_default(),
+                                           false);
+
+  let schemaObj = schemaSource.lookup(schema, true);
+  // print(schemaObj);
+  let settings = new Gio.Settings({ settings_schema: schemaObj });
+  // print(settings);
+
+
+  Main.wm.addKeybinding(
+    'show-switcher',
+    settings,
+    Meta.KeyBindingFlags.NONE,
+    Shell.KeyBindingMode ? Shell.KeyBindingMode.ALL : Shell.ActionMode.ALL,
+    _showUI);
 }
 
 function disable() {
