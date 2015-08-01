@@ -52,7 +52,9 @@ function makeBox(app) {
 }
 
 // function description(w) { return w.meta_window.get_description().replace(/.*\((.*)\)/, "$1"); }
-function description(app) { return app.meta_window.get_title().substring(0, 100); }
+function description(app) {
+  return app.meta_window.get_wm_class() + ' → ' + app.meta_window.get_title().substring(0, 90);
+}
 
 function _showUI() {
   'use strict';
