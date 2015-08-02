@@ -49,7 +49,7 @@ function _showUI() {
   boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
 
   container = new St.Bin({reactive: true});
-  container.set_alignment(St.Align.MIDDLE, St.Align.START);
+  container.set_alignment(St.Align.START, St.Align.START);
   boxLayout.set_vertical(true);
   const apps = global.get_window_actors()
         .filter(w => w.meta_window.get_window_type() == 0);
@@ -89,6 +89,7 @@ function _showUI() {
   width = (boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0));
   if (width > monitor.width) width = monitor.width - 20;
   boxes.forEach(box => box.set_width(width));
+  entry.set_width(width);
 
   Main.pushModal(container);
   container.connect('button-press-event', _hideUI);
