@@ -16,3 +16,7 @@
 .switcher-box:last-child .switcher-label {
     border-radius: 0 0 9px 0;
 }
+
+.switcher-box-layout {
+  padding-top: 100px;
+}

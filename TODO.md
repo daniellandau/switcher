@@ -1,6 +1,5 @@
 ## Before first release
 
-* Modal behaviour
 * Settings
 * Explicit visual cancel and enter buttons
 * Whatever account creation and other fluff there is to get it on e.g.o

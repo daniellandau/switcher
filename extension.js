@@ -10,18 +10,14 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Config = imports.misc.config;
 const Gio = imports.gi.Gio;
 
-let boxes, container, filteredApps, width, background;
+let boxes, container, boxLayout, filteredApps, width;
 
 const ESC = 65307, ENTER = 65293;
 
 function _hideUI() {
   Main.uiGroup.remove_actor(container);
-  Main.uiGroup.remove_actor(background);
+  Main.popModal(container);
   boxes = null;
-  background = null;
-}
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
 }
 
 function makeBox(app) {
@@ -50,52 +46,54 @@ function description(app) {
 function _showUI() {
   'use strict';
   if (boxes) return;
-  container = new St.BoxLayout();
-  container.set_vertical(true);
+  boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
+
+  container = new St.Bin({reactive: true});
+  container.set_alignment(St.Align.MIDDLE, St.Align.START);
+  boxLayout.set_vertical(true);
   const apps = global.get_window_actors()
         .filter(w => w.meta_window.get_window_type() == 0);
   filteredApps = apps;
   boxes = apps.map(makeBox);
   const entry = new St.Entry({hint_text: 'type filter'});
-  global.stage.set_key_focus(entry);
+
   entry.connect('key-release-event', (o, e) => {
     const symbol = e.get_key_symbol();
     if (symbol === ESC) _hideUI();
     else if (symbol === ENTER) {
       _hideUI();
-      filteredApps[0].meta_window.activate(false);
+      filteredApps.length > 0 && filteredApps[0].meta_window.activate(false);
     } else {
-      boxes.forEach(box => container.remove_child(box));
+      boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(app => description(app).toLowerCase().indexOf(o.text.toLowerCase()) !== -1);
       boxes = filteredApps.map(makeBox);
       boxes.forEach((box) => {
         box.set_width(width);
-        container.insert_child_at_index(box, -1);
+        boxLayout.insert_child_at_index(box, -1);
       });
     }
   });
-  container.insert_child_at_index(entry, 0);
-  boxes.forEach((box) => container.insert_child_at_index(box, -1));
 
-  // TODO: make truly modal
-  background = new St.Button();
+  boxLayout.insert_child_at_index(entry, 0);
+  boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
+
+  // container.child = boxLayout;
+  container.add_actor(boxLayout);
   Main.uiGroup.add_actor(container);
-  Main.uiGroup.add_actor(background);
-
 
   let monitor = Main.layoutManager.primaryMonitor;
-  background.set_width(monitor.width);
-  background.set_height(monitor.height);
+  container.set_width(monitor.width);
+  container.set_height(monitor.height);
+  container.set_position(monitor.x, monitor.y);
 
   width = (boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0));
   if (width > monitor.width) width = monitor.width - 20;
-  let height = (boxes.map(text => text.height).reduce((a, b) => a + b, 0));
-  if (height > monitor.height) height = monitor.height - 100;
-  container.set_position(monitor.x + Math.floor(monitor.width / 2 - width / 2),
-                         monitor.y + Math.floor(monitor.height / 2 - height / 2));
   boxes.forEach(box => box.set_width(width));
+
+  Main.pushModal(container);
+  container.connect('button-press-event', _hideUI);
+  global.stage.set_key_focus(entry);
   container.show();
-  background.show();
 
 }
 
