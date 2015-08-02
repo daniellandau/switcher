@@ -41,7 +41,9 @@ function makeBox(app) {
 
 function description(app) {
   const appSys = Shell.AppSystem.get_default();
-  const appName = appSys.lookup_desktop_wmclass(app.meta_window.get_wm_class()).get_name();
+  const wm_class = app.meta_window.get_wm_class();
+  const desktop_wmclass = appSys.lookup_desktop_wmclass(wm_class);
+  const appName = desktop_wmclass ? desktop_wmclass.get_name() : wm_class;
   return appName + ' → ' + app.meta_window.get_title();
 }
 
