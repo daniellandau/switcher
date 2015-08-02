@@ -40,7 +40,9 @@ function makeBox(app) {
 }
 
 function description(app) {
-  return app.meta_window.get_wm_class() + ' → ' + app.meta_window.get_title().substring(0, 90);
+  const appSys = Shell.AppSystem.get_default();
+  const appName = appSys.lookup_desktop_wmclass(app.meta_window.get_wm_class()).get_name();
+  return appName + ' → ' + app.meta_window.get_title();
 }
 
 function _showUI() {
@@ -84,8 +86,11 @@ function _showUI() {
   background.set_height(monitor.height);
 
   width = (boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0));
+  if (width > monitor.width) width = monitor.width - 20;
+  let height = (boxes.map(text => text.height).reduce((a, b) => a + b, 0));
+  if (height > monitor.height) height = monitor.height - 100;
   container.set_position(monitor.x + Math.floor(monitor.width / 2 - width / 2),
-                         monitor.y + Math.floor(monitor.height / 2 - (boxes.map(text => text.height).reduce((a, b) => a + b, 0)) / 2));
+                         monitor.y + Math.floor(monitor.height / 2 - height / 2));
   boxes.forEach(box => box.set_width(width));
   container.show();
   background.show();
