@@ -1,9 +1,18 @@
 
-.helloworld-label {
+.switcher-label, .switcher-icon {
     font-size: 36px;
     font-weight: bold;
     color: #ffffff;
     background-color: rgba(10,10,10,0.7);
-    border-radius: 5px;
     padding: .5em;
+    border-style: solid;
+    border-color: #eee;
+    border-width: 1px;
+}
+
+.switcher-box:last-child .switcher-icon {
+    border-radius: 0 0 0 9px;
+}
+.switcher-box:last-child .switcher-label {
+    border-radius: 0 0 9px 0;
 }
