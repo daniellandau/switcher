@@ -39,7 +39,8 @@ function description(app) {
   const appSys = Shell.AppSystem.get_default();
   const wm_class = app.meta_window.get_wm_class();
   const desktop_wmclass = appSys.lookup_desktop_wmclass(wm_class);
-  const appName = desktop_wmclass ? desktop_wmclass.get_name() : wm_class;
+  const appRef = Shell.WindowTracker.get_default().get_window_app(app.meta_window);
+  const appName = appRef.get_name();
   return appName + ' → ' + app.meta_window.get_title();
 }
 
