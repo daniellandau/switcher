@@ -63,7 +63,8 @@ function _showUI() {
     if (symbol === ESC) _hideUI();
     else if (symbol === ENTER) {
       _hideUI();
-      filteredApps.length > 0 && filteredApps[0].meta_window.activate(false);
+      filteredApps.length > 0 &&
+        Main.activateWindow(filteredApps[0].meta_window);
     } else {
       boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(app => description(app).toLowerCase().indexOf(o.text.toLowerCase()) !== -1);
