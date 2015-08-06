@@ -63,7 +63,7 @@ function _showUI() {
   container.set_height(monitor.height);
   container.set_position(monitor.x, monitor.y);
 
-  let width = (boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0));
+  let width = boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0);
   if (width > monitor.width) width = monitor.width - 20;
   boxes.forEach(box => box.set_width(width));
 
