@@ -91,18 +91,14 @@ function _showUI() {
   container.connect('button-press-event', _hideUI);
   global.stage.set_key_focus(entry);
   container.show();
-
 }
 
 function init() {}
 
-
 function enable() {
-  var settings = Convenience.getSettings();
-
   Main.wm.addKeybinding(
     'show-switcher',
-    settings,
+    Convenience.getSettings(),
     Meta.KeyBindingFlags.NONE,
     Shell.ActionMode.NORMAL,
     _showUI);
