@@ -1,5 +1,5 @@
 {
-  "name": "switcher",
+  "name": "Switcher",
   "uuid": "switcher@landau.fi",
   "settings-schema": "org.gnome.shell.extensions.switcher",
   "description": "Switch windows quickly by typing",

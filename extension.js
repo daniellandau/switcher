@@ -9,6 +9,7 @@ const Lang = imports.lang;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Config = imports.misc.config;
 const Gio = imports.gi.Gio;
+const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
 let boxes, container, boxLayout, filteredApps, width;
 
@@ -79,7 +80,6 @@ function _showUI() {
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
 
-  // container.child = boxLayout;
   container.add_actor(boxLayout);
   Main.uiGroup.add_actor(container);
 
@@ -102,19 +102,9 @@ function _showUI() {
 
 function init() {}
 
+
 function enable() {
-  let extension = ExtensionUtils.getCurrentExtension();
-  let schema = extension.metadata['settings-schema'];
-  const GioSSS = Gio.SettingsSchemaSource;
-  let schemaDir = extension.dir.get_child('schemas');
-  let schemaSource = GioSSS.get_default();
-  schemaSource = GioSSS.new_from_directory(schemaDir.get_path(),
-                                           GioSSS.get_default(),
-                                           false);
-
-  let schemaObj = schemaSource.lookup(schema, true);
-  let settings = new Gio.Settings({ settings_schema: schemaObj });
-
+  var settings = Convenience.getSettings();
 
   Main.wm.addKeybinding(
     'show-switcher',
