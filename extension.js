@@ -13,8 +13,6 @@ const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
 let boxes, container, boxLayout, filteredApps, width;
 
-const ESC = 65307, ENTER = 65293;
-
 function _hideUI() {
   Main.uiGroup.remove_actor(container);
   Main.popModal(container);
@@ -61,8 +59,8 @@ function _showUI() {
 
   entry.connect('key-release-event', (o, e) => {
     const symbol = e.get_key_symbol();
-    if (symbol === ESC) _hideUI();
-    else if (symbol === ENTER) {
+    if (symbol === Clutter.KEY_Escape) _hideUI();
+    else if (symbol === Clutter.KEY_Return) {
       _hideUI();
       filteredApps.length > 0 &&
         Main.activateWindow(filteredApps[0].meta_window);
