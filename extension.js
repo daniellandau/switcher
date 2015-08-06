@@ -11,12 +11,12 @@ const Config = imports.misc.config;
 const Gio = imports.gi.Gio;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
-let boxes, container, boxLayout, filteredApps, width;
+let container;
 
 function _hideUI() {
   Main.uiGroup.remove_actor(container);
   Main.popModal(container);
-  boxes = null;
+  container = null;
 }
 
 function makeBox(app) {
@@ -45,17 +45,33 @@ function description(app) {
 
 function _showUI() {
   'use strict';
-  if (boxes) return;
-  boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
-
+  if (container) return;
   container = new St.Bin({reactive: true});
+  let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
   boxLayout.set_vertical(true);
   const apps = global.get_window_actors()
         .filter(w => w.meta_window.get_window_type() == 0);
-  filteredApps = apps;
-  boxes = apps.map(makeBox);
+  let filteredApps = apps;
+
+  let boxes = apps.map(makeBox);
   const entry = new St.Entry({hint_text: 'type filter'});
+  boxLayout.insert_child_at_index(entry, 0);
+  boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
+
+  container.add_actor(boxLayout);
+  Main.uiGroup.add_actor(container);
+
+  let monitor = Main.layoutManager.primaryMonitor;
+  container.set_width(monitor.width);
+  container.set_height(monitor.height);
+  container.set_position(monitor.x, monitor.y);
+
+  let width = (boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0));
+  if (width > monitor.width) width = monitor.width - 20;
+  boxes.forEach(box => box.set_width(width));
+
+  entry.set_width(width);
 
   entry.connect('key-release-event', (o, e) => {
     const symbol = e.get_key_symbol();
@@ -74,22 +90,6 @@ function _showUI() {
       });
     }
   });
-
-  boxLayout.insert_child_at_index(entry, 0);
-  boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
-
-  container.add_actor(boxLayout);
-  Main.uiGroup.add_actor(container);
-
-  let monitor = Main.layoutManager.primaryMonitor;
-  container.set_width(monitor.width);
-  container.set_height(monitor.height);
-  container.set_position(monitor.x, monitor.y);
-
-  width = (boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0));
-  if (width > monitor.width) width = monitor.width - 20;
-  boxes.forEach(box => box.set_width(width));
-  entry.set_width(width);
 
   Main.pushModal(container);
   container.connect('button-press-event', _hideUI);
