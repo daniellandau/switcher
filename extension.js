@@ -2,13 +2,9 @@
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Main = imports.ui.main;
-const Tweener = imports.ui.tweener;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
-const Lang = imports.lang;
 const ExtensionUtils = imports.misc.extensionUtils;
-const Config = imports.misc.config;
-const Gio = imports.gi.Gio;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
 let container;
