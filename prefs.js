@@ -17,8 +17,8 @@ function buildPrefsWidget() {
   label.set_alignment(0, 0.5);
   widget.add(label);
   entry = new Gtk.Entry({margin_bottom: 10,
-                             margin_top: 5,
-                             text: settings.get_strv("show-switcher")[0]});
+                         margin_top: 5,
+                         text: settings.get_strv("show-switcher")[0]});
   entry.connect('changed', _onHotkeyChange);
   widget.add(entry);
 
