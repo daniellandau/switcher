@@ -1,6 +1,5 @@
 ## Before first release
 
-* Whatever account creation and other fluff there is to get it on e.g.o
 * Make source repo available
 
 ## After release
