@@ -7,7 +7,7 @@ switching windows by typing.
 
 ### Installation
 
-Download from https://extensions.gnome.org/extension/foo/bar/not-yet-there or
+Download from https://extensions.gnome.org/extension/973/switcher/ or
 checkout to the correct place as
 
 ```
