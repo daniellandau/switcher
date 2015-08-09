@@ -3,11 +3,11 @@
 Switcher is a [Gnome Shell extension](https://extensions.gnome.org) for quickly
 switching windows by typing.
 
-[running.gif]
+[](running.gif)
 
 ### Installation
 
-Download from [https://extensions.gnome.org/extension/foo/bar/not-yet-there] or
+Download from https://extensions.gnome.org/extension/foo/bar/not-yet-there or
 checkout to the correct place as
 
 ```
