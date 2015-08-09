@@ -4,6 +4,7 @@
   "settings-schema": "org.gnome.shell.extensions.switcher",
   "description": "Switch windows quickly by typing",
   "shell-version": [
-    "3.16.3"
-  ]
+    "3.16"
+  ],
+  "version": 1
 }
