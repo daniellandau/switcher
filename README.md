@@ -27,7 +27,7 @@ key to cancel and the Return key to activate the window at the top of the list.
 ## Contributing
 
 Contributions are welcome and I will try my best to answer quickly to all
-suggestions. If you start working on something mentioned in [TODO.md], let me
+suggestions. If you start working on something mentioned in [TODO.md](TODO.md), let me
 know so I don't scoop you.
 
 ## License
