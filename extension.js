@@ -25,6 +25,12 @@ const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
 let container;
 
+function makeFilter(text) {
+  return function(app) {
+    return text.split(" ").every(fragment => description(app).toLowerCase().indexOf(fragment.toLowerCase()) !== -1);
+  };
+}
+
 function _hideUI() {
   Main.uiGroup.remove_actor(container);
   Main.popModal(container);
@@ -94,7 +100,7 @@ function _showUI() {
         Main.activateWindow(filteredApps[0].meta_window);
     } else {
       boxes.forEach(box => boxLayout.remove_child(box));
-      filteredApps = apps.filter(app => description(app).toLowerCase().indexOf(o.text.toLowerCase()) !== -1);
+      filteredApps = apps.filter(makeFilter(o.text));
       boxes = filteredApps.map(makeBox);
       boxes.forEach((box) => {
         box.set_width(width);
