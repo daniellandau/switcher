@@ -4,3 +4,4 @@
 * Explicit visual cancel and enter buttons
 * Stable sequence of apps
 * Extension icon
+* Compatible with more gnome-shell versions
