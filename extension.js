@@ -68,14 +68,15 @@ function _showUI() {
 
   // Get all windows in activation order
   const apps = global.display.get_tab_list(Meta.TabList.NORMAL, null);
-  let filteredApps = apps;
 
   // swap the first two, so we can switch quickly back and forth
-  if (filteredApps.length >= 2) {
-    const tmp = filteredApps[0];
-    filteredApps[0] = filteredApps[1];
-    filteredApps[1] = tmp;
+  if (apps.length >= 2) {
+    const tmp = apps[0];
+    apps[0] = apps[1];
+    apps[1] = tmp;
   }
+
+  let filteredApps = apps;
 
   let boxes = filteredApps.map(makeBox);
   const entry = new St.Entry({hint_text: 'type filter'});
