@@ -58,7 +58,7 @@ function description(app) {
   return appName + ' → ' + app.get_title();
 }
 
-function addHighlight(boxes) {
+function updateHighlight(boxes) {
   boxes.forEach(box => box.remove_style_class_name('switcher-highlight'));
   boxes.length > cursor && boxes[cursor].add_style_class_name('switcher-highlight');
 }
@@ -86,7 +86,7 @@ function _showUI() {
   let filteredApps = apps;
 
   let boxes = filteredApps.map(makeBox);
-  addHighlight(boxes);
+  updateHighlight(boxes);
   const entry = new St.Entry({hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
@@ -111,12 +111,18 @@ function _showUI() {
     else if (symbol === Clutter.KEY_Return) {
       _hideUI();
       filteredApps.length > 0 &&
-        Main.activateWindow(filteredApps[0]);
+        Main.activateWindow(filteredApps[cursor]);
+    } else if (symbol === Clutter.KEY_Down) {
+      cursor = cursor + 1 < boxes.length ? cursor + 1 : cursor;
+      updateHighlight(boxes);
+    } else if (symbol === Clutter.KEY_Up) {
+      cursor = cursor > 0 ? cursor - 1 : cursor;
+      updateHighlight(boxes);
     } else {
       boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(makeFilter(o.text));
       boxes = filteredApps.map(makeBox);
-      addHighlight(boxes);
+      updateHighlight(boxes);
       boxes.forEach((box) => {
         box.set_width(width);
         boxLayout.insert_child_at_index(box, -1);
