@@ -44,7 +44,7 @@ function makeBox(app) {
     text: description(app)
   });
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
-  const appRef = Shell.WindowTracker.get_default().get_window_app(app.meta_window);
+  const appRef = Shell.WindowTracker.get_default().get_window_app(app);
   iconBox.child = appRef.create_icon_texture(36);
   box.insert_child_at_index(label, 0);
   label.set_x_expand(true);
@@ -53,12 +53,9 @@ function makeBox(app) {
 }
 
 function description(app) {
-  const appSys = Shell.AppSystem.get_default();
-  const wm_class = app.meta_window.get_wm_class();
-  const desktop_wmclass = appSys.lookup_desktop_wmclass(wm_class);
-  const appRef = Shell.WindowTracker.get_default().get_window_app(app.meta_window);
+  const appRef = Shell.WindowTracker.get_default().get_window_app(app);
   const appName = appRef.get_name();
-  return appName + ' → ' + app.meta_window.get_title();
+  return appName + ' → ' + app.get_title();
 }
 
 function _showUI() {
@@ -68,11 +65,19 @@ function _showUI() {
   let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
   boxLayout.set_vertical(true);
-  const apps = global.get_window_actors()
-        .filter(w => w.meta_window.get_window_type() == 0);
+
+  // Get all windows in activation order
+  const apps = global.display.get_tab_list(Meta.TabList.NORMAL, null);
   let filteredApps = apps;
 
-  let boxes = apps.map(makeBox);
+  // swap the first two, so we can switch quickly back and forth
+  if (filteredApps.length >= 2) {
+    const tmp = filteredApps[0];
+    filteredApps[0] = filteredApps[1];
+    filteredApps[1] = tmp;
+  }
+
+  let boxes = filteredApps.map(makeBox);
   const entry = new St.Entry({hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
@@ -97,7 +102,7 @@ function _showUI() {
     else if (symbol === Clutter.KEY_Return) {
       _hideUI();
       filteredApps.length > 0 &&
-        Main.activateWindow(filteredApps[0].meta_window);
+        Main.activateWindow(filteredApps[0]);
     } else {
       boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(makeFilter(o.text));
