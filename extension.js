@@ -23,7 +23,7 @@ const Meta = imports.gi.Meta;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
-let container;
+let container, cursor;
 
 function makeFilter(text) {
   return function(app) {
@@ -58,10 +58,17 @@ function description(app) {
   return appName + ' → ' + app.get_title();
 }
 
+function addHighlight(boxes) {
+  boxes.forEach(box => box.remove_style_class_name('switcher-highlight'));
+  boxes.length > cursor && boxes[cursor].add_style_class_name('switcher-highlight');
+}
+
 function _showUI() {
   'use strict';
   if (container) return;
   container = new St.Bin({reactive: true});
+  cursor = 0;
+
   let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
   boxLayout.set_vertical(true);
@@ -79,7 +86,7 @@ function _showUI() {
   let filteredApps = apps;
 
   let boxes = filteredApps.map(makeBox);
-  boxes.length > 0 && boxes[0].add_style_class_name('switcher-highlight');
+  addHighlight(boxes);
   const entry = new St.Entry({hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
@@ -109,7 +116,7 @@ function _showUI() {
       boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(makeFilter(o.text));
       boxes = filteredApps.map(makeBox);
-      boxes.length > 0 && boxes[0].add_style_class_name('switcher-highlight');
+      addHighlight(boxes);
       boxes.forEach((box) => {
         box.set_width(width);
         boxLayout.insert_child_at_index(box, -1);
