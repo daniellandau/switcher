@@ -143,7 +143,8 @@ function enable() {
     'show-switcher',
     Convenience.getSettings(),
     Meta.KeyBindingFlags.NONE,
-    Shell.ActionMode.NORMAL,
+    // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
+    Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL : Shell.ActionMode.NORMAL,
     _showUI);
 }
 
