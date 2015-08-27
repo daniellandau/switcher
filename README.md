@@ -50,6 +50,8 @@ Shell Extensions I'll list here where I got information from.
   which is written for the C library, but can be used for JS too, using e.g.
   `new St.Label()` to make a an StLabel.
 
+The icon is based on the "Restore Window" icon by Lloyd Humphreys from the Noun Project, used under a CC-BY version 3.0 license.
+
 I thank my employer [Futurice](https://github.com/futurice/) for providing
 monetary sponsorship for this work through the
 [Spice Program](http://spiceprogram.org/oss-sponsorship/)
