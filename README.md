@@ -45,7 +45,7 @@ Shell Extensions I'll list here where I got information from.
 * The source code of [Project Hamster Extension](https://github.com/projecthamster/shell-extension)
 * The source code of [Window List Extension](http://git.gnome.org/gnome-shell-extensions)
 * The source code of [Gnome Shell itself](https://git.gnome.org/browse/gnome-shell/) (especially the file js/ui/switcherPopup.js)
-* The documentation listed in this [Stackoverflow answer](stackoverflow.com/questions/13107743/documentation-for-writing-gnome-shell-extensions)
+* The documentation listed in this [Stackoverflow answer](https://stackoverflow.com/questions/13107743/documentation-for-writing-gnome-shell-extensions)
 * The [Shell Toolkit documentation](https://developer.gnome.org/st/stable/),
   which is written for the C library, but can be used for JS too, using e.g.
   `new St.Label()` to make a an StLabel.
