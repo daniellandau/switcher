@@ -14,6 +14,7 @@ function buildPrefsWidget() {
   widget.margin = 10;
 
   addShortcut(widget, settings);
+  addImmediately(widget, settings);
 
   widget.show_all();
   return widget;
@@ -53,4 +54,26 @@ function addShortcut(widget, settings) {
   column.add_attribute(accelerator, 'accel-key', 1);
   treeView.append_column(column);
   widget.add(treeView);
+}
+
+function addImmediately(widget, settings) {
+  let title = new Gtk.Label({margin_top: 20, margin_bottom: 5});
+
+  title.set_markup("<b>Immediate activation</b>");
+  title.set_alignment(0, 0.5);
+  widget.add(title);
+
+  let box = new Gtk.HBox();
+  let label = new Gtk.Label();
+  label.set_markup("When there is just one result, activate immediately");
+  label.set_alignment(0, 0.5);
+  box.add(label);
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('activate-immediately')
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('activate-immediately', o.active);
+  });
+  box.add(_switch);
+  widget.add(box);
 }

@@ -5,5 +5,9 @@
             <default><![CDATA[['<Super>w']]]></default>
             <summary>Global key combination to show the switcher.</summary>
         </key>
+        <key type="b" name="activate-immediately">
+            <default>false</default>
+            <summary>Whether to activate immediately when there is just one result.</summary>
+        </key>
     </schema>
 </schemalist>

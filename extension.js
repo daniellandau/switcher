@@ -126,6 +126,12 @@ function _showUI() {
     } else {
       boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(makeFilter(o.text));
+      if (Convenience.getSettings().get_boolean('activate-immediately') &&
+          filteredApps.length === 1) {
+        _hideUI();
+        Main.activateWindow(filteredApps[cursor]);
+      }
+
       boxes = filteredApps.map(makeBox);
       updateHighlight(boxes);
       boxes.forEach((box) => {
