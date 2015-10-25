@@ -13,6 +13,13 @@ function buildPrefsWidget() {
   let widget = new Gtk.VBox();
   widget.margin = 10;
 
+  addShortcut(widget, settings);
+
+  widget.show_all();
+  return widget;
+}
+
+function addShortcut(widget, settings) {
   let label = new Gtk.Label({margin_top: 20, margin_bottom: 5});
   label.set_markup("<b>Hotkey to activate switcher</b>");
   label.set_alignment(0, 0.5);
@@ -46,7 +53,4 @@ function buildPrefsWidget() {
   column.add_attribute(accelerator, 'accel-key', 1);
   treeView.append_column(column);
   widget.add(treeView);
-
-  widget.show_all();
-  return widget;
 }
