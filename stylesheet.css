@@ -1,11 +1,10 @@
 .switcher-label, .switcher-icon {
-  font-size: 36px;
   font-weight: bold;
   color: #ffffff;
   background-color: rgba(10,10,10,0.7);
   padding: .5em;
   border-style: solid;
-  border-color: #eee;
+  border-color: rgba(60,60,60,0.7);
   border-width: 1px;
 }
 

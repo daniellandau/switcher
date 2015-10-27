@@ -9,5 +9,9 @@
             <default>false</default>
             <summary>Whether to activate immediately when there is just one result.</summary>
         </key>
+        <key type="u" name="font-size">
+            <default>32</default>
+            <summary>Font and icon size</summary>
+        </key>
     </schema>
 </schemalist>

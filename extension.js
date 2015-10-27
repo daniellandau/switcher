@@ -38,14 +38,16 @@ function _hideUI() {
 }
 
 function makeBox(app) {
+  const fontSize = Convenience.getSettings().get_uint('font-size');
   const box = new St.BoxLayout({style_class: 'switcher-box'});
   const label = new St.Label({
     style_class: 'switcher-label',
     text: description(app)
   });
+  label.set_style("font-size: "+fontSize+"px");
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
-  iconBox.child = appRef.create_icon_texture(36);
+  iconBox.child = appRef.create_icon_texture(fontSize);
   box.insert_child_at_index(label, 0);
   label.set_x_expand(true);
   box.insert_child_at_index(iconBox, 0);
@@ -104,7 +106,7 @@ function _showUI() {
   container.set_height(monitor.height);
   container.set_position(monitor.x, monitor.y);
 
-  let width = boxes.map(text => text.width).reduce((a, b) => Math.max(a, b), 0);
+  let width = boxes.map(box => box.width).reduce((a, b) => Math.max(a, b), 0);
   if (width > monitor.width) width = monitor.width - 20;
   boxes.forEach(box => box.set_width(width));
 

@@ -1,6 +1,6 @@
 # From feedback
 * customizing look and feel with themes
-* font is too big and UI fills whole screen on 1600x900 (should be customizable)
+* UI fills whole screen on 1600x900 (should be customizable)
 
 # Otherwise
 * highlighting the matched parts in the texts

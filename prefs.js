@@ -15,16 +15,14 @@ function buildPrefsWidget() {
 
   addShortcut(widget, settings);
   addImmediately(widget, settings);
+  addFontSize(widget, settings);
 
   widget.show_all();
   return widget;
 }
 
 function addShortcut(widget, settings) {
-  let label = new Gtk.Label({margin_top: 20, margin_bottom: 5});
-  label.set_markup("<b>Hotkey to activate switcher</b>");
-  label.set_alignment(0, 0.5);
-  widget.add(label);
+  widget.add(makeTitle("<b>Hotkey to activate switcher</b>"));
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
@@ -57,11 +55,7 @@ function addShortcut(widget, settings) {
 }
 
 function addImmediately(widget, settings) {
-  let title = new Gtk.Label({margin_top: 20, margin_bottom: 5});
-
-  title.set_markup("<b>Immediate activation</b>");
-  title.set_alignment(0, 0.5);
-  widget.add(title);
+  widget.add(makeTitle("<b>Immediate activation</b>"));
 
   let box = new Gtk.HBox();
   let label = new Gtk.Label();
@@ -76,4 +70,30 @@ function addImmediately(widget, settings) {
   });
   box.add(_switch);
   widget.add(box);
+}
+
+function addFontSize(widget, settings) {
+  widget.add(makeTitle("<b>Font size (px)</b>"));
+
+  let input = new Gtk.SpinButton({
+    adjustment: new Gtk.Adjustment({
+      lower: 10,
+      upper: 64,
+      step_increment: 1
+    })
+  });
+  input.set_value(settings.get_uint('font-size'));
+  input.connect('value-changed', function(button) {
+    settings.set_uint('font-size', button.get_value_as_int());
+  });
+  widget.add(input);
+
+}
+
+function makeTitle(markup) {
+  let title = new Gtk.Label({margin_top: 20, margin_bottom: 5});
+
+  title.set_markup(markup);
+  title.set_alignment(0, 0.5);
+  return title;
 }
