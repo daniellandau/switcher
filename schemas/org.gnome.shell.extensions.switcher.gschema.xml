@@ -13,5 +13,9 @@
             <default>32</default>
             <summary>Font and icon size</summary>
         </key>
+        <key type="u" name="max-width-percentage">
+            <default>95</default>
+            <summary>Maximum percentage of screen width to take</summary>
+        </key>
     </schema>
 </schemalist>

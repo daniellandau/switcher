@@ -107,7 +107,8 @@ function _showUI() {
   container.set_position(monitor.x, monitor.y);
 
   let width = boxes.map(box => box.width).reduce((a, b) => Math.max(a, b), 0);
-  if (width > monitor.width) width = monitor.width - 20;
+  const maxWidth = monitor.width * 0.01 * Convenience.getSettings().get_uint('max-width-percentage');
+  if (width > maxWidth) width = maxWidth;
   boxes.forEach(box => box.set_width(width));
 
   entry.set_width(width);

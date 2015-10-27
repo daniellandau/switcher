@@ -16,6 +16,7 @@ function buildPrefsWidget() {
   addShortcut(widget, settings);
   addImmediately(widget, settings);
   addFontSize(widget, settings);
+  addMaxWidth(widget, settings);
 
   widget.show_all();
   return widget;
@@ -87,8 +88,24 @@ function addFontSize(widget, settings) {
     settings.set_uint('font-size', button.get_value_as_int());
   });
   widget.add(input);
-
 }
+
+function addMaxWidth(widget, settings) {
+  widget.add(makeTitle("<b>Max width (%)</b>"));
+  let input = new Gtk.SpinButton({
+    adjustment: new Gtk.Adjustment({
+      lower: 10,
+      upper: 100,
+      step_increment: 1
+    })
+  });
+  input.set_value(settings.get_uint('max-width-percentage'));
+  input.connect('value-changed', function(button) {
+    settings.set_uint('max-width-percentage', button.get_value_as_int());
+  });
+  widget.add(input);
+}
+
 
 function makeTitle(markup) {
   let title = new Gtk.Label({margin_top: 20, margin_bottom: 5});
