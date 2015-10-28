@@ -1,6 +1,5 @@
 # From feedback
 * customizing look and feel with themes
-* UI fills whole screen on 1600x900 (should be customizable)
 
 # Otherwise
 * highlighting the matched parts in the texts
