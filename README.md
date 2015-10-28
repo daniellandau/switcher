@@ -44,6 +44,7 @@ Shell Extensions I'll list here where I got information from.
 
 * The source code of [Project Hamster Extension](https://github.com/projecthamster/shell-extension)
 * The source code of [Window List Extension](http://git.gnome.org/gnome-shell-extensions)
+* The source code of [Todo.txt Extension](https://extensions.gnome.org/extension/570/todotxt/)
 * The source code of [Gnome Shell itself](https://git.gnome.org/browse/gnome-shell/) (especially the file js/ui/switcherPopup.js)
 * The documentation listed in this [Stackoverflow answer](stackoverflow.com/questions/13107743/documentation-for-writing-gnome-shell-extensions)
 * The [Shell Toolkit documentation](https://developer.gnome.org/st/stable/),
