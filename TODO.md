@@ -1,5 +1,6 @@
 # From feedback
 * customizing look and feel with themes
+* Hide with same keybinding
 
 # Otherwise
 * highlighting the matched parts in the texts
