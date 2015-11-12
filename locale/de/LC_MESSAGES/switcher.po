@@ -7,16 +7,32 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-27 13:48-0200\n"
-"PO-Revision-Date: 2015-10-27 13:50-0300\n"
+"POT-Creation-Date: 2015-11-12 18:44+0200\n"
+"PO-Revision-Date: 2015-11-12 18:45+0200\n"
+"Last-Translator: Jonatan Zeidler <jonatan_zeidler@gmx.de>\n"
+"Language-Team: \n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Last-Translator: Jonatan Zeidler <jonatan_zeidler@gmx.de>\n"
-"Language-Team: \n"
-"X-Generator: Poedit 1.7.7\n"
+"X-Generator: Poedit 1.8.5\n"
 
-#: prefs.js:21
+#: prefs.js:33
 msgid "Hotkey to activate switcher"
 msgstr "Tastenkürzel zum Aktivieren des Fensterwechslers"
+
+#: prefs.js:66
+msgid "Immediate activation"
+msgstr ""
+
+#: prefs.js:70
+msgid "When there is just one result, activate immediately"
+msgstr ""
+
+#: prefs.js:84
+msgid "Font size (px)"
+msgstr ""
+
+#: prefs.js:101
+msgid "Max width (%)"
+msgstr ""
