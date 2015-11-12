@@ -5,7 +5,14 @@ const GObject = imports.gi.GObject;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
-function init() {}
+const Gettext = imports.gettext.domain('switcher');
+const _ = Gettext.gettext;
+
+let entry, settings;
+
+function init() {
+  Convenience.initTranslations("switcher");
+}
 
 function buildPrefsWidget() {
   let settings = Convenience.getSettings();
@@ -23,7 +30,7 @@ function buildPrefsWidget() {
 }
 
 function addShortcut(widget, settings) {
-  widget.add(makeTitle("<b>Hotkey to activate switcher</b>"));
+  widget.add(makeTitle(_("Hotkey to activate switcher")));
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
@@ -56,11 +63,11 @@ function addShortcut(widget, settings) {
 }
 
 function addImmediately(widget, settings) {
-  widget.add(makeTitle("<b>Immediate activation</b>"));
+  widget.add(makeTitle(_("Immediate activation")));
 
   let box = new Gtk.HBox();
   let label = new Gtk.Label();
-  label.set_markup("When there is just one result, activate immediately");
+  label.set_markup(_("When there is just one result, activate immediately"));
   label.set_alignment(0, 0.5);
   box.add(label);
   let _switch = new Gtk.Switch({
@@ -74,7 +81,7 @@ function addImmediately(widget, settings) {
 }
 
 function addFontSize(widget, settings) {
-  widget.add(makeTitle("<b>Font size (px)</b>"));
+  widget.add(makeTitle(_("Font size (px)")));
 
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
@@ -91,7 +98,7 @@ function addFontSize(widget, settings) {
 }
 
 function addMaxWidth(widget, settings) {
-  widget.add(makeTitle("<b>Max width (%)</b>"));
+  widget.add(makeTitle(_("Max width (%)")));
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
       lower: 10,
@@ -110,7 +117,7 @@ function addMaxWidth(widget, settings) {
 function makeTitle(markup) {
   let title = new Gtk.Label({margin_top: 20, margin_bottom: 5});
 
-  title.set_markup(markup);
+  title.set_markup("<b>"+markup+"</b>");
   title.set_alignment(0, 0.5);
   return title;
 }
