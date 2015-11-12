@@ -5,7 +5,14 @@ const GObject = imports.gi.GObject;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
-function init() {}
+const Gettext = imports.gettext.domain('switcher');
+const _ = Gettext.gettext;
+
+let entry, settings;
+
+function init() {
+  Convenience.initTranslations("switcher");
+}
 
 function buildPrefsWidget() {
   let settings = Convenience.getSettings();
@@ -23,7 +30,7 @@ function buildPrefsWidget() {
 }
 
 function addShortcut(widget, settings) {
-  widget.add(makeTitle("<b>Hotkey to activate switcher</b>"));
+  widget.add(makeTitle("<b>"+_("Hotkey to activate switcher")+"</b>"));
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
