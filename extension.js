@@ -94,7 +94,7 @@ function _showUI() {
 
   let boxes = filteredApps.map(makeBox);
   updateHighlight(boxes);
-  const entry = new St.Entry({hint_text: 'type filter'});
+  const entry = new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
 

@@ -22,3 +22,7 @@
 .switcher-highlight {
   background-color: rgba(100, 100, 200, 0.9);
 }
+
+.switcher-entry {
+  background-color: rgba(41, 41, 41, 1);
+}
