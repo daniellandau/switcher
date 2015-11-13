@@ -6,7 +6,6 @@
 * Optionally darken screen / some similar effect when showing the switcher
 
 # Bugs
-* input box is transparent on Debian Jessie with 3.14
 
 # Otherwise
 * highlighting the matched parts in the texts
