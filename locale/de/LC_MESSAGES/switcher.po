@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-12 17:30-0200\n"
-"PO-Revision-Date: 2015-11-12 17:31-0200\n"
+"POT-Creation-Date: 2015-11-23 11:34-0200\n"
+"PO-Revision-Date: 2015-11-23 11:34-0200\n"
 "Last-Translator: Jonatan Zeidler <jonatan_zeidler@gmx.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -20,6 +20,10 @@ msgstr ""
 #: prefs.js:33
 msgid "Hotkey to activate switcher"
 msgstr "Tastenkürzel zum Aktivieren des Fensterwechslers"
+
+#: prefs.js:57
+msgid "Key"
+msgstr "Kürzel"
 
 #: prefs.js:66
 msgid "Immediate activation"

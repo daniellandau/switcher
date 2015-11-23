@@ -54,7 +54,7 @@ function addShortcut(widget, settings) {
     }
   });
 
-  let column = new Gtk.TreeViewColumn({title: 'Key'});
+  let column = new Gtk.TreeViewColumn({title: _("Key")});
   column.pack_start(accelerator, false);
   column.add_attribute(accelerator, 'accel-mods', 0);
   column.add_attribute(accelerator, 'accel-key', 1);
