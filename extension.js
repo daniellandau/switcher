@@ -24,6 +24,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
 let container, cursor;
+let indexToApp = {};
 
 function makeFilter(text) {
   return function(app) {
@@ -40,6 +41,12 @@ function _hideUI() {
 function makeBox(app) {
   const fontSize = Convenience.getSettings().get_uint('font-size');
   const box = new St.BoxLayout({style_class: 'switcher-box'});
+  const shortcut = new St.Label({
+    style_class: 'switcher-label',
+      text: indexForApp(app) > 0 ? "F" + indexForApp(app) : ""
+  });
+  shortcut.set_style("font-size: "+fontSize+"px");
+  box.insert_child_at_index(shortcut, 0);
   const label = new St.Label({
     style_class: 'switcher-label',
     text: description(app)
@@ -70,6 +77,15 @@ function updateHighlight(boxes) {
   boxes.length > cursor && boxes[cursor].add_style_class_name('switcher-highlight');
 }
 
+function indexForApp(app) {
+  for (var index in indexToApp) {
+    if (indexToApp[index] === app) {
+      return index;
+    }
+  }
+  return null;
+}
+
 function _showUI() {
   'use strict';
   if (container) return;
@@ -82,6 +98,12 @@ function _showUI() {
 
   // Get all windows in activation order
   const apps = global.display.get_tab_list(Meta.TabList.NORMAL, null);
+  // add an index for each app, up to 12.
+  for (var i=0;i<12;i++) {
+    if (!indexToApp[i+1]) {
+      indexToApp[i+1] = apps[i];
+    }
+  }
 
   // swap the first two, so we can switch quickly back and forth
   if (apps.length >= 2) {
@@ -126,6 +148,42 @@ function _showUI() {
     } else if (symbol === Clutter.KEY_Up) {
       cursor = cursor > 0 ? cursor - 1 : cursor;
       updateHighlight(boxes);
+    } else if (symbol == Clutter.KEY_F1) {
+      _hideUI();
+      Main.activateWindow(indexToApp[1]);
+    } else if (symbol == Clutter.KEY_F2) {
+      _hideUI();
+      Main.activateWindow(indexToApp[2]);
+    } else if (symbol == Clutter.KEY_F3) {
+      _hideUI();
+      Main.activateWindow(indexToApp[3]);
+    } else if (symbol == Clutter.KEY_F4) {
+      _hideUI();
+      Main.activateWindow(indexToApp[4]);
+    } else if (symbol == Clutter.KEY_F5) {
+      _hideUI();
+      Main.activateWindow(indexToApp[5]);
+    } else if (symbol == Clutter.KEY_F6) {
+      _hideUI();
+      Main.activateWindow(indexToApp[6]);
+    } else if (symbol == Clutter.KEY_F7) {
+      _hideUI();
+      Main.activateWindow(indexToApp[7]);
+    } else if (symbol == Clutter.KEY_F8) {
+      _hideUI();
+      Main.activateWindow(indexToApp[8]);
+    } else if (symbol == Clutter.KEY_F9) {
+      _hideUI();
+      Main.activateWindow(indexToApp[9]);
+    } else if (symbol == Clutter.KEY_F10) {
+      _hideUI();
+      Main.activateWindow(indexToApp[10]);
+    } else if (symbol == Clutter.KEY_F11) {
+      _hideUI();
+      Main.activateWindow(indexToApp[11]);
+    } else if (symbol == Clutter.KEY_F12) {
+      _hideUI();
+      Main.activateWindow(indexToApp[12]);
     } else {
       boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(makeFilter(o.text));
