@@ -19,11 +19,46 @@ const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
+const Gtk = imports.gi.Gtk;
 const Meta = imports.gi.Meta;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
+const keyActivationNone         = 0;
+const keyActivationFunctionKeys = 1
+const keyActivationNumbers      = 2;
+
 let container, cursor;
+const functionKeySymbols = [
+    Clutter.KEY_F1,
+    Clutter.KEY_F2,
+    Clutter.KEY_F3,
+    Clutter.KEY_F4,
+    Clutter.KEY_F5,
+    Clutter.KEY_F6,
+    Clutter.KEY_F7,
+    Clutter.KEY_F8,
+    Clutter.KEY_F9,
+    Clutter.KEY_F10,
+    Clutter.KEY_F11,
+    Clutter.KEY_F12
+];
+const numberKeySymbols = [
+    Clutter.KEY_1,
+    Clutter.KEY_2,
+    Clutter.KEY_3,
+    Clutter.KEY_4,
+    Clutter.KEY_5,
+    Clutter.KEY_6,
+    Clutter.KEY_7,
+    Clutter.KEY_8,
+    Clutter.KEY_9,
+    Clutter.KEY_0,
+];
+
+const maxWidth = Main.layoutManager.primaryMonitor.width * 0.01 *
+          Convenience.getSettings().get_uint('max-width-percentage');
+const keyColWidth = maxWidth / 15;
 
 function makeFilter(text) {
   return function(app) {
@@ -37,9 +72,21 @@ function _hideUI() {
   container = null;
 }
 
-function makeBox(app) {
+function makeBox(app, index) {
   const fontSize = Convenience.getSettings().get_uint('font-size');
   const box = new St.BoxLayout({style_class: 'switcher-box'});
+  if (getActionKeyTable().length > 0) {
+    const shortcut = new St.Label({
+      style_class: 'switcher-label',
+      text: getKeyDesc(index+1),
+      width: keyColWidth,
+      min_width: keyColWidth
+    });
+    shortcut.set_style("font-size: "+fontSize+"px; text-align: center; padding: 0");
+    const shortcutBox = new St.Bin({style_class: 'switcher-icon'});
+    shortcutBox.child = shortcut;
+    box.insert_child_at_index(shortcutBox, 0);
+  }
   const label = new St.Label({
     style_class: 'switcher-label',
     text: description(app)
@@ -95,6 +142,10 @@ function _showUI() {
   let boxes = filteredApps.map(makeBox);
   updateHighlight(boxes);
   const entry = new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
+  if (getActivateByKey() === keyActivationNumbers) {
+    // if we let the user enter digits in the entry, we can't capture them.
+    entry.set_input_purpose(Gtk.InputPurpose.ALPHA);
+  }
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box, -1));
 
@@ -107,7 +158,6 @@ function _showUI() {
   container.set_position(monitor.x, monitor.y);
 
   let width = boxes.map(box => box.width).reduce((a, b) => Math.max(a, b), 0);
-  const maxWidth = monitor.width * 0.01 * Convenience.getSettings().get_uint('max-width-percentage');
   if (width > maxWidth) width = maxWidth;
   boxes.forEach(box => box.set_width(width));
 
@@ -115,6 +165,7 @@ function _showUI() {
 
   entry.connect('key-release-event', (o, e) => {
     const symbol = e.get_key_symbol();
+    let fkeyIndex = getActionKeyTable().indexOf(symbol);
     if (symbol === Clutter.KEY_Escape) _hideUI();
     else if (symbol === Clutter.KEY_Return) {
       _hideUI();
@@ -126,6 +177,9 @@ function _showUI() {
     } else if (symbol === Clutter.KEY_Up) {
       cursor = cursor > 0 ? cursor - 1 : cursor;
       updateHighlight(boxes);
+    } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
+      _hideUI();
+      Main.activateWindow(filteredApps[fkeyIndex]);
     } else {
       boxes.forEach(box => boxLayout.remove_child(box));
       filteredApps = apps.filter(makeFilter(o.text));
@@ -148,6 +202,33 @@ function _showUI() {
   container.connect('button-press-event', _hideUI);
   global.stage.set_key_focus(entry);
   container.show();
+}
+
+function getActivateByKey() {
+    return Convenience.getSettings().get_uint('activate-by-key');
+}
+
+function getKeyDesc(index) {
+    switch (getActivateByKey()) {
+    case keyActivationFunctionKeys:
+        return index > 12 ? "" : "F" + index;
+    case keyActivationNumbers:
+        return index > 10 ? "" : (index % 10).toString();
+    default:
+        print("getKeyDesc error: " + index);
+        return "";
+    }
+}
+
+function getActionKeyTable() {
+    switch (getActivateByKey()) {
+    case keyActivationFunctionKeys:
+        return functionKeySymbols;
+    case keyActivationNumbers:
+        return numberKeySymbols;
+    default:
+        return [];
+    }
 }
 
 function init() {}
