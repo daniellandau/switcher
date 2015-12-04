@@ -17,5 +17,9 @@
             <default>95</default>
             <summary>Maximum percentage of screen width to take</summary>
         </key>
+        <key type="u" name="activate-by-key">
+            <default>0</default>
+            <summary>Activate by pressing the index in the list: 0=No, 1=Function keys, 2=Number keys</summary>
+        </key>
     </schema>
 </schemalist>
