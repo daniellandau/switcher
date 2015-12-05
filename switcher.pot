@@ -6,37 +6,55 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-23 11:34-0200\n"
+"POT-Creation-Date: 2015-12-05 15:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.6\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: prefs.js\n"
 
-#: prefs.js:33
+#: prefs.js:34
 msgid "Hotkey to activate switcher"
 msgstr ""
 
-#: prefs.js:57
+#: prefs.js:58
 msgid "Key"
 msgstr ""
 
-#: prefs.js:66
+#: prefs.js:67
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:70
+#: prefs.js:71
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:84
+#: prefs.js:85
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:101
+#: prefs.js:102
 msgid "Max width (%)"
+msgstr ""
+
+#: prefs.js:118
+msgid "Activate by pressing a key matching the index in the list"
+msgstr ""
+
+#: prefs.js:119
+msgid "Disable"
+msgstr ""
+
+#: prefs.js:119
+msgid "Function keys"
+msgstr ""
+
+#: prefs.js:119
+msgid "Number keys"
 msgstr ""
