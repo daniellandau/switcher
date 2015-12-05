@@ -26,3 +26,9 @@
 .switcher-entry {
   background-color: rgba(41, 41, 41, 1);
 }
+
+.switcher-shortcut {
+  text-align: center;
+  padding-left: .5em;
+  padding-right: .5em;
+}
