@@ -11,7 +11,7 @@
 .switcher-box:last-child .switcher-icon {
   border-radius: 0 0 0 9px;
 }
-.switcher-box:last-child .switcher-label {
+.switcher-box:last-child .switcher-label:last-child {
   border-radius: 0 0 9px 0;
 }
 
@@ -25,4 +25,10 @@
 
 .switcher-entry {
   background-color: rgba(41, 41, 41, 1);
+}
+
+.switcher-shortcut {
+  text-align: center;
+  padding-left: .5em;
+  padding-right: .5em;
 }

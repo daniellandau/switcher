@@ -11,7 +11,7 @@ const _ = Gettext.gettext;
 let entry, settings;
 
 function init() {
-  Convenience.initTranslations("switcher");
+  Convenience.initTranslations('switcher');
 }
 
 function buildPrefsWidget() {
@@ -24,6 +24,7 @@ function buildPrefsWidget() {
   addImmediately(widget, settings);
   addFontSize(widget, settings);
   addMaxWidth(widget, settings);
+  addActivateByKey(widget, settings);
 
   widget.show_all();
   return widget;
@@ -36,7 +37,7 @@ function addShortcut(widget, settings) {
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
 
   const row = model.insert(0);
-  let [key, mods] = Gtk.accelerator_parse(settings.get_strv("show-switcher")[0]);
+  let [key, mods] = Gtk.accelerator_parse(settings.get_strv('show-switcher')[0]);
   model.set(row, [0, 1], [mods, key]);
 
   let treeView = new Gtk.TreeView({model: model});
@@ -50,7 +51,7 @@ function addShortcut(widget, settings) {
     let [succ, iterator] = model.get_iter_from_string(iter);
     model.set(iterator, [0, 1], [mods, key]);
     if (key != 0) {
-      settings.set_strv("show-switcher", [value]);
+      settings.set_strv('show-switcher', [value]);
     }
   });
 
@@ -113,11 +114,22 @@ function addMaxWidth(widget, settings) {
   widget.add(input);
 }
 
+function addActivateByKey(widget, settings) {
+    widget.add(makeTitle(_("Activate by pressing a key matching the index in the list")));
+    let options = [_("Disable"), _("Function keys"), _("Number keys")];
+    let input = new Gtk.ComboBoxText();
+    options.forEach(o => input.append_text(o));
+    input.set_active(settings.get_uint('activate-by-key'));
+    input.connect('changed', function() {
+        settings.set_uint('activate-by-key', input.get_active());
+    });
+    widget.add(input);
+}
 
 function makeTitle(markup) {
   let title = new Gtk.Label({margin_top: 20, margin_bottom: 5});
 
-  title.set_markup("<b>"+markup+"</b>");
+  title.set_markup('<b>'+markup+'</b>');
   title.set_alignment(0, 0.5);
   return title;
 }
