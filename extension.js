@@ -78,7 +78,7 @@ function makeBox(app, index) {
       text: getKeyDesc(index + 1)
     });
     shortcut.set_style('font-size: '+fontSize+'px');
-    shortcutBox = new St.Bin({style_class: 'switcher-icon'});
+    shortcutBox = new St.Bin({style_class: 'switcher-label'});
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
   }
