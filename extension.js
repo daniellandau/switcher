@@ -58,7 +58,7 @@ const numberKeySymbols = [
 
 function makeFilter(text) {
   return function(app) {
-    return text.split(" ").every(fragment => description(app).toLowerCase().indexOf(fragment.toLowerCase()) !== -1);
+    return text.split(' ').every(fragment => description(app).toLowerCase().indexOf(fragment.toLowerCase()) !== -1);
   };
 }
 
@@ -75,9 +75,9 @@ function makeBox(app, index) {
   if (getActionKeyTable().length > 0) {
     const shortcut = new St.Label({
       style_class: 'switcher-shortcut',
-      text: getKeyDesc(index+1)
+      text: getKeyDesc(index + 1)
     });
-    shortcut.set_style("font-size: "+fontSize+"px");
+    shortcut.set_style('font-size: '+fontSize+'px');
     shortcutBox = new St.Bin({style_class: 'switcher-icon'});
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
@@ -86,7 +86,7 @@ function makeBox(app, index) {
     style_class: 'switcher-label',
     text: description(app)
   });
-  label.set_style("font-size: "+fontSize+"px");
+  label.set_style('font-size: '+fontSize+'px');
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
   iconBox.child = appRef.create_icon_texture(fontSize);
@@ -217,12 +217,12 @@ function getActivateByKey() {
 function getKeyDesc(index) {
   switch (getActivateByKey()) {
   case keyActivationFunctionKeys:
-    return index > 12 ? "" : "F" + index;
+    return index > 12 ? '' : 'F' + index;
   case keyActivationNumbers:
-    return index > 10 ? "" : (index % 10).toString();
+    return index > 10 ? '' : index.toString();
   default:
     print("getKeyDesc error: " + index);
-    return "";
+    return '';
   }
 }
 
@@ -250,5 +250,5 @@ function enable() {
 }
 
 function disable() {
-  Main.wm.removeKeybinding("show-switcher");
+  Main.wm.removeKeybinding('show-switcher');
 }
