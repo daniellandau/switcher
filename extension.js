@@ -20,6 +20,8 @@ const Clutter = imports.gi.Clutter;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
+const GLib = imports.gi.GLib;
+
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
@@ -28,6 +30,7 @@ const keyActivationFunctionKeys = 1;
 const keyActivationNumbers      = 2;
 
 let container, cursor;
+
 const functionKeySymbols = [
   Clutter.KEY_F1,
   Clutter.KEY_F2,
@@ -114,6 +117,16 @@ function updateHighlight(boxes) {
 function _showUI() {
   'use strict';
   if (container) return;
+
+  let filteredApps;
+
+  const debouncedActivateUnique = debounce(() => {
+    if (filteredApps.length === 1) {
+      _hideUI();
+      Main.activateWindow(filteredApps[cursor]);
+    }
+  }, Convenience.getSettings().get_uint('activate-after-ms'));
+
   container = new St.Bin({reactive: true});
   cursor = 0;
 
@@ -131,7 +144,7 @@ function _showUI() {
     apps[1] = tmp;
   }
 
-  let filteredApps = apps;
+  filteredApps = apps;
 
   let boxes = filteredApps.map(makeBox);
   updateHighlight(boxes);
@@ -181,8 +194,7 @@ function _showUI() {
       filteredApps = apps.filter(makeFilter(o.text));
       if (Convenience.getSettings().get_boolean('activate-immediately') &&
           filteredApps.length === 1) {
-        _hideUI();
-        Main.activateWindow(filteredApps[cursor]);
+        debouncedActivateUnique();
       }
 
       boxes = filteredApps.map(makeBox);
@@ -247,3 +259,23 @@ function enable() {
 function disable() {
   Main.wm.removeKeybinding('show-switcher');
 }
+
+// from https://github.com/satya164/gjs-helpers
+const setTimeout = (f, ms) => {
+  return GLib.timeout_add(GLib.PRIORITY_DEFAULT, ms, () => {
+    f();
+
+    return false; // Don't repeat
+  }, null);
+};
+
+const clearTimeout = id => GLib.Source.remove(id);
+
+function debounce(f, ms) {
+  let timeoutId = null;
+  return function() {
+    if (timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(f, ms);
+  };
+}
+

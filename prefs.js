@@ -66,6 +66,7 @@ function addShortcut(widget, settings) {
 function addImmediately(widget, settings) {
   widget.add(makeTitle(_("Immediate activation")));
 
+  let input;
   let box = new Gtk.HBox();
   let label = new Gtk.Label();
   label.set_markup(_("When there is just one result, activate immediately"));
@@ -76,9 +77,28 @@ function addImmediately(widget, settings) {
   });
   _switch.connect('notify::active', function (o) {
     settings.set_boolean('activate-immediately', o.active);
+    input.set_sensitive(o.active);
   });
   box.add(_switch);
   widget.add(box);
+  label = new Gtk.Label();
+  label.set_markup(_("Activate immediately this many milliseconds after last keystroke"));
+  label.set_alignment(0, 0.5);
+  label.set_padding(0, 9);
+  widget.add(label);
+
+  input = new Gtk.SpinButton({
+    adjustment: new Gtk.Adjustment({
+      lower: 0,
+      upper: 5000,
+      step_increment: 100
+    })
+  });
+  input.set_value(settings.get_uint('activate-after-ms'));
+  input.connect('value-changed', function(button) {
+    settings.set_uint('activate-after-ms', button.get_value_as_int());
+  });
+  widget.add(input);
 }
 
 function addFontSize(widget, settings) {
