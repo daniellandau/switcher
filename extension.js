@@ -21,6 +21,8 @@ const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
 const GLib = imports.gi.GLib;
+const Gtk = imports.gi.Gtk;
+const Gdk = imports.gi.Gdk;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
@@ -172,8 +174,70 @@ function _showUI() {
 
   entry.set_width(width);
 
+  let settings = Convenience.getSettings();
+  let [key, mods] = Gtk.accelerator_parse(settings.get_strv('show-switcher')[0]);
+  const needCtrl = !!(mods & Gdk.ModifierType.CONTROL_MASK);
+  const needShift = !!(mods & Gdk.ModifierType.SHIFT_MASK);
+  const needSuper = !!(mods & Gdk.ModifierType.SUPER_MASK);
+  const needAlt = !!(mods & Gdk.ModifierType.MOD1_MASK);
+  if (needSuper) print('Can\'t capture Super more than once, so won\'t be able to close with same key binding, unless Super is never lifted');
+  let haveCtrl = needCtrl;
+  let haveShift = needShift;
+  let haveSuper = needSuper;
+  let haveAlt = needAlt;
+  entry.connect('key-press-event', (o, e) => {
+    switch (e.get_key_symbol()) {
+    case Clutter.Control_L:
+    case Clutter.Control_R:
+      haveCtrl = true;
+      break;
+    case Clutter.Shift_L:
+    case Clutter.Shift_R:
+      haveShift = true;
+      break;
+    case Clutter.Super_L:
+    case Clutter.Super_R:
+      haveSuper = true;
+      break;
+    case Clutter.Alt_L:
+    case Clutter.Alt_R:
+      haveAlt = true;
+      break;
+    }
+  });
+  let first = true;
   entry.connect('key-release-event', (o, e) => {
     const symbol = e.get_key_symbol();
+    print('symbol', symbol, 'super', Clutter.Super_L);
+    switch (symbol) {
+    case Clutter.Control_L:
+    case Clutter.Control_R:
+      haveCtrl = false;
+      break;
+    case Clutter.Shift_L:
+    case Clutter.Shift_R:
+      haveShift = false;
+      break;
+    case Clutter.Super_L:
+    case Clutter.Super_R:
+      haveSuper = false;
+      break;
+    case Clutter.Alt_L:
+    case Clutter.Alt_R:
+      haveAlt = false;
+      break;
+    }
+    if (symbol === key && first) {
+      first = false;
+    } else if ((!needCtrl || haveCtrl) &&
+               (!needShift || haveShift) &&
+               (!needSuper || haveSuper) &&
+               (!needAlt || haveAlt) &&
+               (symbol === key)) {
+      _hideUI();
+      return;
+    }
+
     let fkeyIndex = getActionKeyTable().indexOf(symbol);
     if (symbol === Clutter.KEY_Escape) _hideUI();
     else if (symbol === Clutter.KEY_Return) {
