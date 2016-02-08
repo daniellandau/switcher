@@ -71,7 +71,7 @@ function _hideUI() {
 }
 
 function makeBox(app, index) {
-  const fontSize = Convenience.getSettings().get_uint('font-size');
+  const iconSize = Convenience.getSettings().get_uint('icon-size');
 
   const box = new St.BoxLayout({style_class: 'switcher-box'});
   
@@ -92,7 +92,7 @@ function makeBox(app, index) {
   });
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
-  iconBox.child = appRef.create_icon_texture(fontSize);
+  iconBox.child = appRef.create_icon_texture(iconSize);
   box.insert_child_at_index(label, 0);
   label.set_x_expand(true);
   box.insert_child_at_index(iconBox, 0);
