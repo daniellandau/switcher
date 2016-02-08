@@ -17,18 +17,31 @@ function init() {
 function buildPrefsWidget() {
   let settings = Convenience.getSettings();
 
-  let widget = new Gtk.VBox();
-  widget.margin = 10;
+  let vwidget = new Gtk.VBox({margin: 10});
 
-  addShortcut(widget, settings);
-  addImmediately(widget, settings);
-  addFontSize(widget, settings);
-  addIconSize(widget, settings);
-  addMaxWidth(widget, settings);
-  addActivateByKey(widget, settings);
+  addShortcut(vwidget, settings);
+  addImmediately(vwidget, settings);
 
-  widget.show_all();
-  return widget;
+  let hwidget = new Gtk.HBox();
+  
+  let fontSizeWidget = new Gtk.VBox({'margin-right': 10});
+  addFontSize(fontSizeWidget, settings);
+  fontSizeWidget.show_all();
+  hwidget.add(fontSizeWidget);
+
+  let iconSizeWidget = new Gtk.VBox({'margin-left': 10});
+  addIconSize(iconSizeWidget, settings);
+  iconSizeWidget.show_all();
+  hwidget.add(iconSizeWidget);
+  
+  hwidget.show_all();
+  vwidget.add(hwidget);
+  
+  addMaxWidth(vwidget, settings);
+  addActivateByKey(vwidget, settings);
+
+  vwidget.show_all();
+  return vwidget;
 }
 
 function addShortcut(widget, settings) {
