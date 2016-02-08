@@ -177,18 +177,26 @@ function _showUI() {
   entry.set_width(width);
 
   entry.connect('key-release-event', (o, e) => {
+    let ctrl = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
+    let shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
+
     const symbol = e.get_key_symbol();
     let fkeyIndex = getActionKeyTable().indexOf(symbol);
     if (symbol === Clutter.KEY_Escape) _hideUI();
-    else if (symbol === Clutter.KEY_Return) {
+    else if ((symbol === Clutter.KEY_Return) ||
+        ((symbol === Clutter.j) && ctrl)) {
       _hideUI();
       filteredApps.length > 0 &&
         Main.activateWindow(filteredApps[cursor]);
-    } else if (symbol === Clutter.KEY_Down) {
-      cursor = cursor + 1 < boxes.length ? cursor + 1 : cursor;
+    } else if ((symbol === Clutter.KEY_Down) ||
+        (symbol === Clutter.KEY_Tab) ||
+        ((symbol === Clutter.d) && ctrl)) {
+      cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
       updateHighlight(boxes);
-    } else if (symbol === Clutter.KEY_Up) {
-      cursor = cursor > 0 ? cursor - 1 : cursor;
+    } else if ((symbol === Clutter.KEY_Up) || 
+        ((symbol === Clutter.ISO_Left_Tab) && shift) ||
+        ((symbol === Clutter.u) && ctrl)) {
+      cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
       updateHighlight(boxes);
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       _hideUI();
@@ -208,6 +216,8 @@ function _showUI() {
         boxLayout.insert_child_at_index(box.whole, -1);
       });
     }
+    // If boxes have less entries then previous cursor position, reset cursor
+    cursor = (cursor + 1 > boxes.length) ? 0 : cursor;
   });
 
   Main.pushModal(container);
