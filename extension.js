@@ -163,7 +163,7 @@ function _showUI() {
   let monitor = Main.layoutManager.primaryMonitor;
   container.set_width(monitor.width);
   container.set_height(monitor.height);
-  container.set_position(monitor.x, 200);
+  container.set_position(monitor.x, monitor.y);
 
   let width = boxes.map(box => box.whole.width).reduce((a, b) => Math.max(a, b), 0);
   let shortcutWidth = boxes
