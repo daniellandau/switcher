@@ -9,6 +9,10 @@
             <default>false</default>
             <summary>Whether to activate immediately when there is just one result.</summary>
         </key>
+        <key type="b" name="fuzzy-matching">
+            <default>false</default>
+            <summary>Fuzzy matching</summary>
+        </key>
         <key type="u" name="font-size">
             <default>32</default>
             <summary>Font size</summary>

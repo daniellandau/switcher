@@ -20,6 +20,12 @@ function buildPrefsWidget() {
   let vwidget = new Gtk.VBox({margin: 10});
 
   addShortcut(vwidget, settings);
+  
+  let fuzzyWidget = new Gtk.HBox();
+  addFuzzy(fuzzyWidget, settings);
+  fuzzyWidget.show_all();
+  vwidget.add(fuzzyWidget);
+
   addImmediately(vwidget, settings);
 
   let hwidget = new Gtk.HBox();
@@ -77,6 +83,21 @@ function addShortcut(widget, settings) {
   widget.add(treeView);
 }
 
+function addFuzzy(widget, settings) {
+  widget.add(makeTitle(_("Fuzzy matching")));
+
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('fuzzy-matching'),
+    margin_top: 15,
+    halign: Gtk.Align.END
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('fuzzy-matching', o.active);
+    input.set_sensitive(o.active);
+  });
+  widget.add(_switch);
+}
+
 function addImmediately(widget, settings) {
   widget.add(makeTitle(_("Immediate activation")));
 
@@ -87,7 +108,8 @@ function addImmediately(widget, settings) {
   label.set_alignment(0, 0.5);
   box.add(label);
   let _switch = new Gtk.Switch({
-    active: settings.get_boolean('activate-immediately')
+    active: settings.get_boolean('activate-immediately'),
+    halign: Gtk.Align.END
   });
   _switch.connect('notify::active', function (o) {
     settings.set_boolean('activate-immediately', o.active);
