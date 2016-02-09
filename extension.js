@@ -100,13 +100,14 @@ function makeBox(app, index) {
 
 function description(app) {
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
+  let appName;
   try {
-    const appName = appRef.get_name();
-    return appName + ' → ' + app.get_title();
+    appName = appRef.get_name();
   } catch (e) {
     print(e);
-    return 'Could not get description';
+    appName = 'Could not get name';
   }
+    return appName + ' → ' + app.get_title();
 }
 
 function updateHighlight(boxes) {
