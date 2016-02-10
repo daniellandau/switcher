@@ -88,8 +88,9 @@ function makeBox(app, index) {
   const label = new St.Label({
     style_class: 'switcher-label',
     y_align: Clutter.ActorAlign.CENTER,
-    text: description(app)
   });
+  label.clutter_text.set_text(description(app));
+
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
   iconBox.child = appRef.create_icon_texture(iconSize);
@@ -97,7 +98,7 @@ function makeBox(app, index) {
   label.set_x_expand(true);
   box.insert_child_at_index(iconBox, 0);
 
-  return {whole: box, shortcutBox: shortcutBox};
+  return {whole: box, shortcutBox: shortcutBox, label: label};
 }
 
 function description(app) {
@@ -112,9 +113,49 @@ function description(app) {
     return appName + ' → ' + app.get_title();
 }
 
-function updateHighlight(boxes) {
-  boxes.forEach(box => box.whole.remove_style_class_name('switcher-highlight'));
-  boxes.length > cursor && boxes[cursor].whole.add_style_class_name('switcher-highlight');
+function updateHighlight(boxes, query) {
+  boxes.forEach(box => {
+    // Remove previous selection highlight
+    box.whole.remove_style_class_name('switcher-highlight');
+
+    // Don't highlight description if there's no input
+    if (query == "")
+      return;
+
+    // Identify substring parts to be highlighted
+    let queryExpression = "(";
+    let text = box.label.get_text();
+    let queries = query.split(' ');
+    let queriesLength = queries.length;
+    for (let i = 0; i < queriesLength - 1; i++) {
+      if (queries[i] != "") {
+      queryExpression += queries[i] + "|";
+      }
+    }
+    queryExpression += queries[queriesLength - 1] + ")";
+    let queryRegExp = new RegExp(queryExpression, "i");
+    let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
+
+    // Build description from highlighted and non-highlighted strings
+    let result = "";
+    let tokens = text.split(queryRegExp);
+    let tokensLength = tokens.length;
+    for (let i = 0; i < tokensLength; i++) {
+      if (tokens[i].match(tokenRegExp)) {
+        result += '<span background=\"#4a90d9\" foreground=\"#ffffff\">' +
+                  tokens[i] +
+                  '</span>';
+      } else {
+        result += tokens[i];
+      }
+    }
+
+    box.label.clutter_text.set_markup(result);
+  });
+
+  // Highlight current selection
+  boxes.length > cursor &&
+      boxes[cursor].whole.add_style_class_name('switcher-highlight');
 }
 
 function _showUI() {
@@ -153,7 +194,7 @@ function _showUI() {
   filteredApps = apps;
 
   let boxes = filteredApps.map(makeBox);
-  updateHighlight(boxes);
+  updateHighlight(boxes, "");
   const entry = new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
@@ -187,10 +228,10 @@ function _showUI() {
         Main.activateWindow(filteredApps[cursor]);
     } else if (symbol === Clutter.KEY_Down) {
       cursor = cursor + 1 < boxes.length ? cursor + 1 : cursor;
-      updateHighlight(boxes);
+      updateHighlight(boxes, o.text);
     } else if (symbol === Clutter.KEY_Up) {
       cursor = cursor > 0 ? cursor - 1 : cursor;
-      updateHighlight(boxes);
+      updateHighlight(boxes, o.text);
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       _hideUI();
       Main.activateWindow(filteredApps[fkeyIndex]);
@@ -203,7 +244,7 @@ function _showUI() {
       }
 
       boxes = filteredApps.map(makeBox);
-      updateHighlight(boxes);
+      updateHighlight(boxes, o.text);
       boxes.forEach((box) => {
         fixWidths(box, width, shortcutWidth);
         boxLayout.insert_child_at_index(box.whole, -1);
