@@ -71,30 +71,32 @@ function _hideUI() {
 }
 
 function makeBox(app, index) {
-  const fontSize = Convenience.getSettings().get_uint('font-size');
+  const iconSize = Convenience.getSettings().get_uint('icon-size');
+
   const box = new St.BoxLayout({style_class: 'switcher-box'});
+  
   let shortcutBox = undefined;
   if (getActionKeyTable().length > 0) {
     const shortcut = new St.Label({
       style_class: 'switcher-shortcut',
       text: getKeyDesc(index + 1)
     });
-    shortcut.set_style('font-size: '+fontSize+'px');
     shortcutBox = new St.Bin({style_class: 'switcher-label'});
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
   }
   const label = new St.Label({
     style_class: 'switcher-label',
+    y_align: Clutter.ActorAlign.CENTER,
     text: description(app)
   });
-  label.set_style('font-size: '+fontSize+'px');
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
-  iconBox.child = appRef.create_icon_texture(fontSize);
+  iconBox.child = appRef.create_icon_texture(iconSize);
   box.insert_child_at_index(label, 0);
   label.set_x_expand(true);
   box.insert_child_at_index(iconBox, 0);
+
   return {whole: box, shortcutBox: shortcutBox};
 }
 
@@ -128,11 +130,14 @@ function _showUI() {
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
 
-  container = new St.Bin({reactive: true});
   cursor = 0;
 
-  let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
+  container = new St.Bin({reactive: true});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
+
+  const fontSize = Convenience.getSettings().get_uint('font-size');
+  let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
+  boxLayout.set_style('font-size: ' + fontSize + 'px');
   boxLayout.set_vertical(true);
 
   // Get all windows in activation order
@@ -165,7 +170,6 @@ function _showUI() {
   let shortcutWidth = boxes
         .map(box => box.shortcutBox ? box.shortcutBox.width : 0)
         .reduce((a, b) => Math.max(a, b), 0);
-
   const maxWidth = Main.layoutManager.primaryMonitor.width * 0.01 *
           Convenience.getSettings().get_uint('max-width-percentage');
   if (width > maxWidth) width = maxWidth;

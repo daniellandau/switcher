@@ -11,7 +11,11 @@
         </key>
         <key type="u" name="font-size">
             <default>32</default>
-            <summary>Font and icon size</summary>
+            <summary>Font size</summary>
+        </key>
+        <key type="u" name="icon-size">
+            <default>32</default>
+            <summary>Icon size</summary>
         </key>
         <key type="u" name="max-width-percentage">
             <default>95</default>

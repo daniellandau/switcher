@@ -17,17 +17,28 @@ function init() {
 function buildPrefsWidget() {
   let settings = Convenience.getSettings();
 
-  let widget = new Gtk.VBox();
-  widget.margin = 10;
+  let vWidget = new Gtk.VBox({margin: 10});
 
-  addShortcut(widget, settings);
-  addImmediately(widget, settings);
-  addFontSize(widget, settings);
-  addMaxWidth(widget, settings);
-  addActivateByKey(widget, settings);
+  addShortcut(vWidget, settings);
+  addImmediately(vWidget, settings);
 
-  widget.show_all();
-  return widget;
+  let hWidget = new Gtk.HBox({spacing: 20});
+  
+  let fontSizeWidget = new Gtk.VBox();
+  addFontSize(fontSizeWidget, settings);
+  hWidget.add(fontSizeWidget);
+
+  let iconSizeWidget = new Gtk.VBox();
+  addIconSize(iconSizeWidget, settings);
+  hWidget.add(iconSizeWidget);
+  
+  vWidget.add(hWidget);
+  
+  addMaxWidth(vWidget, settings);
+  addActivateByKey(vWidget, settings);
+
+  vWidget.show_all();
+  return vWidget;
 }
 
 function addShortcut(widget, settings) {
@@ -97,6 +108,23 @@ function addImmediately(widget, settings) {
   input.set_value(settings.get_uint('activate-after-ms'));
   input.connect('value-changed', function(button) {
     settings.set_uint('activate-after-ms', button.get_value_as_int());
+  });
+  widget.add(input);
+}
+
+function addIconSize(widget, settings) {
+  widget.add(makeTitle(_("Icon size (px)")));
+
+  let input = new Gtk.SpinButton({
+    adjustment: new Gtk.Adjustment({
+      lower: 10,
+      upper: 64,
+      step_increment: 1
+    })
+  });
+  input.set_value(settings.get_uint('icon-size'));
+  input.connect('value-changed', function(button) {
+    settings.set_uint('icon-size', button.get_value_as_int());
   });
   widget.add(input);
 }
