@@ -21,6 +21,7 @@ function buildPrefsWidget() {
 
   addShortcut(vWidget, settings);
   addImmediately(vWidget, settings);
+  addActivateByKey(vWidget, settings);
 
   let hWidget = new Gtk.HBox({spacing: 20});
   
@@ -35,7 +36,10 @@ function buildPrefsWidget() {
   vWidget.add(hWidget);
   
   addMaxWidth(vWidget, settings);
-  addActivateByKey(vWidget, settings);
+  
+  let workspaceWidget = new Gtk.HBox();
+  addWorkspace(workspaceWidget, settings);
+  vWidget.add(workspaceWidget);
 
   vWidget.show_all();
   return vWidget;
@@ -84,7 +88,8 @@ function addImmediately(widget, settings) {
   label.set_alignment(0, 0.5);
   box.add(label);
   let _switch = new Gtk.Switch({
-    active: settings.get_boolean('activate-immediately')
+    active: settings.get_boolean('activate-immediately'),
+    halign: Gtk.Align.END
   });
   _switch.connect('notify::active', function (o) {
     settings.set_boolean('activate-immediately', o.active);
@@ -172,6 +177,21 @@ function addActivateByKey(widget, settings) {
         settings.set_uint('activate-by-key', input.get_active());
     });
     widget.add(input);
+}
+
+function addWorkspace(widget, settings) {
+  widget.add(makeTitle(_("Show workspace indicators")));
+
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('workspace-indicator'),
+    margin_top: 15,
+    halign: Gtk.Align.END
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('workspace-indicator', o.active);
+    input.set_sensitive(o.active);
+  });
+  widget.add(_switch);
 }
 
 function makeTitle(markup) {
