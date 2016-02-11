@@ -102,14 +102,17 @@ function makeBox(app, index) {
 
 function description(app) {
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
+  let appName;
+  let workspace;
   try {
-    const appName = appRef.get_name();
-    const workspace = app.get_workspace().index();
-    return workspace + ': ' + appName + ' → ' + app.get_title();
+    appName = appRef.get_name();
+    workspace = app.get_workspace().index() + 1;
   } catch (e) {
     print(e);
-    return 'Could not get description';
+    appName = 'Could not get name';
   }
+  
+  return workspace + ': ' + appName + ' → ' + app.get_title();
 }
 
 function updateHighlight(boxes) {
@@ -164,7 +167,7 @@ function _showUI() {
   let monitor = Main.layoutManager.primaryMonitor;
   container.set_width(monitor.width);
   container.set_height(monitor.height);
-  container.set_position(monitor.x, 200);
+  container.set_position(monitor.x, monitor.y);
 
   let width = boxes.map(box => box.whole.width).reduce((a, b) => Math.max(a, b), 0);
   let shortcutWidth = boxes
