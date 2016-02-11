@@ -117,50 +117,52 @@ function escapeChars(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
 };
 
+function highlightText(text, query) {
+  // Don't apply highlighting if there's no input
+  if (query == "")
+    return text;
+
+  // Escape special characters in query
+  query = escapeChars(query);
+
+  // Identify substring parts to be highlighted
+  let queryExpression = "(";
+  let queries = query.split(' ');
+  let queriesLength = queries.length;
+  for (let i = 0; i < queriesLength - 1; i++) {
+    if (queries[i] != "") {
+      queryExpression += queries[i] + "|";
+    }
+  }
+  queryExpression += queries[queriesLength - 1] + ")";
+  let queryRegExp = new RegExp(queryExpression, "i");
+  let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
+
+  // Build resulting string from highlighted and non-highlighted strings
+  let result = "";
+  let tokens = text.split(queryRegExp);
+  let tokensLength = tokens.length;
+  for (let i = 0; i < tokensLength; i++) {
+    if (tokens[i].match(tokenRegExp)) {
+      result += '<span background=\"#4a90d9\" foreground=\"#ffffff\">' +
+                tokens[i] +
+                '</span>';
+    } else {
+      result += tokens[i];
+    }
+  }
+
+  return result;
+}
+
 function updateHighlight(boxes, query) {
   boxes.forEach(box => {
-    // Remove previous selection highlight
     box.whole.remove_style_class_name('switcher-highlight');
 
-    // Don't highlight description if there's no input
-    if (query == "")
-      return;
-
-    // Escape special characters in query
-    query = escapeChars(query);
-
-    // Identify substring parts to be highlighted
-    let queryExpression = "(";
-    let text = box.label.get_text();
-    let queries = query.split(' ');
-    let queriesLength = queries.length;
-    for (let i = 0; i < queriesLength - 1; i++) {
-      if (queries[i] != "") {
-        queryExpression += queries[i] + "|";
-      }
-    }
-    queryExpression += queries[queriesLength - 1] + ")";
-    let queryRegExp = new RegExp(queryExpression, "i");
-    let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
-
-    // Build description from highlighted and non-highlighted strings
-    let result = "";
-    let tokens = text.split(queryRegExp);
-    let tokensLength = tokens.length;
-    for (let i = 0; i < tokensLength; i++) {
-      if (tokens[i].match(tokenRegExp)) {
-        result += '<span background=\"#4a90d9\" foreground=\"#ffffff\">' +
-                  tokens[i] +
-                  '</span>';
-      } else {
-        result += tokens[i];
-      }
-    }
-
-    box.label.clutter_text.set_markup(result);
+    const highlightedText = highlightText(box.label.get_text(), query);
+    box.label.clutter_text.set_markup(highlightedText);
   });
 
-  // Highlight current selection
   boxes.length > cursor &&
       boxes[cursor].whole.add_style_class_name('switcher-highlight');
 }
