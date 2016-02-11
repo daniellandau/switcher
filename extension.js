@@ -190,12 +190,12 @@ function _showUI() {
         Main.activateWindow(filteredApps[cursor]);
     } else if ((symbol === Clutter.KEY_Down) ||
         (symbol === Clutter.KEY_Tab) ||
-        ((symbol === Clutter.d) && ctrl)) {
+        ((symbol === Clutter.n) && ctrl)) {
       cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
       updateHighlight(boxes);
     } else if ((symbol === Clutter.KEY_Up) || 
         ((symbol === Clutter.ISO_Left_Tab) && shift) ||
-        ((symbol === Clutter.u) && ctrl)) {
+        ((symbol === Clutter.p) && ctrl)) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
       updateHighlight(boxes);
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
