@@ -129,7 +129,7 @@ function updateHighlight(boxes, query) {
     let queriesLength = queries.length;
     for (let i = 0; i < queriesLength - 1; i++) {
       if (queries[i] != "") {
-      queryExpression += queries[i] + "|";
+        queryExpression += queries[i] + "|";
       }
     }
     queryExpression += queries[queriesLength - 1] + ")";
