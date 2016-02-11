@@ -102,11 +102,10 @@ function makeBox(app, index) {
 
 function description(app) {
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
+  const workspace = app.get_workspace().index() + 1;
   let appName;
-  let workspace;
   try {
     appName = appRef.get_name();
-    workspace = app.get_workspace().index() + 1;
   } catch (e) {
     print(e);
     appName = 'Could not get name';
