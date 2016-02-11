@@ -103,8 +103,7 @@ function makeBox(app, index) {
 function description(app) {
   let workspace = "";
   if (Convenience.getSettings().get_boolean('workspace-indicator')) {
-    workspace = (app.get_workspace().index() + 1);
-    workspace += ": ";
+    workspace = (app.get_workspace().index() + 1) + ": ";
   }
 
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
