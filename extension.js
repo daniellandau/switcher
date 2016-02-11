@@ -113,6 +113,10 @@ function description(app) {
     return appName + ' → ' + app.get_title();
 }
 
+function escapeChars(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+};
+
 function updateHighlight(boxes, query) {
   boxes.forEach(box => {
     // Remove previous selection highlight
@@ -121,6 +125,9 @@ function updateHighlight(boxes, query) {
     // Don't highlight description if there's no input
     if (query == "")
       return;
+
+    // Escape special characters in query
+    query = escapeChars(query);
 
     // Identify substring parts to be highlighted
     let queryExpression = "(";
