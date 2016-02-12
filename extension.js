@@ -203,6 +203,10 @@ function _showUI() {
       _hideUI();
       Main.activateWindow(filteredApps[fkeyIndex]);
     } else {
+      if ((symbol === Clutter.h) && ctrl) {
+        o.text = o.text.slice(0, o.text.length - 1);
+      }
+
       boxes.forEach(box => boxLayout.remove_child(box.whole));
       filteredApps = apps.filter(makeFilter(o.text));
       if (Convenience.getSettings().get_boolean('activate-immediately') &&
