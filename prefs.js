@@ -24,7 +24,7 @@ function buildPrefsWidget() {
   addActivateByKey(vWidget, settings);
 
   let hWidget = new Gtk.HBox({spacing: 20});
-  
+
   let fontSizeWidget = new Gtk.VBox();
   addFontSize(fontSizeWidget, settings);
   hWidget.add(fontSizeWidget);
@@ -32,11 +32,11 @@ function buildPrefsWidget() {
   let iconSizeWidget = new Gtk.VBox();
   addIconSize(iconSizeWidget, settings);
   hWidget.add(iconSizeWidget);
-  
+
   vWidget.add(hWidget);
-  
+
   addMaxWidth(vWidget, settings);
-  
+
   let workspaceWidget = new Gtk.HBox();
   addWorkspace(workspaceWidget, settings);
   vWidget.add(workspaceWidget);
@@ -189,7 +189,6 @@ function addWorkspace(widget, settings) {
   });
   _switch.connect('notify::active', function (o) {
     settings.set_boolean('workspace-indicator', o.active);
-    input.set_sensitive(o.active);
   });
   widget.add(_switch);
 }
