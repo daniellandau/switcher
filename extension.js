@@ -101,6 +101,11 @@ function makeBox(app, index) {
 }
 
 function description(app) {
+  let workspace = "";
+  if (Convenience.getSettings().get_boolean('workspace-indicator')) {
+    workspace = (app.get_workspace().index() + 1) + ": ";
+  }
+
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
   let appName;
   try {
@@ -109,7 +114,8 @@ function description(app) {
     print(e);
     appName = 'Could not get name';
   }
-    return appName + ' → ' + app.get_title();
+  
+  return workspace + appName + ' → ' + app.get_title();
 }
 
 function updateHighlight(boxes) {
