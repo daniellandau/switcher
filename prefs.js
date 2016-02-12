@@ -17,37 +17,34 @@ function init() {
 function buildPrefsWidget() {
   let settings = Convenience.getSettings();
 
-  let vwidget = new Gtk.VBox({margin: 10});
+  let vWidget = new Gtk.VBox({margin: 10});
 
-  addShortcut(vwidget, settings);
+  addShortcut(vWidget, settings);
   
   let fuzzyWidget = new Gtk.HBox();
   addFuzzy(fuzzyWidget, settings);
   fuzzyWidget.show_all();
-  vwidget.add(fuzzyWidget);
+  vWidget.add(fuzzyWidget);
 
-  addImmediately(vwidget, settings);
+  addImmediately(vWidget, settings);
 
-  let hwidget = new Gtk.HBox();
+  let hWidget = new Gtk.HBox({spacing: 20});
   
-  let fontSizeWidget = new Gtk.VBox({'margin-right': 10});
+  let fontSizeWidget = new Gtk.VBox();
   addFontSize(fontSizeWidget, settings);
-  fontSizeWidget.show_all();
-  hwidget.add(fontSizeWidget);
+  hWidget.add(fontSizeWidget);
 
-  let iconSizeWidget = new Gtk.VBox({'margin-left': 10});
+  let iconSizeWidget = new Gtk.VBox();
   addIconSize(iconSizeWidget, settings);
-  iconSizeWidget.show_all();
-  hwidget.add(iconSizeWidget);
+  hWidget.add(iconSizeWidget);
   
-  hwidget.show_all();
-  vwidget.add(hwidget);
+  vWidget.add(hWidget);
   
-  addMaxWidth(vwidget, settings);
-  addActivateByKey(vwidget, settings);
+  addMaxWidth(vWidget, settings);
+  addActivateByKey(vWidget, settings);
 
-  vwidget.show_all();
-  return vwidget;
+  vWidget.show_all();
+  return vWidget;
 }
 
 function addShortcut(widget, settings) {
