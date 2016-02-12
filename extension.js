@@ -67,18 +67,37 @@ function makeFilter(text) {
 }
 
 function runFilter(app, fragment) {
-  const useFuzzy = Convenience.getSettings().get_boolean('fuzzy-matching');
+  if (fragment == "")
+    return true;
+
   const description = this.description(app).toLowerCase();
+  const useFuzzy = Convenience.getSettings().get_boolean('fuzzy-matching');
   if (useFuzzy) {
-    const d_length = description.length;
-    const f_length = fragment.length;
-    let d_i, f_i;
-    for (d_i = 0, f_i = 0; (d_i < d_length) && (f_i < f_length); d_i++) {
-      if (fragment.charAt(f_i) == description.charAt(d_i)) {
-        f_i++;
-      }
+    let regexp = new RegExp(fragment.split("").reduce(function(a,b) {
+        return a+'[^'+b+']*'+b;
+    }), "gi");
+
+    let match;
+    let gotMatch = false;
+    let score = 0;
+    while ((match = regexp.exec(description))) {
+      // A full match at the beginning is the best match
+      if ((match.index == 0) && match[0].length == fragment.length)
+        score += 1000;
+
+      // Since we don't split the input by words, we have to identify
+      // which matches are prefixes to words in order to score them properly
+      let scoreFactor = ((match.index != 0) &&
+          description.charAt(match.index - 1) == " ") ? 0 : match.index;
+
+      score = Math.max(score,
+          1.0/(1 + scoreFactor) + 1.2/(1 + match[0].length - fragment.length));
+
+      gotMatch = true;
     }
-    return (f_i == f_length);
+    app.score = score;
+
+    return gotMatch;
   } else {
     return description.indexOf(fragment.toLowerCase()) !== -1;
   }
@@ -97,8 +116,10 @@ function makeBox(app, index) {
 
   let shortcutBox = undefined;
   if (getActionKeyTable().length > 0) {
-    const shortcut = new St.Label(
-        {style_class : 'switcher-shortcut', text : getKeyDesc(index + 1)});
+    const shortcut = new St.Label({
+      style_class : 'switcher-shortcut',
+      text : getKeyDesc(index + 1)
+    });
     shortcutBox = new St.Bin({style_class : 'switcher-label'});
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
@@ -219,7 +240,21 @@ function _showUI() {
       Main.activateWindow(filteredApps[fkeyIndex]);
     } else {
       boxes.forEach(box => boxLayout.remove_child(box.whole));
+
       filteredApps = apps.filter(makeFilter(o.text));
+
+      // Always preserve focus order before typing
+      if (Convenience.getSettings().get_boolean('fuzzy-matching') &&
+          o.text != "") {
+        filteredApps = filteredApps.sort(function(a, b) {
+          if (a.score > b.score)
+            return -1;
+          if (a.score < b.score)
+            return 1;
+          return 0;
+        });
+      }
+
       if (Convenience.getSettings().get_boolean('activate-immediately') &&
           filteredApps.length === 1) {
         debouncedActivateUnique();
