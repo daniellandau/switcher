@@ -204,7 +204,7 @@ function _showUI() {
       Main.activateWindow(filteredApps[fkeyIndex]);
     } else {
       if ((symbol === Clutter.h) && ctrl) {
-        o.text = o.text.slice(0, o.text.length - 1);
+        o.text = o.text.slice(0, -1);
       }
 
       boxes.forEach(box => boxLayout.remove_child(box.whole));
@@ -215,14 +215,17 @@ function _showUI() {
       }
 
       boxes = filteredApps.map(makeBox);
+      
+      // If there's less boxes then in previous cursor position,
+      // set cursor to the last box
+      cursor = (cursor + 1 > boxes.length) ? boxes.length - 1 : cursor;
       updateHighlight(boxes);
+
       boxes.forEach((box) => {
         fixWidths(box, width, shortcutWidth);
         boxLayout.insert_child_at_index(box.whole, -1);
       });
     }
-    // If boxes have less entries then previous cursor position, reset cursor
-    cursor = (cursor + 1 > boxes.length) ? 0 : cursor;
   });
 
   Main.pushModal(container);
