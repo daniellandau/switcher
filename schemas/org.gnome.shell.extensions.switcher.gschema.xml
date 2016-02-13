@@ -33,5 +33,9 @@
             <default>0</default>
             <summary>Activate "immediately" after this many milliseconds</summary>
         </key>
+        <key type="b" name="workspace-indicator">
+            <default>false</default>
+            <summary>Whether to show a workspace indicator for each app</summary>
+        </key>
     </schema>
 </schemalist>
