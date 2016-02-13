@@ -74,7 +74,7 @@ function makeBox(app, index) {
   const iconSize = Convenience.getSettings().get_uint('icon-size');
 
   const box = new St.BoxLayout({style_class: 'switcher-box'});
-  
+
   let shortcutBox = undefined;
   if (getActionKeyTable().length > 0) {
     const shortcut = new St.Label({
@@ -87,9 +87,10 @@ function makeBox(app, index) {
   }
   const label = new St.Label({
     style_class: 'switcher-label',
-    y_align: Clutter.ActorAlign.CENTER,
-    text: description(app)
+    y_align: Clutter.ActorAlign.CENTER
   });
+  label.clutter_text.set_text(description(app));
+
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
   iconBox.child = appRef.create_icon_texture(iconSize);
@@ -97,10 +98,15 @@ function makeBox(app, index) {
   label.set_x_expand(true);
   box.insert_child_at_index(iconBox, 0);
 
-  return {whole: box, shortcutBox: shortcutBox};
+  return {whole: box, shortcutBox: shortcutBox, label: label};
 }
 
 function description(app) {
+  let workspace = "";
+  if (Convenience.getSettings().get_boolean('workspace-indicator')) {
+    workspace = (app.get_workspace().index() + 1) + ": ";
+  }
+
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
   let appName;
   try {
@@ -109,12 +115,62 @@ function description(app) {
     print(e);
     appName = 'Could not get name';
   }
-    return appName + ' → ' + app.get_title();
+
+  return workspace + appName + ' → ' + app.get_title();
 }
 
-function updateHighlight(boxes) {
-  boxes.forEach(box => box.whole.remove_style_class_name('switcher-highlight'));
-  boxes.length > cursor && boxes[cursor].whole.add_style_class_name('switcher-highlight');
+function escapeChars(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+};
+
+function highlightText(text, query) {
+  // Don't apply highlighting if there's no input
+  if (query == "")
+    return text;
+
+  // Escape special characters in query
+  query = escapeChars(query);
+
+  // Identify substring parts to be highlighted
+  let queryExpression = "(";
+  let queries = query.split(' ');
+  let queriesLength = queries.length;
+  for (let i = 0; i < queriesLength - 1; i++) {
+    if (queries[i] != "") {
+      queryExpression += queries[i] + "|";
+    }
+  }
+  queryExpression += queries[queriesLength - 1] + ")";
+  let queryRegExp = new RegExp(queryExpression, "i");
+  let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
+
+  // Build resulting string from highlighted and non-highlighted strings
+  let result = "";
+  let tokens = text.split(queryRegExp);
+  let tokensLength = tokens.length;
+  for (let i = 0; i < tokensLength; i++) {
+    if (tokens[i].match(tokenRegExp)) {
+      result += '<u><span underline_color=\"#4a90d9\" foreground=\"#ffffff\">' +
+                tokens[i] +
+                '</span></u>';
+    } else {
+      result += tokens[i];
+    }
+  }
+
+  return result;
+}
+
+function updateHighlight(boxes, query) {
+  boxes.forEach(box => {
+    box.whole.remove_style_class_name('switcher-highlight');
+
+    const highlightedText = highlightText(box.label.get_text(), query);
+    box.label.clutter_text.set_markup(highlightedText);
+  });
+
+  boxes.length > cursor &&
+      boxes[cursor].whole.add_style_class_name('switcher-highlight');
 }
 
 function _showUI() {
@@ -153,7 +209,7 @@ function _showUI() {
   filteredApps = apps;
 
   let boxes = filteredApps.map(makeBox);
-  updateHighlight(boxes);
+  updateHighlight(boxes, "");
   const entry = new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
@@ -193,12 +249,12 @@ function _showUI() {
         (symbol === Clutter.KEY_Tab) ||
         ((symbol === Clutter.n) && ctrl)) {
       cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
-      updateHighlight(boxes);
+      updateHighlight(boxes, o.text);
     } else if ((symbol === Clutter.KEY_Up) || 
         ((symbol === Clutter.ISO_Left_Tab) && shift) ||
         ((symbol === Clutter.p) && ctrl)) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
-      updateHighlight(boxes);
+      updateHighlight(boxes, o.text);
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       _hideUI();
       Main.activateWindow(filteredApps[fkeyIndex]);
@@ -219,7 +275,7 @@ function _showUI() {
       // If there's less boxes then in previous cursor position,
       // set cursor to the last box
       cursor = (cursor + 1 > boxes.length) ? boxes.length - 1 : cursor;
-      updateHighlight(boxes);
+      updateHighlight(boxes, o.text);
 
       boxes.forEach((box) => {
         fixWidths(box, width, shortcutWidth);
@@ -300,4 +356,3 @@ function debounce(f, ms) {
     timeoutId = setTimeout(f, ms);
   };
 }
-
