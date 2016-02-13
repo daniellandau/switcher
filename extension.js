@@ -144,9 +144,9 @@ function highlightText(text, query) {
   let tokensLength = tokens.length;
   for (let i = 0; i < tokensLength; i++) {
     if (tokens[i].match(tokenRegExp)) {
-      result += '<span background=\"#4a90d9\" foreground=\"#ffffff\">' +
+      result += '<u><span underline_color=\"#4a90d9\" foreground=\"#ffffff\">' +
                 tokens[i] +
-                '</span>';
+                '</span></u>';
     } else {
       result += tokens[i];
     }
