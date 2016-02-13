@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-10 18:10+0200\n"
+"POT-Creation-Date: 2016-02-13 10:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,50 +19,54 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 
-#: prefs.js:45
+#: prefs.js:49
 msgid "Hotkey to activate switcher"
 msgstr ""
 
-#: prefs.js:69
+#: prefs.js:73
 msgid "Key"
 msgstr ""
 
-#: prefs.js:78
+#: prefs.js:82
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:83
+#: prefs.js:87
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:96
+#: prefs.js:101
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 
-#: prefs.js:116
+#: prefs.js:121
 msgid "Icon size (px)"
 msgstr ""
 
-#: prefs.js:133
+#: prefs.js:138
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:150
+#: prefs.js:155
 msgid "Max width (%)"
 msgstr ""
 
-#: prefs.js:166
+#: prefs.js:171
 msgid "Activate by pressing a key matching the index in the list"
 msgstr ""
 
-#: prefs.js:167
+#: prefs.js:172
 msgid "Disable"
 msgstr ""
 
-#: prefs.js:167
+#: prefs.js:172
 msgid "Function keys"
 msgstr ""
 
-#: prefs.js:167
+#: prefs.js:172
 msgid "Number keys"
+msgstr ""
+
+#: prefs.js:183
+msgid "Show workspace indicators"
 msgstr ""
