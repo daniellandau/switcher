@@ -234,32 +234,32 @@ function _showUI() {
   entry.set_width(width);
 
   entry.connect('key-release-event', (o, e) => {
-    let ctrl = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
+    let control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
     let shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
 
     const symbol = e.get_key_symbol();
     let fkeyIndex = getActionKeyTable().indexOf(symbol);
-    if (symbol === Clutter.KEY_Escape) _hideUI();
-    else if ((symbol === Clutter.KEY_Return) ||
-        ((symbol === Clutter.j) && ctrl)) {
+    if (symbol === Clutter.KEY_Escape)
       _hideUI();
-      filteredApps.length > 0 &&
-        Main.activateWindow(filteredApps[cursor]);
+    else if ((symbol === Clutter.KEY_Return) ||
+        ((symbol === Clutter.j) && control)) {
+      _hideUI();
+      filteredApps.length > 0 && Main.activateWindow(filteredApps[cursor]);
     } else if ((symbol === Clutter.KEY_Down) ||
         (symbol === Clutter.KEY_Tab) ||
-        ((symbol === Clutter.n) && ctrl)) {
+        ((symbol === Clutter.n) && control)) {
       cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
       updateHighlight(boxes, o.text);
     } else if ((symbol === Clutter.KEY_Up) || 
         ((symbol === Clutter.ISO_Left_Tab) && shift) ||
-        ((symbol === Clutter.p) && ctrl)) {
+        ((symbol === Clutter.p) && control)) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
       updateHighlight(boxes, o.text);
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       _hideUI();
       Main.activateWindow(filteredApps[fkeyIndex]);
     } else {
-      if ((symbol === Clutter.h) && ctrl) {
+      if ((symbol === Clutter.h) && control) {
         o.text = o.text.slice(0, -1);
       }
 
@@ -274,9 +274,10 @@ function _showUI() {
       
       // If there's less boxes then in previous cursor position,
       // set cursor to the last box
-      cursor = (cursor + 1 > boxes.length) ? boxes.length - 1 : cursor;
-      updateHighlight(boxes, o.text);
+      if (cursor + 1 > boxes.length)
+        cursor = Math.max(boxes.length - 1, 0);
 
+      updateHighlight(boxes, o.text);
       boxes.forEach((box) => {
         fixWidths(box, width, shortcutWidth);
         boxLayout.insert_child_at_index(box.whole, -1);
