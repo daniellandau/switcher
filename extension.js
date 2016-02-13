@@ -234,8 +234,8 @@ function _showUI() {
   entry.set_width(width);
 
   entry.connect('key-release-event', (o, e) => {
-    let control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
-    let shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
+    const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
+    const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
 
     const symbol = e.get_key_symbol();
     let fkeyIndex = getActionKeyTable().indexOf(symbol);
