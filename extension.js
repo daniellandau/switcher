@@ -74,7 +74,7 @@ function makeBox(app, index) {
   const iconSize = Convenience.getSettings().get_uint('icon-size');
 
   const box = new St.BoxLayout({style_class: 'switcher-box'});
-  
+
   let shortcutBox = undefined;
   if (getActionKeyTable().length > 0) {
     const shortcut = new St.Label({
@@ -87,7 +87,7 @@ function makeBox(app, index) {
   }
   const label = new St.Label({
     style_class: 'switcher-label',
-    y_align: Clutter.ActorAlign.CENTER,
+    y_align: Clutter.ActorAlign.CENTER
   });
   label.clutter_text.set_text(description(app));
 
@@ -115,7 +115,7 @@ function description(app) {
     print(e);
     appName = 'Could not get name';
   }
-  
+
   return workspace + appName + ' → ' + app.get_title();
 }
 
@@ -339,4 +339,3 @@ function debounce(f, ms) {
     timeoutId = setTimeout(f, ms);
   };
 }
-
