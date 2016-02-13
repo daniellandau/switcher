@@ -80,7 +80,8 @@ function runFilter(app, fragment) {
     let match;
     let gotMatch = false;
     let score = 0;
-    let filteredDescription = description.slice(3, description.length);
+    let filteredDescription =
+        description.slice(descriptionNameIndex(app), description.length);
     while ((match = regexp.exec(filteredDescription))) {
       // A full match at the beginning is the best match
       if ((match.index == 0) && match[0].length == fragment.length)
@@ -162,9 +163,13 @@ function description(app) {
   return workspace + appName + ' → ' + app.get_title();
 }
 
+function descriptionNameIndex(app) {
+  return (Convenience.getSettings().get_boolean('workspace-indicator')) ? 3 : 0;
+}
+
 function escapeChars(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
-};
+  return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+}
 
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
