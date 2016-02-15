@@ -120,10 +120,10 @@ function makeBox(app, index) {
   let shortcutBox = undefined;
   if (getActionKeyTable().length > 0) {
     const shortcut = new St.Label({
-      style_class : 'switcher-shortcut',
-      text : getKeyDesc(index + 1)
+      style_class: 'switcher-shortcut',
+      text: getKeyDesc(index + 1)
     });
-    shortcutBox = new St.Bin({style_class : 'switcher-label'});
+    shortcutBox = new St.Bin({style_class: 'switcher-label'});
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
   }
@@ -238,11 +238,11 @@ function _showUI() {
 
   cursor = 0;
 
-  container = new St.Bin({reactive : true});
+  container = new St.Bin({reactive: true});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
 
   const fontSize = Convenience.getSettings().get_uint('font-size');
-  let boxLayout = new St.BoxLayout({style_class : 'switcher-box-layout'});
+  let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
   boxLayout.set_style('font-size: ' + fontSize + 'px');
   boxLayout.set_vertical(true);
 
@@ -262,7 +262,7 @@ function _showUI() {
   updateHighlight(boxes, "");
 
   const entry =
-      new St.Entry({style_class : 'switcher-entry', hint_text : 'type filter'});
+      new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
 
