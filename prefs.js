@@ -23,27 +23,30 @@ function buildPrefsWidget() {
   addImmediately(vWidget, settings);
   addActivateByKey(vWidget, settings);
 
-  let fuzzyWidget = new Gtk.HBox();
-  addFuzzy(fuzzyWidget, settings);
-  fuzzyWidget.show_all();
-  vWidget.add(fuzzyWidget);
+  let behaviourWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
+    let matchingWidget = new Gtk.VBox();
+    addMatching(matchingWidget, settings);
+    matchingWidget.show_all();
+    behaviourWidget.pack_start(matchingWidget, true, true, 0);
+    let orderingWidget = new Gtk.VBox();
+    addOrdering(orderingWidget, settings);
+    orderingWidget.show_all();
+    behaviourWidget.pack_start(orderingWidget, true, true, 0);
+  vWidget.add(behaviourWidget);
 
-  let hWidget = new Gtk.HBox({spacing: 20});
-
-  let fontSizeWidget = new Gtk.VBox();
-  addFontSize(fontSizeWidget, settings);
-  hWidget.add(fontSizeWidget);
-
-  let iconSizeWidget = new Gtk.VBox();
-  addIconSize(iconSizeWidget, settings);
-  hWidget.add(iconSizeWidget);
-
-  vWidget.add(hWidget);
+  let appearanceWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
+    let fontSizeWidget = new Gtk.VBox();
+    addFontSize(fontSizeWidget, settings);
+    appearanceWidget.add(fontSizeWidget);
+    let iconSizeWidget = new Gtk.VBox();
+    addIconSize(iconSizeWidget, settings);
+    appearanceWidget.add(iconSizeWidget);
+  vWidget.add(appearanceWidget);
 
   addMaxWidth(vWidget, settings);
 
   let workspaceWidget = new Gtk.HBox();
-  addWorkspace(workspaceWidget, settings);
+    addWorkspace(workspaceWidget, settings);
   vWidget.add(workspaceWidget);
 
   vWidget.show_all();
@@ -96,6 +99,30 @@ function addFuzzy(widget, settings) {
     input.set_sensitive(o.active);
   });
   widget.add(_switch);
+}
+
+function addMatching(widget, settings) {
+    widget.add(makeTitle(_("Pattern matching algorithm")));
+    let options = [_("Substring"), _("Fuzzy")];
+    let input = new Gtk.ComboBoxText();
+    options.forEach(o => input.append_text(o));
+    input.set_active(settings.get_uint('matching'));
+    input.connect('changed', function() {
+        settings.set_uint('matching', input.get_active());
+    });
+    widget.add(input);
+}
+
+function addOrdering(widget, settings) {
+    widget.add(makeTitle(_("Ordering criteria")));
+    let options = [_("Last focused"), _("Relevancy")];
+    let input = new Gtk.ComboBoxText();
+    options.forEach(o => input.append_text(o));
+    input.set_active(settings.get_uint('ordering'));
+    input.connect('changed', function() {
+        settings.set_uint('ordering', input.get_active());
+    });
+    widget.add(input);
 }
 
 function addImmediately(widget, settings) {

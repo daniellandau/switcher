@@ -30,6 +30,10 @@ const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 const keyActivationNone = 0;
 const keyActivationFunctionKeys = 1;
 const keyActivationNumbers = 2;
+const orderByFocus = 0;
+const orderByRelevancy = 1;
+const matchSubstring = 0;
+const matchFuzzy = 1;
 
 let container, cursor;
 
@@ -70,42 +74,39 @@ function runFilter(app, fragment) {
   if (fragment == "")
     return true;
 
+  const matching = Convenience.getSettings().get_uint('matching');
+  const splitChar = (matching == matchFuzzy) ? "" : " ";
+  const regexp = new RegExp(fragment.split(splitChar).reduce(function(a,b) {
+      return a+'[^'+b+']*'+b;
+  }), "gi");
+
+  let match;
+  let gotMatch = false;
+  let score = 0;
   const description = this.description(app).toLowerCase();
-  const useFuzzy = Convenience.getSettings().get_boolean('fuzzy-matching');
-  if (useFuzzy) {
-    let regexp = new RegExp(fragment.split("").reduce(function(a,b) {
-        return a+'[^'+b+']*'+b;
-    }), "gi");
+  const filteredDescription =
+      description.slice(descriptionNameIndex(app), description.length);
+  while ((match = regexp.exec(filteredDescription))) {
+    // A full match at the beginning is the best match
+    if ((match.index == 0) && match[0].length == fragment.length)
+      score += 100;
 
-    let match;
-    let gotMatch = false;
-    let score = 0;
-    let filteredDescription =
-        description.slice(descriptionNameIndex(app), description.length);
-    while ((match = regexp.exec(filteredDescription))) {
-      // A full match at the beginning is the best match
-      if ((match.index == 0) && match[0].length == fragment.length)
-        score += 100;
+    // Since we don't split the input by words, we have to identify
+    // which matches are prefixes to words
+    let prefixFactor = ((match.index != 0) &&
+                        filteredDescription.charAt(match.index - 1) == " ")
+                           ? match.index * 0.01
+                           : match.index;
 
-      // Since we don't split the input by words, we have to identify
-      // which matches are prefixes to words
-      let prefixFactor = ((match.index != 0) &&
-                          filteredDescription.charAt(match.index - 1) == " ")
-                             ? match.index * 0.01
-                             : match.index;
+    // Apply penalizations according to appearance order and match length
+    score = Math.max(score,
+        1.0/(1 + prefixFactor) + 1.2/(1 + match[0].length - fragment.length));
 
-      // Apply penalizations according to appearance order and match length
-      score = Math.max(score,
-          1.0/(1 + prefixFactor) + 1.2/(1 + match[0].length - fragment.length));
-
-      gotMatch = true;
-    }
-    app.score = score;
-
-    return gotMatch;
-  } else {
-    return description.indexOf(fragment.toLowerCase()) !== -1;
+    gotMatch = true;
   }
+  app.score = score;
+
+  return gotMatch;
 }
 
 function _hideUI() {
@@ -115,8 +116,6 @@ function _hideUI() {
 }
 
 function makeBox(app, index) {
-  const iconSize = Convenience.getSettings().get_uint('icon-size');
-
   const box = new St.BoxLayout({style_class: 'switcher-box'});
 
   let shortcutBox = undefined;
@@ -129,17 +128,19 @@ function makeBox(app, index) {
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
   }
+
   const label = new St.Label({
     style_class: 'switcher-label',
     y_align: Clutter.ActorAlign.CENTER
   });
   label.clutter_text.set_text(description(app));
+  label.set_x_expand(true);
+  box.insert_child_at_index(label, 0);
 
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
+  const iconSize = Convenience.getSettings().get_uint('icon-size');
   iconBox.child = appRef.create_icon_texture(iconSize);
-  box.insert_child_at_index(label, 0);
-  label.set_x_expand(true);
   box.insert_child_at_index(iconBox, 0);
 
   return {whole: box, shortcutBox: shortcutBox, label: label};
@@ -180,9 +181,9 @@ function highlightText(text, query) {
   query = escapeChars(query);
 
   // Identify substring parts to be highlighted
-  const useFuzzy = Convenience.getSettings().get_boolean('fuzzy-matching');
+  const matching = Convenience.getSettings().get_uint('matching');
   let queryExpression = "(";
-  let queries = (useFuzzy) ? query.split(/ |/) : query.split(" ");
+  let queries = (matching == matchFuzzy) ? query.split(/ |/) : query.split(" ");
   let queriesLength = queries.length;
   for (let i = 0; i < queriesLength - 1; i++) {
     if (queries[i] != "") {
@@ -310,8 +311,8 @@ function _showUI() {
       filteredApps = apps.filter(makeFilter(o.text));
 
       // Always preserve focus order before typing
-      if (Convenience.getSettings().get_boolean('fuzzy-matching') &&
-          o.text != "") {
+      const ordering = Convenience.getSettings().get_uint('ordering');
+      if ((ordering == orderByRelevancy) && o.text != "") {
         filteredApps = filteredApps.sort(function(a, b) {
           if (a.score > b.score)
             return -1;

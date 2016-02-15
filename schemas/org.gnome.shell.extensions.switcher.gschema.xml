@@ -9,9 +9,13 @@
             <default>false</default>
             <summary>Whether to activate immediately when there is just one result.</summary>
         </key>
-        <key type="b" name="fuzzy-matching">
-            <default>false</default>
-            <summary>Fuzzy matching</summary>
+        <key type="u" name="matching">
+            <default>0</default>
+            <summary>Pattern matching algorithm: 0=Substring, 1=Fuzzy</summary>
+        </key>
+        <key type="u" name="ordering">
+            <default>0</default>
+            <summary>Ordering criteria: 0=Last focused, 1=Relevancy</summary>
         </key>
         <key type="u" name="font-size">
             <default>32</default>
