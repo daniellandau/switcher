@@ -86,21 +86,6 @@ function addShortcut(widget, settings) {
   widget.add(treeView);
 }
 
-function addFuzzy(widget, settings) {
-  widget.add(makeTitle(_("Fuzzy matching")));
-
-  let _switch = new Gtk.Switch({
-    active: settings.get_boolean('fuzzy-matching'),
-    margin_top: 15,
-    halign: Gtk.Align.END
-  });
-  _switch.connect('notify::active', function (o) {
-    settings.set_boolean('fuzzy-matching', o.active);
-    input.set_sensitive(o.active);
-  });
-  widget.add(_switch);
-}
-
 function addMatching(widget, settings) {
     widget.add(makeTitle(_("Pattern matching algorithm")));
     let options = [_("Substring"), _("Fuzzy")];
