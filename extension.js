@@ -1,5 +1,4 @@
-// Switcher is a Gnome Shell extension allowing quickly switching windows by
-// typing
+// Switcher is a Gnome Shell extension allowing quickly switching windows by typing
 // Copyright (C) 2015  Daniel Landau
 //
 // This program is free software: you can redistribute it and/or modify
@@ -27,13 +26,13 @@ const Lang = imports.lang;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 
-const keyActivationNone = 0;
+const keyActivationNone         = 0;
 const keyActivationFunctionKeys = 1;
-const keyActivationNumbers = 2;
-const orderByFocus = 0;
+const keyActivationNumbers      = 2;
+const orderByFocus     = 0;
 const orderByRelevancy = 1;
 const matchSubstring = 0;
-const matchFuzzy = 1;
+const matchFuzzy     = 1;
 
 let container, cursor;
 
