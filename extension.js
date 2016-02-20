@@ -260,7 +260,11 @@ function _showUI() {
       Main.activateWindow(filteredApps[fkeyIndex]);
     } else {
       if ((symbol === Clutter.h) && control) {
-        o.text = o.text.slice(0, -1);
+        const entryText = entry.get_clutter_text();
+        let textCursor = entryText.get_cursor_position();
+        if (textCursor == -1)
+          textCursor = o.text.length;
+        entryText.delete_text(textCursor - 1, textCursor);
       }
 
       boxes.forEach(box => boxLayout.remove_child(box.whole));
