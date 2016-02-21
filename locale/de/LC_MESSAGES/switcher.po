@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-11 18:04+0100\n"
-"PO-Revision-Date: 2016-02-11 18:11+0100\n"
+"POT-Creation-Date: 2016-02-17 08:17+0100\n"
+"PO-Revision-Date: 2016-02-17 08:18+0100\n"
 "Last-Translator: Jonatan Zeidler <jonatan_zeidler@gmx.de>\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -17,50 +17,54 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.4\n"
 
-#: prefs.js:45
+#: prefs.js:49
 msgid "Hotkey to activate switcher"
 msgstr "Tastenkürzel zum Aktivieren des Fensterwechslers"
 
-#: prefs.js:69
+#: prefs.js:73
 msgid "Key"
 msgstr "Kürzel"
 
-#: prefs.js:78
+#: prefs.js:82
 msgid "Immediate activation"
 msgstr "Automatisches Wechseln"
 
-#: prefs.js:83
+#: prefs.js:87
 msgid "When there is just one result, activate immediately"
 msgstr "Automatisch wechseln, falls es nur ein Ergebnis gibt"
 
-#: prefs.js:96
+#: prefs.js:101
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr "Automatisches Wechseln mit Verzögerung in Millisekunden von:"
 
-#: prefs.js:116
+#: prefs.js:121
 msgid "Icon size (px)"
 msgstr "Symbolgröße (px)"
 
-#: prefs.js:133
+#: prefs.js:138
 msgid "Font size (px)"
 msgstr "Schriftgröße (px)"
 
-#: prefs.js:150
+#: prefs.js:155
 msgid "Max width (%)"
 msgstr "Maximale Breite (%)"
 
-#: prefs.js:166
+#: prefs.js:171
 msgid "Activate by pressing a key matching the index in the list"
 msgstr "Wechseln durch Tastendruck"
 
-#: prefs.js:167
+#: prefs.js:172
 msgid "Disable"
 msgstr "Deaktivieren"
 
-#: prefs.js:167
+#: prefs.js:172
 msgid "Function keys"
 msgstr "F-Tasten"
 
-#: prefs.js:167
+#: prefs.js:172
 msgid "Number keys"
 msgstr "Nummern-Tasten"
+
+#: prefs.js:183
+msgid "Show workspace indicators"
+msgstr "Arbeitsflächenindikator anzeigen"
