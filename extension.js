@@ -21,7 +21,6 @@ const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
 const GLib = imports.gi.GLib;
-const Lang = imports.lang;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
@@ -64,17 +63,19 @@ const numberKeySymbols = [
 ];
 
 function makeFilter(text) {
-  return Lang.bind(this, function(app) {
+  return function(app) {
+    // start from zero, filters can change this up or down and the scores are summed
+    app.score = 0;
     return text.split(' ').every(fragment => runFilter(app, fragment));
-  });
+  };
 }
 
 function runFilter(app, fragment) {
-  if (fragment == "")
+  if (fragment == '')
     return true;
 
   const matching = Convenience.getSettings().get_uint('matching');
-  const splitChar = (matching == matchFuzzy) ? "" : " ";
+  const splitChar = (matching == matchFuzzy) ? '' : ' ';
   const regexp = new RegExp(fragment.split(splitChar).reduce(function(a,b) {
       return a+'[^'+b+']*'+b;
   }), "gi");
@@ -82,28 +83,37 @@ function runFilter(app, fragment) {
   let match;
   let gotMatch = false;
   let score = 0;
-  const description = this.description(app).toLowerCase();
-  const filteredDescription =
-      description.slice(descriptionNameIndex(app), description.length);
+  const descriptionLowerCase = description(app).toLowerCase();
+  const filteredDescription = descriptionLowerCase
+          .slice(descriptionNameIndex(), descriptionLowerCase.length);
+
+  // go through each match inside description
   while ((match = regexp.exec(filteredDescription))) {
+
     // A full match at the beginning is the best match
-    if ((match.index == 0) && match[0].length == fragment.length)
+    if ((match.index == 0) && match[0].length == fragment.length) {
       score += 100;
+    }
 
-    // Since we don't split the input by words, we have to identify
-    // which matches are prefixes to words
-    let prefixFactor = ((match.index != 0) &&
-                        filteredDescription.charAt(match.index - 1) == " ")
-                           ? match.index * 0.01
-                           : match.index;
+    // matches at beginning word boundaries are better than in the middle of words
+    const wordPrefixFactor =
+            (match.index == 0 || (match.index != 0) && filteredDescription.charAt(match.index - 1) == " ")
+            ? 1.2 : 0.0;
 
-    // Apply penalizations according to appearance order and match length
-    score = Math.max(score,
-        1.0/(1 + prefixFactor) + 1.2/(1 + match[0].length - fragment.length));
+    // matches nearer to the beginning are better than near the end
+    const precedenceFactor = 1.0 / (1 + match.index);
+
+    // fuzzyness can cause lots of stuff to match, penalize by match length
+    const fuzzynessFactor = 2.3 * (fragment.length - match[0].length) / match[0].length;
+
+    // join factors by summing
+    const newscore = precedenceFactor + wordPrefixFactor + fuzzynessFactor;
+
+    score = Math.max(score, newscore);
 
     gotMatch = true;
   }
-  app.score = score;
+  app.score += score;
 
   return gotMatch;
 }
@@ -132,7 +142,7 @@ function makeBox(app, index) {
     style_class: 'switcher-label',
     y_align: Clutter.ActorAlign.CENTER
   });
-  label.clutter_text.set_text(description(app));
+  label.clutter_text.set_text(description(app).replace(/&/g, "&amp;"));
   label.set_x_expand(true);
   box.insert_child_at_index(label, 0);
 
@@ -163,7 +173,8 @@ function description(app) {
   return workspace + appName + ' → ' + app.get_title();
 }
 
-function descriptionNameIndex(app) {
+function descriptionNameIndex() {
+  // note, this doesn't work correctly when there are more 9 workspaces
   return (Convenience.getSettings().get_boolean('workspace-indicator')) ? 3 : 0;
 }
 
@@ -207,7 +218,7 @@ function highlightText(text, query) {
     }
   }
 
-  return result;
+  return result.replace(/&/g, "&amp;");
 }
 
 function updateHighlight(boxes, query) {
