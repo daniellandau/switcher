@@ -85,7 +85,7 @@ function runFilter(app, fragment) {
   let score = 0;
   const descriptionLowerCase = description(app).toLowerCase();
   const filteredDescription = descriptionLowerCase
-          .slice(descriptionNameIndex(), descriptionLowerCase.length);
+          .slice(descriptionNameIndex(app), descriptionLowerCase.length);
 
   // go through each match inside description
   while ((match = regexp.exec(filteredDescription))) {
@@ -173,9 +173,13 @@ function description(app) {
   return workspace + appName + ' → ' + app.get_title();
 }
 
-function descriptionNameIndex() {
-  // note, this doesn't work correctly when there are more 9 workspaces
-  return (Convenience.getSettings().get_boolean('workspace-indicator')) ? 3 : 0;
+function descriptionNameIndex(app) {
+  if (Convenience.getSettings().get_boolean('workspace-indicator')) {
+    const workspace = (app.get_workspace().index() + 1);
+    return workspace.toString().length + 2;
+  } else {
+    return 0;
+  }
 }
 
 function escapeChars(text) {
