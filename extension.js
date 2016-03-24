@@ -28,6 +28,10 @@ const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
 const keyActivationNone         = 0;
 const keyActivationFunctionKeys = 1;
 const keyActivationNumbers      = 2;
+const orderByFocus     = 0;
+const orderByRelevancy = 1;
+const matchSubstring = 0;
+const matchFuzzy     = 1;
 
 let container, cursor;
 
@@ -60,8 +64,58 @@ const numberKeySymbols = [
 
 function makeFilter(text) {
   return function(app) {
-    return text.split(' ').every(fragment => description(app).toLowerCase().indexOf(fragment.toLowerCase()) !== -1);
+    // start from zero, filters can change this up or down and the scores are summed
+    app.score = 0;
+    return text.split(' ').every(fragment => runFilter(app, fragment));
   };
+}
+
+function runFilter(app, fragment) {
+  if (fragment == '')
+    return true;
+
+  const matching = Convenience.getSettings().get_uint('matching');
+  const splitChar = (matching == matchFuzzy) ? '' : ' ';
+  const regexp = new RegExp(fragment.split(splitChar).reduce(function(a,b) {
+      return a+'[^'+b+']*'+b;
+  }), "gi");
+
+  let match;
+  let gotMatch = false;
+  let score = 0;
+  const descriptionLowerCase = description(app).toLowerCase();
+  const filteredDescription = descriptionLowerCase
+          .slice(descriptionNameIndex(app), descriptionLowerCase.length);
+
+  // go through each match inside description
+  while ((match = regexp.exec(filteredDescription))) {
+
+    // A full match at the beginning is the best match
+    if ((match.index == 0) && match[0].length == fragment.length) {
+      score += 100;
+    }
+
+    // matches at beginning word boundaries are better than in the middle of words
+    const wordPrefixFactor =
+            (match.index == 0 || (match.index != 0) && filteredDescription.charAt(match.index - 1) == " ")
+            ? 1.2 : 0.0;
+
+    // matches nearer to the beginning are better than near the end
+    const precedenceFactor = 1.0 / (1 + match.index);
+
+    // fuzzyness can cause lots of stuff to match, penalize by match length
+    const fuzzynessFactor = 2.3 * (fragment.length - match[0].length) / match[0].length;
+
+    // join factors by summing
+    const newscore = precedenceFactor + wordPrefixFactor + fuzzynessFactor;
+
+    score = Math.max(score, newscore);
+
+    gotMatch = true;
+  }
+  app.score += score;
+
+  return gotMatch;
 }
 
 function _hideUI() {
@@ -71,8 +125,6 @@ function _hideUI() {
 }
 
 function makeBox(app, index) {
-  const iconSize = Convenience.getSettings().get_uint('icon-size');
-
   const box = new St.BoxLayout({style_class: 'switcher-box'});
 
   let shortcutBox = undefined;
@@ -85,17 +137,19 @@ function makeBox(app, index) {
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
   }
+
   const label = new St.Label({
     style_class: 'switcher-label',
     y_align: Clutter.ActorAlign.CENTER
   });
-  label.clutter_text.set_text(description(app));
+  label.clutter_text.set_text(description(app).replace(/&/g, "&amp;"));
+  label.set_x_expand(true);
+  box.insert_child_at_index(label, 0);
 
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
+  const iconSize = Convenience.getSettings().get_uint('icon-size');
   iconBox.child = appRef.create_icon_texture(iconSize);
-  box.insert_child_at_index(label, 0);
-  label.set_x_expand(true);
   box.insert_child_at_index(iconBox, 0);
 
   return {whole: box, shortcutBox: shortcutBox, label: label};
@@ -119,9 +173,18 @@ function description(app) {
   return workspace + appName + ' → ' + app.get_title();
 }
 
+function descriptionNameIndex(app) {
+  if (Convenience.getSettings().get_boolean('workspace-indicator')) {
+    const workspace = (app.get_workspace().index() + 1);
+    return workspace.toString().length + 2;
+  } else {
+    return 0;
+  }
+}
+
 function escapeChars(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
-};
+  return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+}
 
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
@@ -132,8 +195,9 @@ function highlightText(text, query) {
   query = escapeChars(query);
 
   // Identify substring parts to be highlighted
+  const matching = Convenience.getSettings().get_uint('matching');
   let queryExpression = "(";
-  let queries = query.split(' ');
+  let queries = (matching == matchFuzzy) ? query.split(/ |/) : query.split(" ");
   let queriesLength = queries.length;
   for (let i = 0; i < queriesLength - 1; i++) {
     if (queries[i] != "") {
@@ -158,7 +222,7 @@ function highlightText(text, query) {
     }
   }
 
-  return result;
+  return result.replace(/&/g, "&amp;");
 }
 
 function updateHighlight(boxes, query) {
@@ -175,7 +239,8 @@ function updateHighlight(boxes, query) {
 
 function _showUI() {
   'use strict';
-  if (container) return;
+  if (container)
+    return;
 
   let filteredApps;
 
@@ -210,7 +275,9 @@ function _showUI() {
 
   let boxes = filteredApps.map(makeBox);
   updateHighlight(boxes, "");
-  const entry = new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
+
+  const entry =
+      new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
 
@@ -222,13 +289,15 @@ function _showUI() {
   container.set_height(monitor.height);
   container.set_position(monitor.x, monitor.y);
 
-  let width = boxes.map(box => box.whole.width).reduce((a, b) => Math.max(a, b), 0);
-  let shortcutWidth = boxes
-        .map(box => box.shortcutBox ? box.shortcutBox.width : 0)
-        .reduce((a, b) => Math.max(a, b), 0);
+  let width =
+      boxes.map(box => box.whole.width).reduce((a, b) => Math.max(a, b), 0);
+  let shortcutWidth =
+      boxes.map(box => box.shortcutBox ? box.shortcutBox.width : 0)
+           .reduce((a, b) => Math.max(a, b), 0);
   const maxWidth = Main.layoutManager.primaryMonitor.width * 0.01 *
-          Convenience.getSettings().get_uint('max-width-percentage');
-  if (width > maxWidth) width = maxWidth;
+                   Convenience.getSettings().get_uint('max-width-percentage');
+  if (width > maxWidth)
+    width = maxWidth;
   boxes.forEach(box => fixWidths(box, width, shortcutWidth));
 
   entry.set_width(width);
@@ -268,7 +337,21 @@ function _showUI() {
       }
 
       boxes.forEach(box => boxLayout.remove_child(box.whole));
+
       filteredApps = apps.filter(makeFilter(o.text));
+
+      // Always preserve focus order before typing
+      const ordering = Convenience.getSettings().get_uint('ordering');
+      if ((ordering == orderByRelevancy) && o.text != "") {
+        filteredApps = filteredApps.sort(function(a, b) {
+          if (a.score > b.score)
+            return -1;
+          if (a.score < b.score)
+            return 1;
+          return 0;
+        });
+      }
+
       if (Convenience.getSettings().get_boolean('activate-immediately') &&
           filteredApps.length === 1) {
         debouncedActivateUnique();
@@ -331,17 +414,14 @@ function init() {}
 
 function enable() {
   Main.wm.addKeybinding(
-    'show-switcher',
-    Convenience.getSettings(),
-    Meta.KeyBindingFlags.NONE,
-    // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
-    Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL : Shell.ActionMode.NORMAL,
-    _showUI);
+      'show-switcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE,
+      // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
+      Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL
+                           : Shell.ActionMode.NORMAL,
+      _showUI);
 }
 
-function disable() {
-  Main.wm.removeKeybinding('show-switcher');
-}
+function disable() { Main.wm.removeKeybinding('show-switcher'); }
 
 // from https://github.com/satya164/gjs-helpers
 const setTimeout = (f, ms) => {
@@ -357,7 +437,8 @@ const clearTimeout = id => GLib.Source.remove(id);
 function debounce(f, ms) {
   let timeoutId = null;
   return function() {
-    if (timeoutId) clearTimeout(timeoutId);
+    if (timeoutId)
+      clearTimeout(timeoutId);
     timeoutId = setTimeout(f, ms);
   };
 }
