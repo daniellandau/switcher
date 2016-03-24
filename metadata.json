@@ -4,6 +4,7 @@
   "settings-schema": "org.gnome.shell.extensions.switcher",
   "description": "Switch windows quickly by typing\n\nUse the configured global hotkey (Super+w by default) to open a list of current windows. Type a part of the name or title of the application window you want to activate and hit enter. You can use the arrow keys to navigate among the filtered selection and type several space separated search terms to filter further. Use Esc or click anywhere to cancel.\n\nYou can customize the look and feel in the preferences.",
   "shell-version": [
+    "3.20",
     "3.18",
     "3.16",
     "3.14"
