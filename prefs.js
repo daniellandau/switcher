@@ -88,7 +88,7 @@ function addShortcut(widget, settings) {
 
 function addMatching(widget, settings) {
     widget.add(makeTitle(_("Pattern matching algorithm")));
-    let options = [_("Substring"), _("Fuzzy")];
+    let options = [_("Strict"), _("Fuzzy")];
     let input = new Gtk.ComboBoxText();
     options.forEach(o => input.append_text(o));
     input.set_active(settings.get_uint('matching'));
@@ -100,7 +100,7 @@ function addMatching(widget, settings) {
 
 function addOrdering(widget, settings) {
     widget.add(makeTitle(_("Ordering criteria")));
-    let options = [_("Last focused"), _("Relevancy")];
+    let options = [_("Last focused"), _("Most relevant")];
     let input = new Gtk.ComboBoxText();
     options.forEach(o => input.append_text(o));
     input.set_active(settings.get_uint('ordering'));
