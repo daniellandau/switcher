@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-13 10:34+0200\n"
-"PO-Revision-Date: 2016-02-13 10:35+0200\n"
+"POT-Creation-Date: 2016-03-26 18:10+0200\n"
+"PO-Revision-Date: 2016-03-26 18:13+0200\n"
 "Last-Translator: Daniel Landau <daniel@landau.fi>\n"
 "Language-Team: \n"
 "Language: fi_FI\n"
@@ -20,56 +20,80 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 
-#: prefs.js:49
+#: prefs.js:57
 msgid "Hotkey to activate switcher"
 msgstr "Pikanäppäin vaihtajan aktivoimiseen"
 
-#: prefs.js:73
+#: prefs.js:81
 msgid "Key"
 msgstr "Näppäin"
 
-#: prefs.js:82
+#: prefs.js:90
+msgid "Pattern matching algorithm"
+msgstr "Hahmonnusalgoritmi"
+
+#: prefs.js:91
+msgid "Strict"
+msgstr "Tarkka"
+
+#: prefs.js:91
+msgid "Fuzzy"
+msgstr "Sumea"
+
+#: prefs.js:102
+msgid "Ordering criteria"
+msgstr "Järjestys"
+
+#: prefs.js:103
+msgid "Last focused"
+msgstr "Viimeksi käytetty ensin"
+
+#: prefs.js:103
+msgid "Most relevant"
+msgstr "Oleellisin ensin"
+
+#: prefs.js:114
 msgid "Immediate activation"
 msgstr "Välitön aktivointi"
 
-#: prefs.js:87
+#: prefs.js:119
 msgid "When there is just one result, activate immediately"
 msgstr "Kun tuloksia on vain yksi, aktivoi välittömästi"
 
-#: prefs.js:101
+#: prefs.js:133
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 "Aktivoi välittömästi näin monta millisekuntia viimeisen näppäinpainalluksen "
 "jälkeen"
 
-#: prefs.js:121
+#: prefs.js:153
 msgid "Icon size (px)"
 msgstr "Ikonin koko (px)"
 
-#: prefs.js:138
+#: prefs.js:170
 msgid "Font size (px)"
 msgstr "Fonttikoko (px)"
 
-#: prefs.js:155
+#: prefs.js:187
 msgid "Max width (%)"
 msgstr "Maksimileveys (%)"
 
-#: prefs.js:171
+#: prefs.js:203
 msgid "Activate by pressing a key matching the index in the list"
 msgstr "Aktivoi painamalla järjestysnumeroa vastaavaa näppäintä"
 
-#: prefs.js:172
+#: prefs.js:204
 msgid "Disable"
 msgstr "Pois käytöstä"
 
-#: prefs.js:172
+#: prefs.js:204
 msgid "Function keys"
 msgstr "Funktionäppäimet"
 
-#: prefs.js:172
+#: prefs.js:204
 msgid "Number keys"
 msgstr "Numeronäppäimet"
 
-#: prefs.js:183
+#: prefs.js:215
 msgid "Show workspace indicators"
 msgstr "Näytä työtilaindikaattori"
