@@ -62,9 +62,14 @@ const numberKeySymbols = [
   Clutter.KEY_0,
 ];
 
+function escapeChars(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+}
+
 function makeFilter(text) {
   return function(app) {
-    // start from zero, filters can change this up or down and the scores are summed
+    // start from zero, filters can change this up or down
+    // and the scores are summed
     app.score = 0;
     return text.split(' ').every(fragment => runFilter(app, fragment));
   };
@@ -74,19 +79,28 @@ function runFilter(app, fragment) {
   if (fragment == '')
     return true;
 
+  fragment = escapeChars(fragment);
+  
   const matching = Convenience.getSettings().get_uint('matching');
   const splitChar = (matching == matchFuzzy) ? '' : ' ';
+  const specialexp = new RegExp(/[-[\]{}()*+?.,\\^$|#]/);
   const regexp = new RegExp(fragment.split(splitChar).reduce(function(a,b) {
-      return a+'[^'+b+']*'+b;
+      // In order to treat special charactes as a whole,
+      // we manually identify and concatenate them
+      if (b == '\\')
+        return a+b;
+      else if (specialexp.test(b) && (a.charAt(a.length - 1) == '\\'))
+        return a.slice(0, a.length - 1) + '[^' + '\\' + b + ']*' + '\\' +  b;
+      else
+        return a + '[^' + b + ']*' + b;
   }), "gi");
 
   let match;
   let gotMatch = false;
   let score = 0;
   const descriptionLowerCase = description(app).toLowerCase();
-  const filteredDescription = descriptionLowerCase
-          .slice(descriptionNameIndex(app), descriptionLowerCase.length);
-
+  const filteredDescription = escapeChars(descriptionLowerCase
+          .slice(descriptionNameIndex(app), descriptionLowerCase.length));
   // go through each match inside description
   while ((match = regexp.exec(filteredDescription))) {
 
@@ -142,7 +156,7 @@ function makeBox(app, index) {
     style_class: 'switcher-label',
     y_align: Clutter.ActorAlign.CENTER
   });
-  label.clutter_text.set_text(description(app).replace(/&/g, "&amp;"));
+  label.clutter_text.set_text(description(app));
   label.set_x_expand(true);
   box.insert_child_at_index(label, 0);
 
@@ -182,17 +196,10 @@ function descriptionNameIndex(app) {
   }
 }
 
-function escapeChars(text) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
-}
-
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
   if (query == "")
     return text;
-
-  // Escape special characters in query
-  query = escapeChars(query);
 
   // Identify substring parts to be highlighted
   const matching = Convenience.getSettings().get_uint('matching');
@@ -201,10 +208,11 @@ function highlightText(text, query) {
   let queriesLength = queries.length;
   for (let i = 0; i < queriesLength - 1; i++) {
     if (queries[i] != "") {
-      queryExpression += queries[i] + "|";
+      queryExpression += escapeChars(queries[i]) + "|";
     }
   }
-  queryExpression += queries[queriesLength - 1] + ")";
+  queryExpression += escapeChars(queries[queriesLength - 1]) + ")";
+
   let queryRegExp = new RegExp(queryExpression, "i");
   let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
 
