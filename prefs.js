@@ -19,7 +19,17 @@ function buildPrefsWidget() {
 
   let vWidget = new Gtk.VBox({margin: 10});
 
-  addShortcut(vWidget, settings);
+  let shortcutsWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
+    let switcherWidget = new Gtk.VBox();
+    addShortcut(switcherWidget, settings, 'show-switcher', "Hotkey to activate switcher");
+    switcherWidget.show_all();
+    shortcutsWidget.pack_start(switcherWidget, true, true, 0);
+    let launcherWidget = new Gtk.VBox();
+    addShortcut(launcherWidget, settings, 'show-launcher', "Hotkey to activate launcher");
+    launcherWidget.show_all();
+    shortcutsWidget.pack_start(launcherWidget, true, true, 0);
+  vWidget.add(shortcutsWidget);
+
   addImmediately(vWidget, settings);
   addActivateByKey(vWidget, settings);
 
@@ -53,14 +63,14 @@ function buildPrefsWidget() {
   return vWidget;
 }
 
-function addShortcut(widget, settings) {
-  widget.add(makeTitle(_("Hotkey to activate switcher")));
+function addShortcut(widget, settings, shortcut, title) {
+  widget.add(makeTitle(_(title)));
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
 
   const row = model.insert(0);
-  let [key, mods] = Gtk.accelerator_parse(settings.get_strv('show-switcher')[0]);
+  let [key, mods] = Gtk.accelerator_parse(settings.get_strv(shortcut)[0]);
   model.set(row, [0, 1], [mods, key]);
 
   let treeView = new Gtk.TreeView({model: model});
@@ -74,7 +84,7 @@ function addShortcut(widget, settings) {
     let [succ, iterator] = model.get_iter_from_string(iter);
     model.set(iterator, [0, 1], [mods, key]);
     if (key != 0) {
-      settings.set_strv('show-switcher', [value]);
+      settings.set_strv(shortcut, [value]);
     }
   });
 

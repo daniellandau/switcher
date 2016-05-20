@@ -23,7 +23,10 @@ const Meta = imports.gi.Meta;
 const GLib = imports.gi.GLib;
 
 const ExtensionUtils = imports.misc.extensionUtils;
-const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
+const Me = ExtensionUtils.getCurrentExtension();
+const Convenience = Me.imports.convenience;
+const Switcher = Me.imports.modes.switcher;
+const Launcher = Me.imports.modes.launcher;
 
 const keyActivationNone         = 0;
 const keyActivationFunctionKeys = 1;
@@ -32,8 +35,6 @@ const orderByFocus     = 0;
 const orderByRelevancy = 1;
 const matchSubstring = 0;
 const matchFuzzy     = 1;
-
-let container, cursor;
 
 const functionKeySymbols = [
   Clutter.KEY_F1,
@@ -62,20 +63,27 @@ const numberKeySymbols = [
   Clutter.KEY_0,
 ];
 
+// Limit the number of displayed items
+const MAX_NUM_ITEMS = 10;
+
+let container, cursor;
+let switcher = Switcher.Switcher;
+let launcher = Launcher.Launcher;
+
 function escapeChars(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
 }
 
-function makeFilter(text) {
+function makeFilter(mode, text) {
   return function(app) {
     // start from zero, filters can change this up or down
     // and the scores are summed
     app.score = 0;
-    return text.split(' ').every(fragment => runFilter(app, fragment));
+    return text.split(' ').every(fragment => runFilter(mode, app, fragment));
   };
 }
 
-function runFilter(app, fragment) {
+function runFilter(mode, app, fragment) {
   if (fragment == '')
     return true;
 
@@ -98,9 +106,9 @@ function runFilter(app, fragment) {
   let match;
   let gotMatch = false;
   let score = 0;
-  const descriptionLowerCase = description(app).toLowerCase();
+  const descriptionLowerCase = mode.description(app).toLowerCase();
   const filteredDescription = escapeChars(descriptionLowerCase
-          .slice(descriptionNameIndex(app), descriptionLowerCase.length));
+          .slice(mode.descriptionNameIndex(app), descriptionLowerCase.length));
   // go through each match inside description
   while ((match = regexp.exec(filteredDescription))) {
 
@@ -134,66 +142,12 @@ function runFilter(app, fragment) {
 
 function _hideUI() {
   Main.uiGroup.remove_actor(container);
-  Main.popModal(container);
-  container = null;
-}
-
-function makeBox(app, index) {
-  const box = new St.BoxLayout({style_class: 'switcher-box'});
-
-  let shortcutBox = undefined;
-  if (getActionKeyTable().length > 0) {
-    const shortcut = new St.Label({
-      style_class: 'switcher-shortcut',
-      text: getKeyDesc(index + 1)
-    });
-    shortcutBox = new St.Bin({style_class: 'switcher-label'});
-    shortcutBox.child = shortcut;
-    box.insert_child_at_index(shortcutBox, 0);
-  }
-
-  const label = new St.Label({
-    style_class: 'switcher-label',
-    y_align: Clutter.ActorAlign.CENTER
-  });
-  label.clutter_text.set_text(description(app));
-  label.set_x_expand(true);
-  box.insert_child_at_index(label, 0);
-
-  const iconBox = new St.Bin({style_class: 'switcher-icon'});
-  const appRef = Shell.WindowTracker.get_default().get_window_app(app);
-  const iconSize = Convenience.getSettings().get_uint('icon-size');
-  iconBox.child = appRef.create_icon_texture(iconSize);
-  box.insert_child_at_index(iconBox, 0);
-
-  return {whole: box, shortcutBox: shortcutBox, label: label};
-}
-
-function description(app) {
-  let workspace = "";
-  if (Convenience.getSettings().get_boolean('workspace-indicator')) {
-    workspace = (app.get_workspace().index() + 1) + ": ";
-  }
-
-  const appRef = Shell.WindowTracker.get_default().get_window_app(app);
-  let appName;
   try {
-    appName = appRef.get_name();
+    Main.popModal(container);
   } catch (e) {
-    print(e);
-    appName = 'Could not get name';
+    Main.notifyError("Switcher crashed!", "The extension might be in an unstable state. Please restart GNOME Shell.");
   }
-
-  return workspace + appName + ' → ' + app.get_title();
-}
-
-function descriptionNameIndex(app) {
-  if (Convenience.getSettings().get_boolean('workspace-indicator')) {
-    const workspace = (app.get_workspace().index() + 1);
-    return workspace.toString().length + 2;
-  } else {
-    return 0;
-  }
+  container = null;
 }
 
 function highlightText(text, query) {
@@ -245,21 +199,27 @@ function updateHighlight(boxes, query) {
       boxes[cursor].whole.add_style_class_name('switcher-highlight');
 }
 
-function _showUI() {
+function _showSwitcher() {
+  _showUI(switcher, "");
+}
+
+function _showLauncher() {
+  _showUI(launcher, "");
+}
+
+function _showUI(mode, entryText) {
   'use strict';
   if (container)
     return;
 
-  let filteredApps;
+  cursor = 0;
 
   const debouncedActivateUnique = debounce(() => {
     if (filteredApps.length === 1) {
       _hideUI();
-      Main.activateWindow(filteredApps[cursor]);
+      mode.activate(filteredApps[cursor]);
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
-
-  cursor = 0;
 
   container = new St.Bin({reactive: true});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
@@ -269,23 +229,16 @@ function _showUI() {
   boxLayout.set_style('font-size: ' + fontSize + 'px');
   boxLayout.set_vertical(true);
 
-  // Get all windows in activation order
-  const apps = global.display.get_tab_list(Meta.TabList.NORMAL, null);
+  // Use all apps for filtering
+  const apps = mode.apps();
+  let filteredApps = apps.filter(makeFilter(mode, entryText));
 
-  // swap the first two, so we can switch quickly back and forth
-  if (apps.length >= 2) {
-    const tmp = apps[0];
-    apps[0] = apps[1];
-    apps[1] = tmp;
-  }
+  let boxes = filteredApps.slice(0,MAX_NUM_ITEMS).map(mode.makeBox);
+  updateHighlight(boxes, entryText);
 
-  filteredApps = apps;
-
-  let boxes = filteredApps.map(makeBox);
-  updateHighlight(boxes, "");
-
-  const entry =
-      new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
+  let entry =
+    new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
+  entry.set_text(entryText);
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
 
@@ -298,7 +251,8 @@ function _showUI() {
   container.set_position(monitor.x, monitor.y);
 
   let width =
-      boxes.map(box => box.whole.width).reduce((a, b) => Math.max(a, b), 0);
+      boxes.map(box => box.whole.width)
+           .reduce((a, b) => Math.max(a, b), 0);
   let shortcutWidth =
       boxes.map(box => box.shortcutBox ? box.shortcutBox.width : 0)
            .reduce((a, b) => Math.max(a, b), 0);
@@ -306,6 +260,8 @@ function _showUI() {
                    Convenience.getSettings().get_uint('max-width-percentage');
   if (width > maxWidth)
     width = maxWidth;
+  if (width < maxWidth/2)
+    width = maxWidth/2;
   boxes.forEach(box => fixWidths(box, width, shortcutWidth));
 
   entry.set_width(width);
@@ -313,15 +269,23 @@ function _showUI() {
   entry.connect('key-release-event', (o, e) => {
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
-
     const symbol = e.get_key_symbol();
     let fkeyIndex = getActionKeyTable().indexOf(symbol);
-    if (symbol === Clutter.KEY_Escape)
+    if (symbol === Clutter.KEY_Escape) {
       _hideUI();
-    else if ((symbol === Clutter.KEY_Return) ||
+      entry.set_text("");
+    // Switch mode
+    } else if (((symbol === Clutter.m) && control) ||
+        ((symbol === Clutter.KEY_Tab) && control)) {
+        let previousText = entry.get_text();
+        _hideUI();
+        (mode.name() === "Switcher")
+          ? _showUI(launcher, previousText)
+          : _showUI(switcher, previousText);
+    } else if ((symbol === Clutter.KEY_Return) ||
         ((symbol === Clutter.j) && control)) {
       _hideUI();
-      filteredApps.length > 0 && Main.activateWindow(filteredApps[cursor]);
+      filteredApps.length > 0 && mode.activate(filteredApps[cursor]);
     } else if ((symbol === Clutter.KEY_Down) ||
         (symbol === Clutter.KEY_Tab) ||
         ((symbol === Clutter.n) && control)) {
@@ -329,12 +293,13 @@ function _showUI() {
       updateHighlight(boxes, o.text);
     } else if ((symbol === Clutter.KEY_Up) || 
         ((symbol === Clutter.ISO_Left_Tab) && shift) ||
+        ((symbol === Clutter.KEY_Tab) && shift) ||
         ((symbol === Clutter.p) && control)) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
       updateHighlight(boxes, o.text);
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       _hideUI();
-      Main.activateWindow(filteredApps[fkeyIndex]);
+      mode.activate(filteredApps[fkeyIndex]);
     } else {
       if ((symbol === Clutter.h) && control) {
         const entryText = entry.get_clutter_text();
@@ -346,7 +311,7 @@ function _showUI() {
 
       boxes.forEach(box => boxLayout.remove_child(box.whole));
 
-      filteredApps = apps.filter(makeFilter(o.text));
+      filteredApps = apps.filter(makeFilter(mode, o.text));
 
       // Always preserve focus order before typing
       const ordering = Convenience.getSettings().get_uint('ordering');
@@ -365,7 +330,7 @@ function _showUI() {
         debouncedActivateUnique();
       }
 
-      boxes = filteredApps.map(makeBox);
+      boxes = filteredApps.slice(0,MAX_NUM_ITEMS).map(mode.makeBox);
       
       // If there's less boxes then in previous cursor position,
       // set cursor to the last box
@@ -418,7 +383,8 @@ function getActionKeyTable() {
   }
 }
 
-function init() {}
+function init() {
+}
 
 function enable() {
   Main.wm.addKeybinding(
@@ -426,10 +392,19 @@ function enable() {
       // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
       Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL
                            : Shell.ActionMode.NORMAL,
-      _showUI);
+      _showSwitcher);
+  Main.wm.addKeybinding(
+      'show-launcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE,
+      // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
+      Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL
+                           : Shell.ActionMode.NORMAL,
+      _showLauncher);
 }
 
-function disable() { Main.wm.removeKeybinding('show-switcher'); }
+function disable() { 
+  Main.wm.removeKeybinding('show-switcher');
+  Main.wm.removeKeybinding('show-launcher');
+}
 
 // from https://github.com/satya164/gjs-helpers
 const setTimeout = (f, ms) => {
