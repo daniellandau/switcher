@@ -38,15 +38,12 @@ const Launcher = (function () {
   };
 
   var description = function(app) {
-    let appName;
     try {
-      appName = app.get_name();
+      return app.get_name();
     } catch (e) {
       print(e);
-      appName = 'Could not get name';
+      return 'Could not get name';
     }
-
-    return appName;
   };
 
   // Workspace indicators are not used
@@ -81,7 +78,7 @@ const Launcher = (function () {
     iconBox.child = app.create_icon_texture(iconSize);
     box.insert_child_at_index(iconBox, 0);
 
-    return {whole: box, shortcutBox: shortcutBox, label: label};
+    return { whole: box, shortcutBox: shortcutBox, label: label };
   };
 
   return {

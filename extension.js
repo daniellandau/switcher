@@ -221,6 +221,29 @@ function _showUI(mode, entryText) {
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
 
+  const filterByText = function(mode, apps, text) {
+      let filteredApps = apps.filter(makeFilter(mode, text));
+
+      // Always preserve focus order before typing
+      const ordering = Convenience.getSettings().get_uint('ordering');
+      if ((ordering == orderByRelevancy) && text != "") {
+        filteredApps = filteredApps.sort(function(a, b) {
+          if (a.score > b.score)
+            return -1;
+          if (a.score < b.score)
+            return 1;
+          return 0;
+        });
+      }
+
+      if (Convenience.getSettings().get_boolean('activate-immediately') &&
+          filteredApps.length === 1) {
+        debouncedActivateUnique();
+      }
+
+      return filteredApps;
+  };
+
   container = new St.Bin({reactive: true});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
 
@@ -229,9 +252,8 @@ function _showUI(mode, entryText) {
   boxLayout.set_style('font-size: ' + fontSize + 'px');
   boxLayout.set_vertical(true);
 
-  // Use all apps for filtering
   const apps = mode.apps();
-  let filteredApps = apps.filter(makeFilter(mode, entryText));
+  let filteredApps = filterByText(mode, apps, entryText);
 
   let boxes = filteredApps.slice(0,MAX_NUM_ITEMS).map(mode.makeBox);
   updateHighlight(boxes, entryText);
@@ -263,7 +285,6 @@ function _showUI(mode, entryText) {
   if (width < maxWidth/2)
     width = maxWidth/2;
   boxes.forEach(box => fixWidths(box, width, shortcutWidth));
-
   entry.set_width(width);
 
   entry.connect('key-release-event', (o, e) => {
@@ -309,27 +330,9 @@ function _showUI(mode, entryText) {
         entryText.delete_text(textCursor - 1, textCursor);
       }
 
+      filteredApps = filterByText(mode, apps, o.text);
+
       boxes.forEach(box => boxLayout.remove_child(box.whole));
-
-      filteredApps = apps.filter(makeFilter(mode, o.text));
-
-      // Always preserve focus order before typing
-      const ordering = Convenience.getSettings().get_uint('ordering');
-      if ((ordering == orderByRelevancy) && o.text != "") {
-        filteredApps = filteredApps.sort(function(a, b) {
-          if (a.score > b.score)
-            return -1;
-          if (a.score < b.score)
-            return 1;
-          return 0;
-        });
-      }
-
-      if (Convenience.getSettings().get_boolean('activate-immediately') &&
-          filteredApps.length === 1) {
-        debouncedActivateUnique();
-      }
-
       boxes = filteredApps.slice(0,MAX_NUM_ITEMS).map(mode.makeBox);
       
       // If there's less boxes then in previous cursor position,
