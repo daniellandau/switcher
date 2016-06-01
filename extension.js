@@ -141,6 +141,14 @@ function _hideUI() {
 function makeBox(app, index) {
   const box = new St.BoxLayout({style_class: 'switcher-box'});
 
+  const label = new St.Label({
+    style_class: 'switcher-label',
+    y_align: Clutter.ActorAlign.CENTER
+  });
+  label.clutter_text.set_text(description(app));
+  label.set_x_expand(true);
+  box.insert_child_at_index(label, 0);
+
   let shortcutBox = undefined;
   if (getActionKeyTable().length > 0) {
     const shortcut = new St.Label({
@@ -151,14 +159,6 @@ function makeBox(app, index) {
     shortcutBox.child = shortcut;
     box.insert_child_at_index(shortcutBox, 0);
   }
-
-  const label = new St.Label({
-    style_class: 'switcher-label',
-    y_align: Clutter.ActorAlign.CENTER
-  });
-  label.clutter_text.set_text(description(app));
-  label.set_x_expand(true);
-  box.insert_child_at_index(label, 0);
 
   const iconBox = new St.Bin({style_class: 'switcher-icon'});
   const appRef = Shell.WindowTracker.get_default().get_window_app(app);
