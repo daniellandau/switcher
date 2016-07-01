@@ -41,5 +41,9 @@
             <default>false</default>
             <summary>Whether to show a workspace indicator for each app</summary>
         </key>
+        <key type="b" name="only-current-workspace">
+            <default>false</default>
+            <summary>Whether to show just the apps in the current workspace</summary>
+        </key>
     </schema>
 </schemalist>

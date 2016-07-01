@@ -270,7 +270,10 @@ function _showUI() {
   boxLayout.set_vertical(true);
 
   // Get all windows in activation order
-  const apps = global.display.get_tab_list(Meta.TabList.NORMAL, null);
+  let onlyCurrentWorkspace = Convenience.getSettings().get_boolean('only-current-workspace');
+  let currentWorkspace = global.screen.get_active_workspace_index();
+  const apps = global.display.get_tab_list(Meta.TabList.NORMAL, null)
+    .filter(app => !onlyCurrentWorkspace || app.get_workspace().index() === currentWorkspace);
 
   // swap the first two, so we can switch quickly back and forth
   if (apps.length >= 2) {

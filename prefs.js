@@ -45,9 +45,13 @@ function buildPrefsWidget() {
 
   addMaxWidth(vWidget, settings);
 
-  let workspaceWidget = new Gtk.HBox();
-    addWorkspace(workspaceWidget, settings);
-  vWidget.add(workspaceWidget);
+  let workspaceIndicatorWidget = new Gtk.HBox();
+    addWorkspaceIndicator(workspaceIndicatorWidget, settings);
+  vWidget.add(workspaceIndicatorWidget);
+
+  let onlyOneWorkSpaceWidget = new Gtk.HBox();
+  addOnlyONeWorkspace(onlyOneWorkSpaceWidget, settings);
+  vWidget.add(onlyOneWorkSpaceWidget);
 
   vWidget.show_all();
   return vWidget;
@@ -211,7 +215,7 @@ function addActivateByKey(widget, settings) {
     widget.add(input);
 }
 
-function addWorkspace(widget, settings) {
+function addWorkspaceIndicator(widget, settings) {
   widget.add(makeTitle(_("Show workspace indicators")));
 
   let _switch = new Gtk.Switch({
@@ -221,6 +225,20 @@ function addWorkspace(widget, settings) {
   });
   _switch.connect('notify::active', function (o) {
     settings.set_boolean('workspace-indicator', o.active);
+  });
+  widget.add(_switch);
+}
+
+function addOnlyONeWorkspace(widget, settings) {
+  widget.add(makeTitle(_("Show only apps in the current workspace")));
+
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('only-current-workspace'),
+    margin_top: 15,
+    halign: Gtk.Align.END
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('only-current-workspace', o.active);
   });
   widget.add(_switch);
 }

@@ -8,89 +8,93 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-26 18:09+0200\n"
+"POT-Creation-Date: 2016-07-01 18:24+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 1.8.7.1\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 
-#: prefs.js:57
+#: prefs.js:61
 msgid "Hotkey to activate switcher"
 msgstr ""
 
-#: prefs.js:81
+#: prefs.js:85
 msgid "Key"
 msgstr ""
 
-#: prefs.js:90
+#: prefs.js:94
 msgid "Pattern matching algorithm"
 msgstr ""
 
-#: prefs.js:91
+#: prefs.js:95
 msgid "Strict"
 msgstr ""
 
-#: prefs.js:91
+#: prefs.js:95
 msgid "Fuzzy"
 msgstr ""
 
-#: prefs.js:102
+#: prefs.js:106
 msgid "Ordering criteria"
 msgstr ""
 
-#: prefs.js:103
+#: prefs.js:107
 msgid "Last focused"
 msgstr ""
 
-#: prefs.js:103
+#: prefs.js:107
 msgid "Most relevant"
 msgstr ""
 
-#: prefs.js:114
+#: prefs.js:118
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:119
+#: prefs.js:123
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:133
+#: prefs.js:137
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 
-#: prefs.js:153
+#: prefs.js:157
 msgid "Icon size (px)"
 msgstr ""
 
-#: prefs.js:170
+#: prefs.js:174
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:187
+#: prefs.js:191
 msgid "Max width (%)"
 msgstr ""
 
-#: prefs.js:203
+#: prefs.js:207
 msgid "Activate by pressing a key matching the index in the list"
 msgstr ""
 
-#: prefs.js:204
+#: prefs.js:208
 msgid "Disable"
 msgstr ""
 
-#: prefs.js:204
+#: prefs.js:208
 msgid "Function keys"
 msgstr ""
 
-#: prefs.js:204
+#: prefs.js:208
 msgid "Number keys"
 msgstr ""
 
-#: prefs.js:215
+#: prefs.js:219
 msgid "Show workspace indicators"
+msgstr ""
+
+#: prefs.js:233
+msgid "Show only apps in the current workspace"
 msgstr ""
