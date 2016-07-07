@@ -9,6 +9,9 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
 const Switcher = (function () {
+  // Limit the number of displayed items
+  const MAX_NUM_ITEMS = 15;
+
   var name = function() {
     return "Switcher";
   };

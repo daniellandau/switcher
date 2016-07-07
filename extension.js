@@ -63,9 +63,6 @@ const numberKeySymbols = [
   Clutter.KEY_0,
 ];
 
-// Limit the number of displayed items
-const MAX_NUM_ITEMS = 10;
-
 let container, cursor;
 let switcher = Switcher.Switcher;
 let launcher = Launcher.Launcher;
@@ -255,7 +252,7 @@ function _showUI(mode, entryText) {
   const apps = mode.apps();
   let filteredApps = filterByText(mode, apps, entryText);
 
-  let boxes = filteredApps.slice(0,MAX_NUM_ITEMS).map(mode.makeBox);
+  let boxes = filteredApps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
   updateHighlight(boxes, entryText);
 
   let entry =
@@ -297,7 +294,8 @@ function _showUI(mode, entryText) {
       entry.set_text("");
     // Switch mode
     } else if (((symbol === Clutter.m) && control) ||
-        ((symbol === Clutter.KEY_Tab) && control)) {
+        ((symbol === Clutter.KEY_Tab) && control)) ||
+        ((symbol === Clutter.KEY_space) && control)) {
         let previousText = entry.get_text();
         _hideUI();
         (mode.name() === "Switcher")
@@ -333,7 +331,7 @@ function _showUI(mode, entryText) {
       filteredApps = filterByText(mode, apps, o.text);
 
       boxes.forEach(box => boxLayout.remove_child(box.whole));
-      boxes = filteredApps.slice(0,MAX_NUM_ITEMS).map(mode.makeBox);
+      boxes = filteredApps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
       
       // If there's less boxes then in previous cursor position,
       // set cursor to the last box

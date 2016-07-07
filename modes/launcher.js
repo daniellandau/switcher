@@ -10,6 +10,12 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
 const Launcher = (function () {
+  // Limit the number of displayed items
+  const MAX_NUM_ITEMS = 5;
+  
+  //var a = Gio.AppInfo.get_all().filter(function(a){return a.get_name() === "Files";});
+  //var b = Shell.AppSystem.get_default().lookup_app(a[0].get_id());
+
   var name = function() {
     return "Launcher";
   };
@@ -82,6 +88,7 @@ const Launcher = (function () {
   };
 
   return {
+    MAX_NUM_ITEMS: MAX_NUM_ITEMS,
     name: name,
     apps: apps, 
     activate: activate, 
