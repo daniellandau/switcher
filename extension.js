@@ -294,7 +294,7 @@ function _showUI(mode, entryText) {
       entry.set_text("");
     // Switch mode
     } else if (((symbol === Clutter.m) && control) ||
-        ((symbol === Clutter.KEY_Tab) && control)) ||
+        ((symbol === Clutter.KEY_Tab) && control) ||
         ((symbol === Clutter.KEY_space) && control)) {
         let previousText = entry.get_text();
         _hideUI();
