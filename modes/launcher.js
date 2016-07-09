@@ -9,6 +9,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
+const keyActivation = Me.imports.keyActivation.KeyActivation;
+
 const Launcher = (function () {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 5;
@@ -64,7 +66,7 @@ const Launcher = (function () {
     if (Convenience.getSettings().get_uint('activate-by-key')) {
       const shortcut = new St.Label({
         style_class: 'switcher-shortcut',
-        text: getKeyDesc(index + 1)
+        text: keyActivation.getKeyDesc(index + 1)
       });
       shortcutBox = new St.Bin({style_class: 'switcher-label'});
       shortcutBox.child = shortcut;

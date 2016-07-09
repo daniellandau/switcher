@@ -25,47 +25,17 @@ const GLib = imports.gi.GLib;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
-const Switcher = Me.imports.modes.switcher;
-const Launcher = Me.imports.modes.launcher;
 
-const keyActivationNone         = 0;
-const keyActivationFunctionKeys = 1;
-const keyActivationNumbers      = 2;
+const keyActivation = Me.imports.keyActivation.KeyActivation;
+const switcher = Me.imports.modes.switcher.Switcher;
+const launcher = Me.imports.modes.launcher.Launcher;
+
 const orderByFocus     = 0;
 const orderByRelevancy = 1;
 const matchSubstring = 0;
 const matchFuzzy     = 1;
 
-const functionKeySymbols = [
-  Clutter.KEY_F1,
-  Clutter.KEY_F2,
-  Clutter.KEY_F3,
-  Clutter.KEY_F4,
-  Clutter.KEY_F5,
-  Clutter.KEY_F6,
-  Clutter.KEY_F7,
-  Clutter.KEY_F8,
-  Clutter.KEY_F9,
-  Clutter.KEY_F10,
-  Clutter.KEY_F11,
-  Clutter.KEY_F12
-];
-const numberKeySymbols = [
-  Clutter.KEY_1,
-  Clutter.KEY_2,
-  Clutter.KEY_3,
-  Clutter.KEY_4,
-  Clutter.KEY_5,
-  Clutter.KEY_6,
-  Clutter.KEY_7,
-  Clutter.KEY_8,
-  Clutter.KEY_9,
-  Clutter.KEY_0,
-];
-
 let container, cursor;
-let switcher = Switcher.Switcher;
-let launcher = Launcher.Launcher;
 
 function escapeChars(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
@@ -139,11 +109,7 @@ function runFilter(mode, app, fragment) {
 
 function _hideUI() {
   Main.uiGroup.remove_actor(container);
-  try {
-    Main.popModal(container);
-  } catch (e) {
-    Main.notifyError("Switcher crashed!", "The extension might be in an unstable state. Please restart GNOME Shell.");
-  }
+  Main.popModal(container);
   container = null;
 }
 
@@ -288,7 +254,7 @@ function _showUI(mode, entryText) {
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
     const symbol = e.get_key_symbol();
-    let fkeyIndex = getActionKeyTable().indexOf(symbol);
+    let fkeyIndex = keyActivation.getActionKeyTable().indexOf(symbol);
     if (symbol === Clutter.KEY_Escape) {
       _hideUI();
       entry.set_text("");
@@ -357,32 +323,6 @@ function fixWidths(box, width, shortcutWidth) {
   box.shortcutBox && box.shortcutBox.set_width(shortcutWidth);
 }
 
-function getActivateByKey() {
-  return Convenience.getSettings().get_uint('activate-by-key');
-}
-
-function getKeyDesc(index) {
-  switch (getActivateByKey()) {
-  case keyActivationFunctionKeys:
-    return index > 12 ? '' : 'F' + index;
-  case keyActivationNumbers:
-    return index > 10 ? '' : index.toString();
-  default:
-    print("getKeyDesc error: " + index);
-    return '';
-  }
-}
-
-function getActionKeyTable() {
-  switch (getActivateByKey()) {
-  case keyActivationFunctionKeys:
-    return functionKeySymbols;
-  case keyActivationNumbers:
-    return numberKeySymbols;
-  default:
-    return [];
-  }
-}
 
 function init() {
 }

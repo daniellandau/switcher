@@ -8,6 +8,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
+const keyActivation = Me.imports.keyActivation.KeyActivation;
+
 const Switcher = (function () {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 15;
@@ -18,7 +20,10 @@ const Switcher = (function () {
 
   var apps = function() {
     // Get all windows in activation order
-    let tabList = global.display.get_tab_list(Meta.TabList.NORMAL, null);
+    let onlyCurrentWorkspace = Convenience.getSettings().get_boolean('only-current-workspace');
+    let currentWorkspace = global.screen.get_active_workspace_index();
+    let tabList = global.display.get_tab_list(Meta.TabList.NORMAL, null)
+      .filter(app => !onlyCurrentWorkspace || app.get_workspace().index() === currentWorkspace);
 
     // swap the first two, so we can switch quickly back and forth
     if (tabList.length >= 2) {
@@ -64,17 +69,6 @@ const Switcher = (function () {
   var makeBox = function(app, index) {
     const box = new St.BoxLayout({style_class: 'switcher-box'});
 
-    let shortcutBox;
-    if (Convenience.getSettings().get_uint('activate-by-key')) {
-      const shortcut = new St.Label({
-        style_class: 'switcher-shortcut',
-        text: getKeyDesc(index + 1)
-      });
-      shortcutBox = new St.Bin({style_class: 'switcher-label'});
-      shortcutBox.child = shortcut;
-      box.insert_child_at_index(shortcutBox, 0);
-    }
-
     const label = new St.Label({
       style_class: 'switcher-label',
       y_align: Clutter.ActorAlign.CENTER
@@ -82,6 +76,17 @@ const Switcher = (function () {
     label.clutter_text.set_text(description(app));
     label.set_x_expand(true);
     box.insert_child_at_index(label, 0);
+
+    let shortcutBox;
+    if (Convenience.getSettings().get_uint('activate-by-key')) {
+      const shortcut = new St.Label({
+        style_class: 'switcher-shortcut',
+        text: keyActivation.getKeyDesc(index + 1)
+      });
+      shortcutBox = new St.Bin({style_class: 'switcher-label'});
+      shortcutBox.child = shortcut;
+      box.insert_child_at_index(shortcutBox, 0);
+    }
 
     const iconBox = new St.Bin({style_class: 'switcher-icon'});
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
