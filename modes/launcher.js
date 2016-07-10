@@ -13,7 +13,7 @@ const keyActivation = Me.imports.keyActivation.KeyActivation;
 
 const Launcher = (function () {
   // Limit the number of displayed items
-  const MAX_NUM_ITEMS = 5;
+  const MAX_NUM_ITEMS = 10;
   
   //var a = Gio.AppInfo.get_all().filter(function(a){return a.get_name() === "Files";});
   //var b = Shell.AppSystem.get_default().lookup_app(a[0].get_id());
@@ -41,13 +41,19 @@ const Launcher = (function () {
     return shellApps;
   };
 
+  var appIcons = {};
+  const iconSize = Convenience.getSettings().get_uint('icon-size');
+  shellApps.forEach(function(app) {
+      appIcons[app.get_name()] = app.create_icon_texture(iconSize);
+  });
+
   var activate = function(app) {
     app.open_new_window(-1);
   };
 
   var description = function(app) {
     try {
-      return app.get_name();
+      return app.get_name().replace(/&/g, "&amp;");
     } catch (e) {
       print(e);
       return 'Could not get name';
@@ -82,11 +88,27 @@ const Launcher = (function () {
     box.insert_child_at_index(label, 0);
 
     const iconBox = new St.Bin({style_class: 'switcher-icon'});
-    const iconSize = Convenience.getSettings().get_uint('icon-size');
-    iconBox.child = app.create_icon_texture(iconSize);
+    var appIcon = appIcons[app.get_name()];
+    destroyParent(appIcon);
+    iconBox.child = appIcon;
     box.insert_child_at_index(iconBox, 0);
 
-    return { whole: box, shortcutBox: shortcutBox, label: label };
+    return {
+      whole: box,
+      shortcutBox: shortcutBox,
+      iconBox: iconBox,
+      label: label,
+    };
+  };
+
+  var destroyParent = function(child) {
+    if (child) {
+      let parent = child.get_parent();
+      if (parent) {
+        parent.remove_actor(child);
+        parent.destroy();
+      }
+    }
   };
 
   return {
@@ -96,6 +118,7 @@ const Launcher = (function () {
     activate: activate, 
     description: description,
     descriptionNameIndex: descriptionNameIndex,
-    makeBox: makeBox
+    makeBox: makeBox,
+    destroyParent: destroyParent
   };
 }());

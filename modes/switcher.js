@@ -94,15 +94,27 @@ const Switcher = (function () {
     iconBox.child = appRef.create_icon_texture(iconSize);
     box.insert_child_at_index(iconBox, 0);
 
-    return {whole: box, shortcutBox: shortcutBox, label: label};
+    return { whole: box, iconBox: iconBox, shortcutBox: shortcutBox, label: label };
+  };
+
+  var destroyParent = function(child) {
+    if (child) {
+      let parent = child.get_parent();
+      if (parent) {
+        parent.remove_actor(child);
+        parent.destroy();
+      }
+    }
   };
 
   return {
+    MAX_NUM_ITEMS: MAX_NUM_ITEMS,
     name: name,
     apps: apps, 
     activate: activate, 
     description: description,
     descriptionNameIndex: descriptionNameIndex,
-    makeBox: makeBox
+    makeBox: makeBox,
+    destroyParent: destroyParent
   };
 }());

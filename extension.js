@@ -107,12 +107,6 @@ function runFilter(mode, app, fragment) {
   return gotMatch;
 }
 
-function _hideUI() {
-  Main.uiGroup.remove_actor(container);
-  Main.popModal(container);
-  container = null;
-}
-
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
   if (query == "")
@@ -170,6 +164,12 @@ function _showLauncher() {
   _showUI(launcher, "");
 }
 
+function _hideUI() {
+    Main.uiGroup.remove_actor(container);
+    Main.popModal(container);
+    container = null;
+}
+
 function _showUI(mode, entryText) {
   'use strict';
   if (container)
@@ -179,7 +179,7 @@ function _showUI(mode, entryText) {
 
   const debouncedActivateUnique = debounce(() => {
     if (filteredApps.length === 1) {
-      _hideUI();
+      cleanUI();
       mode.activate(filteredApps[cursor]);
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
@@ -205,6 +205,18 @@ function _showUI(mode, entryText) {
       }
 
       return filteredApps;
+  };
+
+  const cleanUI = function() {
+    boxes.forEach(box => {
+        box.iconBox.get_children().forEach(child => 
+            mode.destroyParent(child));
+        box.iconBox.destroy();
+        boxLayout.remove_child(box.whole);
+    });
+    Main.uiGroup.remove_actor(container);
+    Main.popModal(container);
+    container = null;
   };
 
   container = new St.Bin({reactive: true});
@@ -256,20 +268,20 @@ function _showUI(mode, entryText) {
     const symbol = e.get_key_symbol();
     let fkeyIndex = keyActivation.getActionKeyTable().indexOf(symbol);
     if (symbol === Clutter.KEY_Escape) {
-      _hideUI();
+      cleanUI();
       entry.set_text("");
     // Switch mode
     } else if (((symbol === Clutter.m) && control) ||
         ((symbol === Clutter.KEY_Tab) && control) ||
         ((symbol === Clutter.KEY_space) && control)) {
         let previousText = entry.get_text();
-        _hideUI();
+        cleanUI();
         (mode.name() === "Switcher")
           ? _showUI(launcher, previousText)
           : _showUI(switcher, previousText);
     } else if ((symbol === Clutter.KEY_Return) ||
         ((symbol === Clutter.j) && control)) {
-      _hideUI();
+      cleanUI();
       filteredApps.length > 0 && mode.activate(filteredApps[cursor]);
     } else if ((symbol === Clutter.KEY_Down) ||
         (symbol === Clutter.KEY_Tab) ||
@@ -283,7 +295,7 @@ function _showUI(mode, entryText) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
       updateHighlight(boxes, o.text);
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
-      _hideUI();
+      cleanUI();
       mode.activate(filteredApps[fkeyIndex]);
     } else {
       if ((symbol === Clutter.h) && control) {
@@ -296,7 +308,12 @@ function _showUI(mode, entryText) {
 
       filteredApps = filterByText(mode, apps, o.text);
 
-      boxes.forEach(box => boxLayout.remove_child(box.whole));
+      boxes.forEach(box => {
+          box.iconBox.get_children().forEach(child => 
+              mode.destroyParent(child));
+          box.iconBox.destroy();
+          boxLayout.remove_child(box.whole);
+      });
       boxes = filteredApps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
       
       // If there's less boxes then in previous cursor position,
@@ -313,7 +330,7 @@ function _showUI(mode, entryText) {
   });
 
   Main.pushModal(container);
-  container.connect('button-press-event', _hideUI);
+  container.connect('button-press-event', cleanUI);
   global.stage.set_key_focus(entry);
   container.show();
 }
