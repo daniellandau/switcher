@@ -156,20 +156,6 @@ function updateHighlight(boxes, query) {
       boxes[cursor].whole.add_style_class_name('switcher-highlight');
 }
 
-function _showSwitcher() {
-  _showUI(switcher, "");
-}
-
-function _showLauncher() {
-  _showUI(launcher, "");
-}
-
-function _hideUI() {
-    Main.uiGroup.remove_actor(container);
-    Main.popModal(container);
-    container = null;
-}
-
 function _showUI(mode, entryText) {
   'use strict';
   if (container)
@@ -207,13 +193,17 @@ function _showUI(mode, entryText) {
       return filteredApps;
   };
 
-  const cleanUI = function() {
+  const cleanBoxes = function() {
     boxes.forEach(box => {
         box.iconBox.get_children().forEach(child => 
             mode.destroyParent(child));
         box.iconBox.destroy();
         boxLayout.remove_child(box.whole);
     });
+  };
+
+  const cleanUI = function() {
+    cleanBoxes();
     Main.uiGroup.remove_actor(container);
     Main.popModal(container);
     container = null;
@@ -267,9 +257,12 @@ function _showUI(mode, entryText) {
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
     const symbol = e.get_key_symbol();
     let fkeyIndex = keyActivation.getActionKeyTable().indexOf(symbol);
+
+    // Exit
     if (symbol === Clutter.KEY_Escape) {
       cleanUI();
       entry.set_text("");
+
     // Switch mode
     } else if (((symbol === Clutter.m) && control) ||
         ((symbol === Clutter.KEY_Tab) && control) ||
@@ -279,25 +272,36 @@ function _showUI(mode, entryText) {
         (mode.name() === "Switcher")
           ? _showUI(launcher, previousText)
           : _showUI(switcher, previousText);
+
+    // Activate selected entry
     } else if ((symbol === Clutter.KEY_Return) ||
         ((symbol === Clutter.j) && control)) {
       cleanUI();
       filteredApps.length > 0 && mode.activate(filteredApps[cursor]);
+
+    // Activate entry by shortcut
+    } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
+      cleanUI();
+      mode.activate(filteredApps[fkeyIndex]);
+
+    // Next entry
     } else if ((symbol === Clutter.KEY_Down) ||
         (symbol === Clutter.KEY_Tab) ||
         ((symbol === Clutter.n) && control)) {
       cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
       updateHighlight(boxes, o.text);
+
+    // Previous entry
     } else if ((symbol === Clutter.KEY_Up) || 
         ((symbol === Clutter.ISO_Left_Tab) && shift) ||
         ((symbol === Clutter.KEY_Tab) && shift) ||
         ((symbol === Clutter.p) && control)) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
       updateHighlight(boxes, o.text);
-    } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
-      cleanUI();
-      mode.activate(filteredApps[fkeyIndex]);
+
+    // Filter text
     } else {
+      // Delete last character
       if ((symbol === Clutter.h) && control) {
         const entryText = entry.get_clutter_text();
         let textCursor = entryText.get_cursor_position();
@@ -308,12 +312,7 @@ function _showUI(mode, entryText) {
 
       filteredApps = filterByText(mode, apps, o.text);
 
-      boxes.forEach(box => {
-          box.iconBox.get_children().forEach(child => 
-              mode.destroyParent(child));
-          box.iconBox.destroy();
-          boxLayout.remove_child(box.whole);
-      });
+      cleanBoxes();
       boxes = filteredApps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
       
       // If there's less boxes then in previous cursor position,
@@ -340,23 +339,21 @@ function fixWidths(box, width, shortcutWidth) {
   box.shortcutBox && box.shortcutBox.set_width(shortcutWidth);
 }
 
-
 function init() {
 }
 
 function enable() {
+  // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
   Main.wm.addKeybinding(
       'show-switcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE,
-      // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
       Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL
                            : Shell.ActionMode.NORMAL,
-      _showSwitcher);
+      () => _showUI(switcher, ""));
   Main.wm.addKeybinding(
       'show-launcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE,
-      // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
       Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL
                            : Shell.ActionMode.NORMAL,
-      _showLauncher);
+      () => _showUI(launcher, ""));
 }
 
 function disable() { 

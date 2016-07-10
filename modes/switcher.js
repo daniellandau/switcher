@@ -8,7 +8,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
-const keyActivation = Me.imports.keyActivation.KeyActivation;
+const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
 const Switcher = (function () {
   // Limit the number of displayed items
@@ -48,7 +48,7 @@ const Switcher = (function () {
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
     let appName;
     try {
-      appName = appRef.get_name();
+      appName = appRef.get_name().replace(/&/g, "&amp;");
     } catch (e) {
       print(e);
       appName = 'Could not get name';
@@ -67,44 +67,8 @@ const Switcher = (function () {
   };
 
   var makeBox = function(app, index) {
-    const box = new St.BoxLayout({style_class: 'switcher-box'});
-
-    const label = new St.Label({
-      style_class: 'switcher-label',
-      y_align: Clutter.ActorAlign.CENTER
-    });
-    label.clutter_text.set_text(description(app));
-    label.set_x_expand(true);
-    box.insert_child_at_index(label, 0);
-
-    let shortcutBox;
-    if (Convenience.getSettings().get_uint('activate-by-key')) {
-      const shortcut = new St.Label({
-        style_class: 'switcher-shortcut',
-        text: keyActivation.getKeyDesc(index + 1)
-      });
-      shortcutBox = new St.Bin({style_class: 'switcher-label'});
-      shortcutBox.child = shortcut;
-      box.insert_child_at_index(shortcutBox, 0);
-    }
-
-    const iconBox = new St.Bin({style_class: 'switcher-icon'});
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
-    const iconSize = Convenience.getSettings().get_uint('icon-size');
-    iconBox.child = appRef.create_icon_texture(iconSize);
-    box.insert_child_at_index(iconBox, 0);
-
-    return { whole: box, iconBox: iconBox, shortcutBox: shortcutBox, label: label };
-  };
-
-  var destroyParent = function(child) {
-    if (child) {
-      let parent = child.get_parent();
-      if (parent) {
-        parent.remove_actor(child);
-        parent.destroy();
-      }
-    }
+    return modeUtils.makeBox(app, appRef, description(app), index);
   };
 
   return {
@@ -115,6 +79,6 @@ const Switcher = (function () {
     description: description,
     descriptionNameIndex: descriptionNameIndex,
     makeBox: makeBox,
-    destroyParent: destroyParent
+    destroyParent: modeUtils.destroyParent
   };
 }());
