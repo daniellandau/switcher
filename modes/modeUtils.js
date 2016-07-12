@@ -34,6 +34,8 @@ const ModeUtils = (function () {
       appIcons[app.get_id()] = app.create_icon_texture(iconSize);
   });
 
+  var seenIDs = {};
+  var cleanIDs = () => seenIDs = {};
   var makeBox = function(app, appRef, description, index) {
     const box = new St.BoxLayout({style_class: 'switcher-box'});
 
@@ -56,10 +58,21 @@ const ModeUtils = (function () {
       box.insert_child_at_index(shortcutBox, 0);
     }
 
+    // In case of multiple windows sharing the same id, we need to keep track
+    // of ids which were already seen, in order to create a new icon for each
+    // window beyond the first
     const iconBox = new St.Bin({style_class: 'switcher-icon'});
-    var appIcon = appIcons[appRef.get_id()];
-    destroyParent(appIcon);
-    iconBox.child = appIcon;
+    const id = appRef.get_id();
+    if (seenIDs.hasOwnProperty(id)) {
+        iconBox.child = appRef.create_icon_texture(iconSize);
+    } else {
+        // To reuse the same icon, it's actor must not belong to any parent 
+        let appIcon = appIcons[id];
+        destroyParent(appIcon);
+        iconBox.child = appIcon;
+
+        seenIDs[id] = true; // Dummy value
+    }
     box.insert_child_at_index(iconBox, 0);
 
     return { whole: box, iconBox: iconBox, shortcutBox: shortcutBox, label: label };
@@ -77,8 +90,9 @@ const ModeUtils = (function () {
 
   return {
     appIcons: appIcons, 
-    shellApps: shellApps,
+    cleanIDs: cleanIDs,
+    destroyParent: destroyParent,
     makeBox: makeBox,
-    destroyParent: destroyParent
+    shellApps: shellApps
   };
 }());

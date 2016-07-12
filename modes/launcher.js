@@ -35,9 +35,8 @@ const Launcher = (function () {
     }
   };
 
-  // Workspace indicators are not used
   var descriptionNameIndex = function(app) {
-    return 0;
+    return 0; // Workspace indicators are not used
   };
 
   var makeBox = function(app, index) {
@@ -52,6 +51,7 @@ const Launcher = (function () {
     description: description,
     descriptionNameIndex: descriptionNameIndex,
     makeBox: makeBox,
+    cleanIDs: modeUtils.cleanIDs,
     destroyParent: modeUtils.destroyParent
   };
 }());

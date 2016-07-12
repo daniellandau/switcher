@@ -209,6 +209,11 @@ function _showUI(mode, entryText) {
     container = null;
   };
 
+  const makeBoxes = function(apps, mode) {
+    mode.cleanIDs(); 
+    return apps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
+  };
+
   container = new St.Bin({reactive: true});
   container.set_alignment(St.Align.MIDDLE, St.Align.START);
 
@@ -220,7 +225,7 @@ function _showUI(mode, entryText) {
   const apps = mode.apps();
   let filteredApps = filterByText(mode, apps, entryText);
 
-  let boxes = filteredApps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
+  let boxes = makeBoxes(filteredApps, mode);
   updateHighlight(boxes, entryText);
 
   let entry =
@@ -253,8 +258,8 @@ function _showUI(mode, entryText) {
   entry.set_width(width);
 
   entry.connect('key-release-event', (o, e) => {
-    const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) != 0;
-    const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) != 0;
+    const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
+    const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
     const symbol = e.get_key_symbol();
     let fkeyIndex = keyActivation.getActionKeyTable().indexOf(symbol);
 
@@ -313,7 +318,7 @@ function _showUI(mode, entryText) {
       filteredApps = filterByText(mode, apps, o.text);
 
       cleanBoxes();
-      boxes = filteredApps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
+      boxes = makeBoxes(filteredApps, mode);
       
       // If there's less boxes then in previous cursor position,
       // set cursor to the last box

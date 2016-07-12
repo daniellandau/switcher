@@ -79,6 +79,7 @@ const Switcher = (function () {
     description: description,
     descriptionNameIndex: descriptionNameIndex,
     makeBox: makeBox,
+    cleanIDs: modeUtils.cleanIDs,
     destroyParent: modeUtils.destroyParent
   };
 }());
