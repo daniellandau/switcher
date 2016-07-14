@@ -60,14 +60,16 @@ const ModeUtils = (function () {
 
     // In case of multiple windows sharing the same id, we need to keep track
     // of ids which were already seen, in order to create a new icon for each
-    // window beyond the first
+    // window beyond the first.
+    // In another case, some windows may use a custom app id, forcing us to
+    // create an icon.
     const iconBox = new St.Bin({style_class: 'switcher-icon'});
     const id = appRef.get_id();
-    if (seenIDs.hasOwnProperty(id)) {
+    let appIcon = appIcons[id];
+    if ((seenIDs.hasOwnProperty(id)) || (appIcon === undefined)) {
         iconBox.child = appRef.create_icon_texture(iconSize);
     } else {
         // To reuse the same icon, it's actor must not belong to any parent 
-        let appIcon = appIcons[id];
         destroyParent(appIcon);
         iconBox.child = appIcon;
 
