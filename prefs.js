@@ -28,6 +28,11 @@ function buildPrefsWidget() {
     shortcutsWidget.pack_start(launcherWidget, true, true, 0);
   vWidget.add(shortcutsWidget);
 
+  let changeExplanation = new Gtk.Label({margin_top: 5});
+  changeExplanation.set_markup(_("Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"));
+  changeExplanation.set_alignment(0, 0.5);
+  vWidget.add(changeExplanation);
+
   addImmediately(vWidget, settings);
   addActivateByKey(vWidget, settings);
 
