@@ -19,18 +19,29 @@ function buildPrefsWidget() {
 
   let vWidget = new Gtk.VBox({margin: 10});
 
-  addShortcut(vWidget, settings);
+  let shortcutsWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
+    let switcherWidget = new Gtk.VBox();
+    addShortcut(switcherWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
+    shortcutsWidget.pack_start(switcherWidget, true, true, 0);
+    let launcherWidget = new Gtk.VBox();
+    addShortcut(launcherWidget, settings, 'show-launcher', _("Hotkey to activate launcher"));
+    shortcutsWidget.pack_start(launcherWidget, true, true, 0);
+  vWidget.add(shortcutsWidget);
+
+  let changeExplanation = new Gtk.Label({margin_top: 5});
+  changeExplanation.set_markup(_("Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"));
+  changeExplanation.set_alignment(0, 0.5);
+  vWidget.add(changeExplanation);
+
   addImmediately(vWidget, settings);
   addActivateByKey(vWidget, settings);
 
   let behaviourWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
     let matchingWidget = new Gtk.VBox();
     addMatching(matchingWidget, settings);
-    matchingWidget.show_all();
     behaviourWidget.pack_start(matchingWidget, true, true, 0);
     let orderingWidget = new Gtk.VBox();
     addOrdering(orderingWidget, settings);
-    orderingWidget.show_all();
     behaviourWidget.pack_start(orderingWidget, true, true, 0);
   vWidget.add(behaviourWidget);
 
@@ -57,14 +68,14 @@ function buildPrefsWidget() {
   return vWidget;
 }
 
-function addShortcut(widget, settings) {
-  widget.add(makeTitle(_("Hotkey to activate switcher")));
+function addShortcut(widget, settings, shortcut, title) {
+  widget.add(makeTitle(title));
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
 
   const row = model.insert(0);
-  let [key, mods] = Gtk.accelerator_parse(settings.get_strv('show-switcher')[0]);
+  let [key, mods] = Gtk.accelerator_parse(settings.get_strv(shortcut)[0]);
   model.set(row, [0, 1], [mods, key]);
 
   let treeView = new Gtk.TreeView({model: model});
@@ -78,7 +89,7 @@ function addShortcut(widget, settings) {
     let [succ, iterator] = model.get_iter_from_string(iter);
     model.set(iterator, [0, 1], [mods, key]);
     if (key != 0) {
-      settings.set_strv('show-switcher', [value]);
+      settings.set_strv(shortcut, [value]);
     }
   });
 

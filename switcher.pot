@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-01 18:24+0300\n"
+"POT-Creation-Date: 2016-07-17 17:12+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,82 +19,90 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 
-#: prefs.js:61
+#: prefs.js:24
 msgid "Hotkey to activate switcher"
 msgstr ""
 
-#: prefs.js:85
+#: prefs.js:27
+msgid "Hotkey to activate launcher"
+msgstr ""
+
+#: prefs.js:32
+msgid "Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"
+msgstr ""
+
+#: prefs.js:96
 msgid "Key"
 msgstr ""
 
-#: prefs.js:94
+#: prefs.js:105
 msgid "Pattern matching algorithm"
 msgstr ""
 
-#: prefs.js:95
+#: prefs.js:106
 msgid "Strict"
 msgstr ""
 
-#: prefs.js:95
+#: prefs.js:106
 msgid "Fuzzy"
 msgstr ""
 
-#: prefs.js:106
+#: prefs.js:117
 msgid "Ordering criteria"
 msgstr ""
 
-#: prefs.js:107
+#: prefs.js:118
 msgid "Last focused"
 msgstr ""
 
-#: prefs.js:107
+#: prefs.js:118
 msgid "Most relevant"
 msgstr ""
 
-#: prefs.js:118
+#: prefs.js:129
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:123
+#: prefs.js:134
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:137
+#: prefs.js:148
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 
-#: prefs.js:157
+#: prefs.js:168
 msgid "Icon size (px)"
 msgstr ""
 
-#: prefs.js:174
+#: prefs.js:185
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:191
+#: prefs.js:202
 msgid "Max width (%)"
 msgstr ""
 
-#: prefs.js:207
+#: prefs.js:218
 msgid "Activate by pressing a key matching the index in the list"
 msgstr ""
 
-#: prefs.js:208
+#: prefs.js:219
 msgid "Disable"
 msgstr ""
 
-#: prefs.js:208
+#: prefs.js:219
 msgid "Function keys"
 msgstr ""
 
-#: prefs.js:208
+#: prefs.js:219
 msgid "Number keys"
 msgstr ""
 
-#: prefs.js:219
+#: prefs.js:230
 msgid "Show workspace indicators"
 msgstr ""
 
-#: prefs.js:233
+#: prefs.js:244
 msgid "Show only apps in the current workspace"
 msgstr ""

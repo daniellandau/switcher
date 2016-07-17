@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-01 18:24+0300\n"
-"PO-Revision-Date: 2016-07-01 18:25+0300\n"
+"POT-Creation-Date: 2016-07-17 17:12+0300\n"
+"PO-Revision-Date: 2016-07-17 17:13+0300\n"
 "Last-Translator: Daniel Landau <daniel@landau.fi>\n"
 "Language-Team: \n"
 "Language: fi_FI\n"
@@ -20,84 +20,94 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 
-#: prefs.js:61
+#: prefs.js:24
 msgid "Hotkey to activate switcher"
 msgstr "Pikanäppäin vaihtajan aktivoimiseen"
 
-#: prefs.js:85
+#: prefs.js:27
+msgid "Hotkey to activate launcher"
+msgstr "Pikanäppäin ohjelmakäynnistäjän aktivoimiseen"
+
+#: prefs.js:32
+msgid "Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"
+msgstr ""
+"Paina Ctrl+Tab tai Ctrl+Space vaihtaaksesi vaihtajan ja ohjelmakäynnistäjän "
+"välillä"
+
+#: prefs.js:96
 msgid "Key"
 msgstr "Näppäin"
 
-#: prefs.js:94
+#: prefs.js:105
 msgid "Pattern matching algorithm"
 msgstr "Hahmonnusalgoritmi"
 
-#: prefs.js:95
+#: prefs.js:106
 msgid "Strict"
 msgstr "Tarkka"
 
-#: prefs.js:95
+#: prefs.js:106
 msgid "Fuzzy"
 msgstr "Sumea"
 
-#: prefs.js:106
+#: prefs.js:117
 msgid "Ordering criteria"
 msgstr "Järjestys"
 
-#: prefs.js:107
+#: prefs.js:118
 msgid "Last focused"
 msgstr "Viimeksi käytetty ensin"
 
-#: prefs.js:107
+#: prefs.js:118
 msgid "Most relevant"
 msgstr "Oleellisin ensin"
 
-#: prefs.js:118
+#: prefs.js:129
 msgid "Immediate activation"
 msgstr "Välitön aktivointi"
 
-#: prefs.js:123
+#: prefs.js:134
 msgid "When there is just one result, activate immediately"
 msgstr "Kun tuloksia on vain yksi, aktivoi välittömästi"
 
-#: prefs.js:137
+#: prefs.js:148
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 "Aktivoi välittömästi näin monta millisekuntia viimeisen näppäinpainalluksen "
 "jälkeen"
 
-#: prefs.js:157
+#: prefs.js:168
 msgid "Icon size (px)"
 msgstr "Ikonin koko (px)"
 
-#: prefs.js:174
+#: prefs.js:185
 msgid "Font size (px)"
 msgstr "Fonttikoko (px)"
 
-#: prefs.js:191
+#: prefs.js:202
 msgid "Max width (%)"
 msgstr "Maksimileveys (%)"
 
-#: prefs.js:207
+#: prefs.js:218
 msgid "Activate by pressing a key matching the index in the list"
 msgstr "Aktivoi painamalla järjestysnumeroa vastaavaa näppäintä"
 
-#: prefs.js:208
+#: prefs.js:219
 msgid "Disable"
 msgstr "Pois käytöstä"
 
-#: prefs.js:208
+#: prefs.js:219
 msgid "Function keys"
 msgstr "Funktionäppäimet"
 
-#: prefs.js:208
+#: prefs.js:219
 msgid "Number keys"
 msgstr "Numeronäppäimet"
 
-#: prefs.js:219
+#: prefs.js:230
 msgid "Show workspace indicators"
 msgstr "Näytä työtilaindikaattori"
 
-#: prefs.js:233
+#: prefs.js:244
 msgid "Show only apps in the current workspace"
 msgstr "Näytä vain nykyisellä työpöydällä olevat sovellukset"

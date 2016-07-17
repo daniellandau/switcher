@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
     <schema id="org.gnome.shell.extensions.switcher" path="/org/gnome/shell/extensions/switcher/">
+        <key type="as" name="show-launcher">
+            <default><![CDATA[['<Super>x']]]></default>
+            <summary>Global key combination to show the launcher.</summary>
+        </key>
         <key type="as" name="show-switcher">
             <default><![CDATA[['<Super>w']]]></default>
             <summary>Global key combination to show the switcher.</summary>
