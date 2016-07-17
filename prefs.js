@@ -21,10 +21,10 @@ function buildPrefsWidget() {
 
   let shortcutsWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
     let switcherWidget = new Gtk.VBox();
-    addShortcut(switcherWidget, settings, 'show-switcher', "Hotkey to activate switcher");
+    addShortcut(switcherWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
     shortcutsWidget.pack_start(switcherWidget, true, true, 0);
     let launcherWidget = new Gtk.VBox();
-    addShortcut(launcherWidget, settings, 'show-launcher', "Hotkey to activate launcher");
+    addShortcut(launcherWidget, settings, 'show-launcher', _("Hotkey to activate launcher"));
     shortcutsWidget.pack_start(launcherWidget, true, true, 0);
   vWidget.add(shortcutsWidget);
 
@@ -64,7 +64,7 @@ function buildPrefsWidget() {
 }
 
 function addShortcut(widget, settings, shortcut, title) {
-  widget.add(makeTitle(_(title)));
+  widget.add(makeTitle(title));
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
