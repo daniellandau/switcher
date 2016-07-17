@@ -156,7 +156,7 @@ function updateHighlight(boxes, query) {
       boxes[cursor].whole.add_style_class_name('switcher-highlight');
 }
 
-function _showUI(mode, entryText) {
+function _showUI(mode, entryText, previousWidth) {
   'use strict';
   if (container)
     return;
@@ -254,6 +254,9 @@ function _showUI(mode, entryText) {
     width = maxWidth;
   if (width < maxWidth/2)
     width = maxWidth/2;
+
+  if (previousWidth && Number(previousWidth) === previousWidth) width = previousWidth;
+
   boxes.forEach(box => fixWidths(box, width, shortcutWidth));
   entry.set_width(width);
 
@@ -275,8 +278,8 @@ function _showUI(mode, entryText) {
         let previousText = entry.get_text();
         cleanUI();
         (mode.name() === "Switcher")
-          ? _showUI(launcher, previousText)
-          : _showUI(switcher, previousText);
+          ? _showUI(launcher, previousText, width)
+          : _showUI(switcher, previousText, width);
 
     // Activate selected entry
     } else if ((symbol === Clutter.KEY_Return) ||
