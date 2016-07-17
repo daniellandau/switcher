@@ -14,19 +14,19 @@ const Launcher = (function () {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 10;
 
-  var name = function() {
+  let name = function() {
     return "Launcher";
   };
 
-  var apps = function() {
+  let apps = function() {
     return modeUtils.shellApps;
   };
 
-  var activate = function(app) {
+  let activate = function(app) {
     app.open_new_window(-1);
   };
 
-  var description = function(app) {
+  let description = function(app) {
     try {
       return app.get_name().replace(/&/g, "&amp;");
     } catch (e) {
@@ -35,11 +35,11 @@ const Launcher = (function () {
     }
   };
 
-  var descriptionNameIndex = function(app) {
+  let descriptionNameIndex = function(app) {
     return 0; // Workspace indicators are not used
   };
 
-  var makeBox = function(app, index) {
+  let makeBox = function(app, index) {
     return modeUtils.makeBox(app, app, description(app), index);
   };
 

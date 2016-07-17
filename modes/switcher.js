@@ -14,11 +14,11 @@ const Switcher = (function () {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 15;
 
-  var name = function() {
+  let name = function() {
     return "Switcher";
   };
 
-  var apps = function() {
+  let apps = function() {
     // Get all windows in activation order
     let onlyCurrentWorkspace = Convenience.getSettings().get_boolean('only-current-workspace');
     let currentWorkspace = global.screen.get_active_workspace_index();
@@ -35,11 +35,11 @@ const Switcher = (function () {
     return tabList;
   };
 
-  var activate = function(app) {
+  let activate = function(app) {
     Main.activateWindow(app);
   };
 
-  var description = function(app) {
+  let description = function(app) {
     let workspace = "";
     if (Convenience.getSettings().get_boolean('workspace-indicator')) {
       workspace = (app.get_workspace().index() + 1) + ": ";
@@ -57,7 +57,7 @@ const Switcher = (function () {
     return workspace + appName + ' → ' + app.get_title();
   };
 
-  var descriptionNameIndex = function(app) {
+  let descriptionNameIndex = function(app) {
     if (Convenience.getSettings().get_boolean('workspace-indicator')) {
       const workspace = (app.get_workspace().index() + 1);
       return workspace.toString().length + 2;
@@ -66,7 +66,7 @@ const Switcher = (function () {
     }
   };
 
-  var makeBox = function(app, index) {
+  let makeBox = function(app, index) {
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
     return modeUtils.makeBox(app, appRef, description(app), index);
   };
