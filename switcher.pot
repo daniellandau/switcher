@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-01 18:24+0300\n"
+"POT-Creation-Date: 2016-07-17 17:06+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,82 +19,86 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 
-#: prefs.js:61
+#: prefs.js:24
 msgid "Hotkey to activate switcher"
 msgstr ""
 
-#: prefs.js:85
+#: prefs.js:27
+msgid "Hotkey to activate launcher"
+msgstr ""
+
+#: prefs.js:91
 msgid "Key"
 msgstr ""
 
-#: prefs.js:94
+#: prefs.js:100
 msgid "Pattern matching algorithm"
 msgstr ""
 
-#: prefs.js:95
+#: prefs.js:101
 msgid "Strict"
 msgstr ""
 
-#: prefs.js:95
+#: prefs.js:101
 msgid "Fuzzy"
 msgstr ""
 
-#: prefs.js:106
+#: prefs.js:112
 msgid "Ordering criteria"
 msgstr ""
 
-#: prefs.js:107
+#: prefs.js:113
 msgid "Last focused"
 msgstr ""
 
-#: prefs.js:107
+#: prefs.js:113
 msgid "Most relevant"
 msgstr ""
 
-#: prefs.js:118
+#: prefs.js:124
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:123
+#: prefs.js:129
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:137
+#: prefs.js:143
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 
-#: prefs.js:157
+#: prefs.js:163
 msgid "Icon size (px)"
 msgstr ""
 
-#: prefs.js:174
+#: prefs.js:180
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:191
+#: prefs.js:197
 msgid "Max width (%)"
 msgstr ""
 
-#: prefs.js:207
+#: prefs.js:213
 msgid "Activate by pressing a key matching the index in the list"
 msgstr ""
 
-#: prefs.js:208
+#: prefs.js:214
 msgid "Disable"
 msgstr ""
 
-#: prefs.js:208
+#: prefs.js:214
 msgid "Function keys"
 msgstr ""
 
-#: prefs.js:208
+#: prefs.js:214
 msgid "Number keys"
 msgstr ""
 
-#: prefs.js:219
+#: prefs.js:225
 msgid "Show workspace indicators"
 msgstr ""
 
-#: prefs.js:233
+#: prefs.js:239
 msgid "Show only apps in the current workspace"
 msgstr ""
