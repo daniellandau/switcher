@@ -193,15 +193,6 @@ function _showUI(mode, entryText, previousWidth) {
       return filteredApps;
   };
 
-  const cleanBoxes = function() {
-    boxes.forEach(box => {
-        box.iconBox.get_children().forEach(child =>
-            mode.destroyParent(child));
-        box.iconBox.destroy();
-        boxLayout.remove_child(box.whole);
-    });
-  };
-
   const cleanUI = function() {
     cleanBoxes();
     Main.uiGroup.remove_actor(container);
@@ -335,6 +326,18 @@ function _showUI(mode, entryText, previousWidth) {
       });
     }
   });
+
+
+  // In the bottom as a function statement so the variables closed
+  // over are defined and so it's hoisted up
+  function cleanBoxes() {
+    boxes.forEach(box => {
+      box.iconBox.get_children().forEach(child =>
+                                         mode.destroyParent(child));
+      box.iconBox.destroy();
+      boxLayout.remove_child(box.whole);
+    });
+  };
 
   Main.pushModal(container);
   container.connect('button-press-event', cleanUI);
