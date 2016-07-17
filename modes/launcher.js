@@ -13,7 +13,7 @@ const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 const Launcher = (function () {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 10;
-  
+
   var name = function() {
     return "Launcher";
   };
@@ -46,8 +46,8 @@ const Launcher = (function () {
   return {
     MAX_NUM_ITEMS: MAX_NUM_ITEMS,
     name: name,
-    apps: apps, 
-    activate: activate, 
+    apps: apps,
+    activate: activate,
     description: description,
     descriptionNameIndex: descriptionNameIndex,
     makeBox: makeBox,

@@ -22,11 +22,9 @@ function buildPrefsWidget() {
   let shortcutsWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
     let switcherWidget = new Gtk.VBox();
     addShortcut(switcherWidget, settings, 'show-switcher', "Hotkey to activate switcher");
-    switcherWidget.show_all();
     shortcutsWidget.pack_start(switcherWidget, true, true, 0);
     let launcherWidget = new Gtk.VBox();
     addShortcut(launcherWidget, settings, 'show-launcher', "Hotkey to activate launcher");
-    launcherWidget.show_all();
     shortcutsWidget.pack_start(launcherWidget, true, true, 0);
   vWidget.add(shortcutsWidget);
 
@@ -36,11 +34,9 @@ function buildPrefsWidget() {
   let behaviourWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
     let matchingWidget = new Gtk.VBox();
     addMatching(matchingWidget, settings);
-    matchingWidget.show_all();
     behaviourWidget.pack_start(matchingWidget, true, true, 0);
     let orderingWidget = new Gtk.VBox();
     addOrdering(orderingWidget, settings);
-    orderingWidget.show_all();
     behaviourWidget.pack_start(orderingWidget, true, true, 0);
   vWidget.add(behaviourWidget);
 

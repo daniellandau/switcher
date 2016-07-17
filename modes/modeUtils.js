@@ -13,7 +13,7 @@ const keyActivation = Me.imports.keyActivation.KeyActivation;
 
 const ModeUtils = (function () {
   // From _loadApps() in GNOME Shell's appDisplay.js
-  var appInfos = Gio.AppInfo.get_all().filter(function(appInfo) {
+  let appInfos = Gio.AppInfo.get_all().filter(function(appInfo) {
       try {
           let id = appInfo.get_id(); // catch invalid file encodings
       } catch(e) {
@@ -24,19 +24,19 @@ const ModeUtils = (function () {
       return app.get_id();
   });
 
-  var shellApps = appInfos.map(function(appID) {
+  let shellApps = appInfos.map(function(appID) {
     return Shell.AppSystem.get_default().lookup_app(appID);
   });
 
-  var appIcons = {};
+  let appIcons = {};
   const iconSize = Convenience.getSettings().get_uint('icon-size');
   shellApps.forEach(function(app) {
       appIcons[app.get_id()] = app.create_icon_texture(iconSize);
   });
 
-  var seenIDs = {};
-  var cleanIDs = () => seenIDs = {};
-  var makeBox = function(app, appRef, description, index) {
+  let seenIDs = {};
+  let cleanIDs = () => seenIDs = {};
+  let makeBox = function(app, appRef, description, index) {
     const box = new St.BoxLayout({style_class: 'switcher-box'});
 
     const label = new St.Label({
@@ -69,7 +69,7 @@ const ModeUtils = (function () {
     if ((seenIDs.hasOwnProperty(id)) || (appIcon === undefined)) {
         iconBox.child = appRef.create_icon_texture(iconSize);
     } else {
-        // To reuse the same icon, it's actor must not belong to any parent 
+        // To reuse the same icon, it's actor must not belong to any parent
         destroyParent(appIcon);
         iconBox.child = appIcon;
 
@@ -80,7 +80,7 @@ const ModeUtils = (function () {
     return { whole: box, iconBox: iconBox, shortcutBox: shortcutBox, label: label };
   };
 
-  var destroyParent = function(child) {
+  let destroyParent = function(child) {
     if (child) {
       let parent = child.get_parent();
       if (parent) {
@@ -91,7 +91,7 @@ const ModeUtils = (function () {
   };
 
   return {
-    appIcons: appIcons, 
+    appIcons: appIcons,
     cleanIDs: cleanIDs,
     destroyParent: destroyParent,
     makeBox: makeBox,

@@ -55,7 +55,7 @@ function runFilter(mode, app, fragment) {
     return true;
 
   fragment = escapeChars(fragment);
-  
+
   const matching = Convenience.getSettings().get_uint('matching');
   const splitChar = (matching == matchFuzzy) ? '' : ' ';
   const specialexp = new RegExp(/[-[\]{}()*+?.,\\^$|#]/);
@@ -195,7 +195,7 @@ function _showUI(mode, entryText) {
 
   const cleanBoxes = function() {
     boxes.forEach(box => {
-        box.iconBox.get_children().forEach(child => 
+        box.iconBox.get_children().forEach(child =>
             mode.destroyParent(child));
         box.iconBox.destroy();
         boxLayout.remove_child(box.whole);
@@ -210,8 +210,8 @@ function _showUI(mode, entryText) {
   };
 
   const makeBoxes = function(apps, mode) {
-    mode.cleanIDs(); 
-    return apps.slice(0,mode.MAX_NUM_ITEMS).map(mode.makeBox);
+    mode.cleanIDs();
+    return apps.slice(0, mode.MAX_NUM_ITEMS).map(mode.makeBox);
   };
 
   container = new St.Bin({reactive: true});
@@ -297,7 +297,7 @@ function _showUI(mode, entryText) {
       updateHighlight(boxes, o.text);
 
     // Previous entry
-    } else if ((symbol === Clutter.KEY_Up) || 
+    } else if ((symbol === Clutter.KEY_Up) ||
         ((symbol === Clutter.ISO_Left_Tab) && shift) ||
         ((symbol === Clutter.KEY_Tab) && shift) ||
         ((symbol === Clutter.p) && control)) {
@@ -319,7 +319,7 @@ function _showUI(mode, entryText) {
 
       cleanBoxes();
       boxes = makeBoxes(filteredApps, mode);
-      
+
       // If there's less boxes then in previous cursor position,
       // set cursor to the last box
       if (cursor + 1 > boxes.length)
@@ -361,7 +361,7 @@ function enable() {
       () => _showUI(launcher, ""));
 }
 
-function disable() { 
+function disable() {
   Main.wm.removeKeybinding('show-switcher');
   Main.wm.removeKeybinding('show-launcher');
 }
