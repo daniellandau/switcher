@@ -21,8 +21,9 @@ const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
 const GLib = imports.gi.GLib;
-
 const ExtensionUtils = imports.misc.extensionUtils;
+const Gettext = imports.gettext;
+
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
@@ -365,6 +366,8 @@ function fixWidths(box, width, shortcutWidth) {
 }
 
 function init() {
+  Gettext.textdomain("switcher");
+  Gettext.bindtextdomain("switcher", Me.path + "/locale");
 }
 
 function enable() {
