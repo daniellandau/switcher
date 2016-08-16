@@ -19,7 +19,7 @@ const Launcher = (function () {
   };
 
   let apps = function() {
-    return modeUtils.shellApps;
+    return modeUtils.shellApps();
   };
 
   let activate = function(app) {

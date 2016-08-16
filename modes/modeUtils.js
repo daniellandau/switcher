@@ -13,7 +13,7 @@ const keyActivation = Me.imports.keyActivation.KeyActivation;
 
 const ModeUtils = (function () {
   // From _loadApps() in GNOME Shell's appDisplay.js
-  let appInfos = Gio.AppInfo.get_all().filter(function(appInfo) {
+  let appInfos = () => Gio.AppInfo.get_all().filter(function(appInfo) {
       try {
           let id = appInfo.get_id(); // catch invalid file encodings
       } catch(e) {
@@ -24,15 +24,32 @@ const ModeUtils = (function () {
       return app.get_id();
   });
 
-  let shellApps = appInfos.map(function(appID) {
+  let shellApps = () => appInfos().map(function(appID) {
     return Shell.AppSystem.get_default().lookup_app(appID);
   });
 
   let appIcons = {};
-  const iconSize = Convenience.getSettings().get_uint('icon-size');
-  shellApps.forEach(function(app) {
+  let iconSize = null;
+
+  let getAppIcon = (app) => {
+    const configuredIconSize = Convenience.getSettings().get_uint('icon-size');
+
+    // if icon size changes, redo the whole cache
+    if (configuredIconSize !== iconSize) {
+      appIcons = {};
+      iconSize = configuredIconSize;
+      shellApps().forEach(function(app) {
+        appIcons[app.get_id()] = app.create_icon_texture(iconSize);
+      });
+    }
+
+    // if icon doesn't exist (e.g. new app installed) add it to the cache
+    if (!appIcons.hasOwnProperty(app.get_id())) {
       appIcons[app.get_id()] = app.create_icon_texture(iconSize);
-  });
+    }
+
+    return appIcons[app.get_id()];
+  }
 
   let seenIDs = {};
   let cleanIDs = () => seenIDs = {};
@@ -65,8 +82,8 @@ const ModeUtils = (function () {
     // create an icon.
     const iconBox = new St.Bin({style_class: 'switcher-icon'});
     const id = appRef.get_id();
-    let appIcon = appIcons[id];
-    if ((seenIDs.hasOwnProperty(id)) || (appIcon === undefined)) {
+    let appIcon = getAppIcon(appRef);
+    if (seenIDs.hasOwnProperty(id) || appIcon === undefined) {
         iconBox.child = appRef.create_icon_texture(iconSize);
     } else {
         // To reuse the same icon, it's actor must not belong to any parent
@@ -91,7 +108,6 @@ const ModeUtils = (function () {
   };
 
   return {
-    appIcons: appIcons,
     cleanIDs: cleanIDs,
     destroyParent: destroyParent,
     makeBox: makeBox,
