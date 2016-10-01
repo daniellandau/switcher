@@ -266,11 +266,11 @@ function _showUI(mode, entryText, previousWidth) {
   boxes.forEach(box => fixWidths(box, width, shortcutWidth));
   entry.set_width(width);
 
-  entry.connect('key-release-event', (o, e) => {
+  // handle what we can on key press and the rest on key release
+  entry.connect('key-press-event', (o, e) => {
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
     const symbol = e.get_key_symbol();
-    let fkeyIndex = keyActivation.getActionKeyTable().indexOf(symbol);
 
     // Exit
     if (symbol === Clutter.KEY_Escape) {
@@ -279,16 +279,39 @@ function _showUI(mode, entryText, previousWidth) {
 
     // Switch mode
     } else if (((symbol === Clutter.m) && control) ||
-        ((symbol === Clutter.KEY_Tab) && control) ||
-        ((symbol === Clutter.KEY_space) && control)) {
-        let previousText = entry.get_text();
-        cleanUI();
-        (mode.name() === "Switcher")
-          ? _showUI(launcher, previousText, width)
-          : _showUI(switcher, previousText, width);
+               ((symbol === Clutter.KEY_Tab) && control) ||
+               ((symbol === Clutter.KEY_space) && control)) {
+      let previousText = entry.get_text();
+      cleanUI();
+      (mode.name() === "Switcher")
+        ? _showUI(launcher, previousText, width)
+        : _showUI(switcher, previousText, width);
+
+    // Next entry
+    } else if ((symbol === Clutter.KEY_Down) ||
+              (symbol === Clutter.KEY_Tab) ||
+              ((symbol === Clutter.n) && control)) {
+      cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
+      updateHighlight(boxes, o.text);
+
+    // Previous entry
+    } else if ((symbol === Clutter.KEY_Up) ||
+               ((symbol === Clutter.ISO_Left_Tab) && shift) ||
+               ((symbol === Clutter.KEY_Tab) && shift) ||
+               ((symbol === Clutter.p) && control)) {
+      cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
+      updateHighlight(boxes, o.text);
+    }
+  });
+
+  entry.connect('key-release-event', (o, e) => {
+    const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
+    const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
+    const symbol = e.get_key_symbol();
+    let fkeyIndex = keyActivation.getActionKeyTable().indexOf(symbol);
 
     // Activate selected entry
-    } else if ((symbol === Clutter.KEY_Return) ||
+    if ((symbol === Clutter.KEY_Return) ||
         ((symbol === Clutter.j) && control)) {
       cleanUI();
       filteredApps.length > 0 && mode.activate(filteredApps[cursor]);
@@ -297,21 +320,6 @@ function _showUI(mode, entryText, previousWidth) {
     } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       cleanUI();
       mode.activate(filteredApps[fkeyIndex]);
-
-    // Next entry
-    } else if ((symbol === Clutter.KEY_Down) ||
-        (symbol === Clutter.KEY_Tab) ||
-        ((symbol === Clutter.n) && control)) {
-      cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
-      updateHighlight(boxes, o.text);
-
-    // Previous entry
-    } else if ((symbol === Clutter.KEY_Up) ||
-        ((symbol === Clutter.ISO_Left_Tab) && shift) ||
-        ((symbol === Clutter.KEY_Tab) && shift) ||
-        ((symbol === Clutter.p) && control)) {
-      cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
-      updateHighlight(boxes, o.text);
 
     // Filter text
     } else {
