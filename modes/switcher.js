@@ -74,8 +74,8 @@ const Switcher = (function () {
   return {
     MAX_NUM_ITEMS: MAX_NUM_ITEMS,
     name: name,
-    apps: apps, 
-    activate: activate, 
+    apps: apps,
+    activate: activate,
     description: description,
     descriptionNameIndex: descriptionNameIndex,
     makeBox: makeBox,
