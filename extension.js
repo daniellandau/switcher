@@ -36,7 +36,7 @@ const orderByRelevancy = 1;
 const matchSubstring = 0;
 const matchFuzzy     = 1;
 
-let container, cursor;
+let container, containers, cursor;
 
 function escapeChars(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
@@ -196,9 +196,12 @@ function _showUI(mode, entryText, previousWidth) {
 
   const cleanUI = function() {
     cleanBoxes();
-    Main.uiGroup.remove_actor(container);
-    Main.popModal(container);
+    containers.reverse().forEach(c => {
+      Main.uiGroup.remove_actor(c);
+      Main.popModal(c);
+    })
     container = null;
+    containers = null;
   };
 
   const switchMode = function () {
@@ -228,8 +231,6 @@ function _showUI(mode, entryText, previousWidth) {
       : [ switchModeHint() ];
   };
 
-  container = new St.Bin({reactive: true});
-  container.set_alignment(St.Align.MIDDLE, St.Align.START);
 
   const fontSize = Convenience.getSettings().get_uint('font-size');
   let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
@@ -248,13 +249,24 @@ function _showUI(mode, entryText, previousWidth) {
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
 
-  container.add_actor(boxLayout);
-  Main.uiGroup.add_actor(container);
+  let primaryMonitor = Main.layoutManager.primaryMonitor;
+  let allMonitors = Main.layoutManager.monitors;
 
-  let monitor = Main.layoutManager.primaryMonitor;
-  container.set_width(monitor.width);
-  container.set_height(monitor.height);
-  container.set_position(monitor.x, monitor.y);
+  containers = allMonitors.map(monitor => {
+    let tmpContainer = new St.Bin({reactive: true});
+    tmpContainer.set_alignment(St.Align.MIDDLE, St.Align.START);
+    tmpContainer.set_width(monitor.width);
+    tmpContainer.set_height(monitor.height);
+    tmpContainer.set_position(monitor.x, monitor.y);
+
+    Main.uiGroup.add_actor(tmpContainer);
+    if (monitor === primaryMonitor) container = tmpContainer;
+    return tmpContainer;
+  })
+  // sort primary last so it gets to the top of the modal stack
+    .sort((a, b) => a === primaryMonitor ? 1 : -1);
+
+  container.add_actor(boxLayout);
 
   let width =
       boxes.map(box => box.whole.width)
@@ -392,10 +404,12 @@ function _showUI(mode, entryText, previousWidth) {
     });
   };
 
-  Main.pushModal(container);
-  container.connect('button-press-event', cleanUI);
+  containers.forEach (c => {
+    Main.pushModal(c);
+    c.connect('button-press-event', cleanUI);
+    c.show();
+  });
   global.stage.set_key_focus(entry);
-  container.show();
 }
 
 function fixWidths(box, width, shortcutWidth) {
