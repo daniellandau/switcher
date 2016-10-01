@@ -201,6 +201,14 @@ function _showUI(mode, entryText, previousWidth) {
     container = null;
   };
 
+  const switchMode = function () {
+    let previousText = entry.get_text();
+    cleanUI();
+    (mode.name() === "Switcher")
+      ? _showUI(launcher, previousText, width)
+      : _showUI(switcher, previousText, width);
+  };
+
 
   const switchModeHint = function () {
     const box = new St.BoxLayout({style_class: 'switcher-box'});
@@ -215,7 +223,7 @@ function _showUI(mode, entryText, previousWidth) {
 
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
-    return (apps.length > 0 || mode.name() === "Launcher")
+    return (apps.length > 0)
       ? apps.slice(0, mode.MAX_NUM_ITEMS).map(mode.makeBox)
       : [ switchModeHint() ];
   };
@@ -276,26 +284,23 @@ function _showUI(mode, entryText, previousWidth) {
     if (symbol === Clutter.KEY_Escape) {
       cleanUI();
       entry.set_text("");
-
+    }
     // Switch mode
-    } else if (((symbol === Clutter.m) && control) ||
+    else if (((symbol === Clutter.m) && control) ||
                ((symbol === Clutter.KEY_Tab) && control) ||
                ((symbol === Clutter.KEY_space) && control)) {
-      let previousText = entry.get_text();
-      cleanUI();
-      (mode.name() === "Switcher")
-        ? _showUI(launcher, previousText, width)
-        : _showUI(switcher, previousText, width);
+      switchMode();
 
+    }
     // Next entry
-    } else if ((symbol === Clutter.KEY_Down) ||
+    else if ((symbol === Clutter.KEY_Down) ||
               (symbol === Clutter.KEY_Tab) ||
               ((symbol === Clutter.n) && control)) {
       cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
       updateHighlight(boxes, o.text);
-
+    }
     // Previous entry
-    } else if ((symbol === Clutter.KEY_Up) ||
+    else if ((symbol === Clutter.KEY_Up) ||
                ((symbol === Clutter.ISO_Left_Tab) && shift) ||
                ((symbol === Clutter.KEY_Tab) && shift) ||
                ((symbol === Clutter.p) && control)) {
@@ -310,19 +315,35 @@ function _showUI(mode, entryText, previousWidth) {
     const symbol = e.get_key_symbol();
     let fkeyIndex = keyActivation.getActionKeyTable().indexOf(symbol);
 
+    if (symbol === Clutter.KEY_Escape ||
+        ((symbol === Clutter.m) && control) ||
+        ((symbol === Clutter.KEY_Tab) && control) ||
+        ((symbol === Clutter.KEY_space) && control) ||
+        (symbol === Clutter.KEY_Down) ||
+        (symbol === Clutter.KEY_Tab) ||
+        ((symbol === Clutter.n) && control) ||
+        (symbol === Clutter.KEY_Up) ||
+        ((symbol === Clutter.ISO_Left_Tab) && shift) ||
+        ((symbol === Clutter.KEY_Tab) && shift) ||
+        ((symbol === Clutter.p) && control)) {
+      // pass, these where handled already in keypress
+    }
     // Activate selected entry
-    if ((symbol === Clutter.KEY_Return) ||
+    else if ((symbol === Clutter.KEY_Return) ||
         ((symbol === Clutter.j) && control)) {
       cleanUI();
-      filteredApps.length > 0 && mode.activate(filteredApps[cursor]);
+      if (filteredApps.length > 0) {
+        mode.activate(filteredApps[cursor]);
+      }
 
+    }
     // Activate entry by shortcut
-    } else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
+    else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       cleanUI();
       mode.activate(filteredApps[fkeyIndex]);
-
+    }
     // Filter text
-    } else {
+    else {
       // Delete last character
       if ((symbol === Clutter.h) && control) {
         const entryText = entry.get_clutter_text();
@@ -333,6 +354,16 @@ function _showUI(mode, entryText, previousWidth) {
       }
 
       filteredApps = filterByText(mode, apps, o.text);
+
+      const otherMode = mode.name() === "Switcher" ? launcher : switcher;
+      const filteredAppsInOtherMode = filterByText(otherMode, otherMode.apps(), entry.get_text());
+
+      // switch automatically when we have zero apps, the other mode has some apps, and we are not
+      // just releasing control, meaning e.g. that we just tried to switch the mode and this switches
+      // it back
+      if (filteredApps.length === 0 && filteredAppsInOtherMode.length > 0 && !control) {
+        switchMode();
+      }
 
       cleanBoxes();
       boxes = makeBoxes(filteredApps, mode);
@@ -355,8 +386,7 @@ function _showUI(mode, entryText, previousWidth) {
   // over are defined and so it's hoisted up
   function cleanBoxes() {
     boxes.forEach(box => {
-      box.iconBox.get_children().forEach(child =>
-                                         mode.destroyParent(child));
+      box.iconBox.get_children().forEach(child => mode.destroyParent(child));
       box.iconBox.destroy();
       boxLayout.remove_child(box.whole);
     });
