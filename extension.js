@@ -186,11 +186,6 @@ function _showUI(mode, entryText, previousWidth) {
         });
       }
 
-      if (Convenience.getSettings().get_boolean('activate-immediately') &&
-          filteredApps.length === 1) {
-        debouncedActivateUnique();
-      }
-
       return filteredApps;
   };
 
@@ -207,6 +202,7 @@ function _showUI(mode, entryText, previousWidth) {
   const switchMode = function () {
     let previousText = entry.get_text();
     cleanUI();
+    debouncedActivateUnique.cancel();
     (mode.name() === "Switcher")
       ? _showUI(launcher, previousText, width)
       : _showUI(switcher, previousText, width);
@@ -366,6 +362,13 @@ function _showUI(mode, entryText, previousWidth) {
       }
 
       filteredApps = filterByText(mode, apps, o.text);
+      if (Convenience.getSettings().get_boolean('activate-immediately') &&
+          filteredApps.length === 1 &&
+          symbol !== Clutter.Control_L &&
+          symbol !== Clutter.Control_R) {
+        debouncedActivateUnique();
+      }
+
 
       const otherMode = mode.name() === "Switcher" ? launcher : switcher;
       const filteredAppsInOtherMode = filterByText(otherMode, otherMode.apps(), entry.get_text());
@@ -454,9 +457,13 @@ const clearTimeout = id => GLib.Source.remove(id);
 
 function debounce(f, ms) {
   let timeoutId = null;
-  return function() {
+  const debounced = function() {
     if (timeoutId)
       clearTimeout(timeoutId);
     timeoutId = setTimeout(f, ms);
   };
+  debounced.cancel = function () {
+    clearTimeout(timeoutId);
+  };
+  return debounced;
 }
