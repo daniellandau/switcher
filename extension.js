@@ -341,6 +341,8 @@ function _showUI(mode, entryText, previousWidth) {
         ((symbol === Clutter.j) && control)) {
       cleanUI();
       if (filteredApps.length > 0) {
+        if(shift) // If shift pressed, bring the window in our current workspace.
+          filteredApps[cursor].change_workspace_by_index(global.screen.get_active_workspace_index(), true);
         mode.activate(filteredApps[cursor]);
       }
 
