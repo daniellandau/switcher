@@ -53,8 +53,9 @@ const ModeUtils = (function () {
 
   let seenIDs = {};
   let cleanIDs = () => seenIDs = {};
-  let makeBox = function(app, appRef, description, index) {
-    const box = new St.BoxLayout({style_class: 'switcher-box'});
+  let makeBox = function(app, appRef, description, index, onActivate) {
+    const button = new St.Button({style_class: 'switcher-box'});
+    const box = new St.BoxLayout();
 
     const label = new St.Label({
       style_class: 'switcher-label',
@@ -93,8 +94,12 @@ const ModeUtils = (function () {
         seenIDs[id] = true; // Dummy value
     }
     box.insert_child_at_index(iconBox, 0);
+    button.connect('clicked', () => onActivate(app));
+    button.set_child(box)
+    button.set_fill(true, true);
+    button.set_track_hover(true);
 
-    return { whole: box, iconBox: iconBox, shortcutBox: shortcutBox, label: label };
+    return { whole: button, iconBox: iconBox, shortcutBox: shortcutBox, label: label };
   };
 
   let destroyParent = function(child) {

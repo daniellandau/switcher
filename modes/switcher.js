@@ -66,9 +66,9 @@ const Switcher = (function () {
     }
   };
 
-  let makeBox = function(app, index) {
+  let makeBox = function(app, index, onActivate) {
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
-    return modeUtils.makeBox(app, appRef, description(app), index);
+    return modeUtils.makeBox(app, appRef, description(app), index, onActivate);
   };
 
   return {

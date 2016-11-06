@@ -223,7 +223,9 @@ function _showUI(mode, entryText, previousWidth) {
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
     return (apps.length > 0)
-      ? apps.slice(0, mode.MAX_NUM_ITEMS).map(mode.makeBox)
+      ? apps
+          .slice(0, mode.MAX_NUM_ITEMS)
+          .map((a, i) => mode.makeBox(a, i, (app) => { cleanUI(); mode.activate(app); }))
       : [ switchModeHint() ];
   };
 

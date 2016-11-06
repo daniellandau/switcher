@@ -5,6 +5,11 @@
 .switcher-box {
   border-top: 2px solid #343a3a;
 }
+
+.switcher-box:hover {
+  background-color: rgba(54, 56, 58, 1);
+}
+
 .switcher-box:last-child {
   border-radius: 0 0 9px 9px;
 }
@@ -21,6 +26,11 @@
 .switcher-highlight {
   color: #ffffff;
   background-color: #215d9c;
+}
+
+.switcher-highlight:hover {
+  color: #ffffff;
+  background-color: #447dbc;
 }
 
 .switcher-entry {

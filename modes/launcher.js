@@ -39,8 +39,8 @@ const Launcher = (function () {
     return 0; // Workspace indicators are not used
   };
 
-  let makeBox = function(app, index) {
-    return modeUtils.makeBox(app, app, description(app), index);
+  let makeBox = function(app, index, onActivate) {
+    return modeUtils.makeBox(app, app, description(app), index, onActivate);
   };
 
   return {
