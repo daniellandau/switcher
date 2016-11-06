@@ -22,18 +22,38 @@ const functionKeySymbols = [
   Clutter.KEY_F11,
   Clutter.KEY_F12
 ];
-const numberKeySymbols = [
-  Clutter.KEY_1,
-  Clutter.KEY_2,
-  Clutter.KEY_3,
-  Clutter.KEY_4,
-  Clutter.KEY_5,
-  Clutter.KEY_6,
-  Clutter.KEY_7,
-  Clutter.KEY_8,
-  Clutter.KEY_9,
-  Clutter.KEY_0,
-];
+const numberKeySymbols = {
+  indexOf: function(symbol) {
+    let normal = [
+      Clutter.KEY_1,
+      Clutter.KEY_2,
+      Clutter.KEY_3,
+      Clutter.KEY_4,
+      Clutter.KEY_5,
+      Clutter.KEY_6,
+      Clutter.KEY_7,
+      Clutter.KEY_8,
+      Clutter.KEY_9,
+      Clutter.KEY_0,
+    ];
+
+    let numpad = [
+      Clutter.KEY_KP_1,
+      Clutter.KEY_KP_2,
+      Clutter.KEY_KP_3,
+      Clutter.KEY_KP_4,
+      Clutter.KEY_KP_5,
+      Clutter.KEY_KP_6,
+      Clutter.KEY_KP_7,
+      Clutter.KEY_KP_8,
+      Clutter.KEY_KP_9,
+      Clutter.KEY_KP_0,
+    ];
+
+    return normal.indexOf(symbol) !== -1 ?
+      normal.indexOf(symbol) : numpad.indexOf(symbol);
+  }
+};
 
 const KeyActivation = (function () {
   var getActivateByKey = function() {
