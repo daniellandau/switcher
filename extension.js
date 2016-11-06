@@ -409,7 +409,7 @@ function _showUI(mode, entryText, previousWidth) {
   };
 
   containers.forEach (c => {
-    Main.pushModal(c);
+    Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
     c.connect('button-press-event', cleanUI);
     c.show();
   });
