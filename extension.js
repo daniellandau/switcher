@@ -220,15 +220,25 @@ function _showUI(mode, entryText, previousWidth) {
     return { whole: box, label: label, iconBox: new St.Bin(), shortcutBox: new St.Bin() };
   }
 
+  const bringWindowInWorkspaceHint = function () {
+    const box = new St.BoxLayout({style_class: 'switcher-box'});
+    const label = new St.Label({
+      style_class: 'switcher-label',
+      y_align: Clutter.ActorAlign.CENTER
+    });
+    label.clutter_text.set_text(_("Use Shift+Return to bring the window in the current workspace"));
+    box.insert_child_at_index(label, 0);
+    return { whole: box, label: label, iconBox: new St.Bin(), shortcutBox: new St.Bin() };
+  }
+
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
     return (apps.length > 0)
       ? apps
           .slice(0, mode.MAX_NUM_ITEMS)
           .map((a, i) => mode.makeBox(a, i, (app) => { cleanUI(); mode.activate(app); }))
-      : [ switchModeHint() ];
+      : [ switchModeHint(), bringWindowInWorkspaceHint() ];
   };
-
 
   const fontSize = Convenience.getSettings().get_uint('font-size');
   let boxLayout = new St.BoxLayout({style_class: 'switcher-box-layout'});
@@ -344,6 +354,9 @@ function _showUI(mode, entryText, previousWidth) {
         ((symbol === Clutter.j) && control)) {
       cleanUI();
       if (filteredApps.length > 0) {
+        // If shift pressed and we are in switcher mode, bring the window in our current workspace.
+        if(mode.name() === "Switcher" && shift)
+          filteredApps[cursor].change_workspace_by_index(global.screen.get_active_workspace_index(), true);
         mode.activate(filteredApps[cursor]);
       }
 
