@@ -338,6 +338,7 @@ function _showUI(mode, entryText, previousWidth) {
     }
     // Activate selected entry
     else if ((symbol === Clutter.KEY_Return) ||
+             (symbol === Clutter.KEY_KP_Enter) ||
         ((symbol === Clutter.j) && control)) {
       cleanUI();
       if (filteredApps.length > 0) {
