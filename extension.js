@@ -226,7 +226,7 @@ function _showUI(mode, entryText, previousWidth) {
       style_class: 'switcher-label',
       y_align: Clutter.ActorAlign.CENTER
     });
-    label.clutter_text.set_text(_("Use Shift+Return to bring the window in the current workspace"));
+    label.clutter_text.set_text(_("Use Shift+Return to bring the activated window to the current workspace"));
     box.insert_child_at_index(label, 0);
     return { whole: box, label: label, iconBox: new St.Bin(), shortcutBox: new St.Bin() };
   }
