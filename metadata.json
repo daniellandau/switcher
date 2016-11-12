@@ -2,7 +2,7 @@
   "name": "Switcher",
   "uuid": "switcher@landau.fi",
   "settings-schema": "org.gnome.shell.extensions.switcher",
-  "description": "Switch windows or launch applications quickly by typing\n\nUse the configured global hotkey (Super+w by default) to open a list of current windows. Type a part of the name or title of the application window you want to activate and hit enter. You can use the arrow keys to navigate among the filtered selection and type several space separated search terms to filter further. Use Esc or click anywhere to cancel.\n\nUse the configured global hotkey (Super+x by default) to open the application launcher. Type a part of the name of the application you want to launch and hit enter. You can use Ctrl+Space or Ctrl+Tab to switch between the switcher and the launcher\n\nYou can customize the look and feel in the preferences.",
+  "description": "Switch windows or launch applications quickly by typing\n\nUse the configured global hotkey (Super+w by default) to open a list of current windows. Type a part of the name or title of the application window you want to activate and hit enter or click on the item you wish to activate. You can use the arrow keys to navigate among the filtered selection and type several space separated search terms to filter further. Use Esc or click anywhere outside the switcher to cancel.\n\nUse the configured global hotkey (Super+x by default) to open the application launcher. Type a part of the name of the application you want to launch and hit enter. You can use Ctrl+Space or Ctrl+Tab to switch between the switcher and the launcher, or when there are no open windows matching a name but there are apps the mode is switched automatically.\n\nYou can customize the look and feel and functionality in the preferences.",
   "shell-version": [
     "3.22",
     "3.20",
@@ -10,6 +10,6 @@
     "3.16",
     "3.14"
   ],
-  "version": 12,
+  "version": 13,
   "url": "https://github.com/daniellandau/switcher"
 }
