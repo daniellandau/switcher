@@ -31,78 +31,82 @@ msgstr ""
 msgid "Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"
 msgstr ""
 
-#: prefs.js:96
+#: prefs.js:100
 msgid "Key"
 msgstr ""
 
-#: prefs.js:105
+#: prefs.js:109
 msgid "Pattern matching algorithm"
 msgstr ""
 
-#: prefs.js:106
+#: prefs.js:110
 msgid "Strict"
 msgstr ""
 
-#: prefs.js:106
+#: prefs.js:110
 msgid "Fuzzy"
 msgstr ""
 
-#: prefs.js:117
+#: prefs.js:121
 msgid "Ordering criteria"
 msgstr ""
 
-#: prefs.js:118
+#: prefs.js:122
 msgid "Last focused"
 msgstr ""
 
-#: prefs.js:118
+#: prefs.js:122
 msgid "Most relevant"
 msgstr ""
 
-#: prefs.js:129
+#: prefs.js:133
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:134
+#: prefs.js:138
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:148
+#: prefs.js:152
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 
-#: prefs.js:168
+#: prefs.js:172
 msgid "Icon size (px)"
 msgstr ""
 
-#: prefs.js:185
+#: prefs.js:189
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:202
+#: prefs.js:206
 msgid "Max width (%)"
 msgstr ""
 
-#: prefs.js:218
+#: prefs.js:222
 msgid "Activate by pressing a key matching the index in the list"
 msgstr ""
 
-#: prefs.js:219
+#: prefs.js:223
 msgid "Disable"
 msgstr ""
 
-#: prefs.js:219
+#: prefs.js:223
 msgid "Function keys"
 msgstr ""
 
-#: prefs.js:219
+#: prefs.js:223
 msgid "Number keys"
 msgstr ""
 
-#: prefs.js:230
+#: prefs.js:234
 msgid "Show workspace indicators"
 msgstr ""
 
-#: prefs.js:244
+#: prefs.js:248
 msgid "Show only apps in the current workspace"
+msgstr ""
+
+#: prefs.js:262
+msgid "Fade Effect"
 msgstr ""
