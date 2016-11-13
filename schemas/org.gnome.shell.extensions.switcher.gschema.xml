@@ -49,5 +49,9 @@
             <default>false</default>
             <summary>Whether to show just the apps in the current workspace</summary>
         </key>
+        <key type="b" name="fade-enable">
+            <default>false</default>
+            <summary>Toggle Window Fade</summary>
+        </key>
     </schema>
 </schemalist>

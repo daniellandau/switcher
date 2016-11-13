@@ -23,6 +23,7 @@ const Meta = imports.gi.Meta;
 const GLib = imports.gi.GLib;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Gettext = imports.gettext;
+const Tweener = imports.ui.tweener;
 
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
@@ -273,7 +274,10 @@ function _showUI(mode, entryText, previousWidth) {
   })
   // sort primary last so it gets to the top of the modal stack
     .sort((a, b) => a === primaryMonitor ? 1 : -1);
-
+  if (Convenience.getSettings().get_boolean('fade-enable')) {
+    boxLayout.opacity = 0;
+    Tweener.addTween(boxLayout, { opacity: 255, time: .5, transition: 'easeOutQuad'});
+  }
   container.add_actor(boxLayout);
 
   let width =
@@ -302,7 +306,12 @@ function _showUI(mode, entryText, previousWidth) {
 
     // Exit
     if (symbol === Clutter.KEY_Escape) {
-      cleanUI();
+      boxLayout.opacity = 255;
+      if (Convenience.getSettings().get_boolean('fade-enable')) {
+        Tweener.addTween(boxLayout, { opacity: 0, time: .5, transition: 'easeOutQuad', onComplete: cleanUI });
+      } else {
+        cleanUI();
+      }
       entry.set_text("");
     }
     // Switch mode

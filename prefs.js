@@ -64,6 +64,10 @@ function buildPrefsWidget() {
   addOnlyONeWorkspace(onlyOneWorkSpaceWidget, settings);
   vWidget.add(onlyOneWorkSpaceWidget);
 
+  let fadeEffectWidget = new Gtk.HBox();
+  addFadeEffect(fadeEffectWidget, settings);
+  vWidget.add(fadeEffectWidget);
+
   vWidget.show_all();
   return vWidget;
 }
@@ -250,6 +254,20 @@ function addOnlyONeWorkspace(widget, settings) {
   });
   _switch.connect('notify::active', function (o) {
     settings.set_boolean('only-current-workspace', o.active);
+  });
+  widget.add(_switch);
+}
+
+function addFadeEffect(widget, settings) {
+  widget.add(makeTitle(_("Fade Effect")));
+
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('fade-enable'),
+    margin_top: 15,
+    halign: Gtk.Align.END
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('fade-enable', o.active);
   });
   widget.add(_switch);
 }
