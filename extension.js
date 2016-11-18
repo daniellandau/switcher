@@ -36,55 +36,6 @@ const orderByRelevancy = 1;
 
 let container, containers, cursor;
 
-function highlightText(text, query) {
-  // Don't apply highlighting if there's no input
-  if (query == "")
-    return text;
-
-  // Identify substring parts to be highlighted
-  const matching = Convenience.getSettings().get_uint('matching');
-  let queryExpression = "(";
-  let queries = (matching == util.matchFuzzy) ? query.split(/ |/) : query.split(" ");
-  let queriesLength = queries.length;
-  for (let i = 0; i < queriesLength - 1; i++) {
-    if (queries[i] != "") {
-      queryExpression += util.escapeChars(queries[i]) + "|";
-    }
-  }
-  queryExpression += util.escapeChars(queries[queriesLength - 1]) + ")";
-
-  let queryRegExp = new RegExp(queryExpression, "i");
-  let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
-
-  // Build resulting string from highlighted and non-highlighted strings
-  let result = "";
-  let tokens = text.split(queryRegExp);
-  let tokensLength = tokens.length;
-  for (let i = 0; i < tokensLength; i++) {
-    if (tokens[i].match(tokenRegExp)) {
-      result += '<u><span underline_color=\"#4a90d9\" foreground=\"#ffffff\">' +
-                tokens[i] +
-                '</span></u>';
-    } else {
-      result += tokens[i];
-    }
-  }
-
-  return result.replace(/&/g, "&amp;");
-}
-
-function updateHighlight(boxes, query) {
-  boxes.forEach(box => {
-    box.whole.remove_style_class_name('switcher-highlight');
-
-    const highlightedText = highlightText(box.label.get_text(), query);
-    box.label.clutter_text.set_markup(highlightedText);
-  });
-
-  boxes.length > cursor &&
-      boxes[cursor].whole.add_style_class_name('switcher-highlight');
-}
-
 function _showUI(mode, entryText, previousWidth) {
   'use strict';
   if (container)
@@ -177,7 +128,7 @@ function _showUI(mode, entryText, previousWidth) {
   let filteredApps = filterByText(mode, apps, entryText);
 
   let boxes = makeBoxes(filteredApps, mode);
-  updateHighlight(boxes, entryText);
+  util.updateHighlight(boxes, entryText, cursor);
 
   let entry =
     new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
@@ -253,7 +204,7 @@ function _showUI(mode, entryText, previousWidth) {
               (symbol === Clutter.KEY_Tab) ||
               ((symbol === Clutter.n) && control)) {
       cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
-      updateHighlight(boxes, o.text);
+      util.updateHighlight(boxes, o.text, cursor);
     }
     // Previous entry
     else if ((symbol === Clutter.KEY_Up) ||
@@ -261,7 +212,7 @@ function _showUI(mode, entryText, previousWidth) {
                ((symbol === Clutter.KEY_Tab) && shift) ||
                ((symbol === Clutter.p) && control)) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
-      updateHighlight(boxes, o.text);
+      util.updateHighlight(boxes, o.text, cursor);
     }
   });
 
@@ -340,7 +291,7 @@ function _showUI(mode, entryText, previousWidth) {
       if (cursor + 1 > boxes.length)
         cursor = Math.max(boxes.length - 1, 0);
 
-      updateHighlight(boxes, o.text);
+      util.updateHighlight(boxes, o.text, cursor);
       boxes.forEach((box) => {
         util.fixWidths(box, width, shortcutWidth);
         boxLayout.insert_child_at_index(box.whole, -1);

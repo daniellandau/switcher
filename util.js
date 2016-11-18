@@ -103,3 +103,52 @@ function fixWidths(box, width, shortcutWidth) {
   box.whole.set_width(width);
   box.shortcutBox && box.shortcutBox.set_width(shortcutWidth);
 }
+
+function updateHighlight(boxes, query, cursor) {
+  boxes.forEach(box => {
+    box.whole.remove_style_class_name('switcher-highlight');
+
+    const highlightedText = highlightText(box.label.get_text(), query);
+    box.label.clutter_text.set_markup(highlightedText);
+  });
+
+  boxes.length > cursor &&
+    boxes[cursor].whole.add_style_class_name('switcher-highlight');
+}
+
+function highlightText(text, query) {
+  // Don't apply highlighting if there's no input
+  if (query == "")
+    return text;
+
+  // Identify substring parts to be highlighted
+  const matching = Convenience.getSettings().get_uint('matching');
+  let queryExpression = "(";
+  let queries = (matching == matchFuzzy) ? query.split(/ |/) : query.split(" ");
+  let queriesLength = queries.length;
+  for (let i = 0; i < queriesLength - 1; i++) {
+    if (queries[i] != "") {
+      queryExpression += escapeChars(queries[i]) + "|";
+    }
+  }
+  queryExpression += escapeChars(queries[queriesLength - 1]) + ")";
+
+  let queryRegExp = new RegExp(queryExpression, "i");
+  let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
+
+  // Build resulting string from highlighted and non-highlighted strings
+  let result = "";
+  let tokens = text.split(queryRegExp);
+  let tokensLength = tokens.length;
+  for (let i = 0; i < tokensLength; i++) {
+    if (tokens[i].match(tokenRegExp)) {
+      result += '<u><span underline_color=\"#4a90d9\" foreground=\"#ffffff\">' +
+                tokens[i] +
+                '</span></u>';
+    } else {
+      result += tokens[i];
+    }
+  }
+
+  return result.replace(/&/g, "&amp;");
+}
