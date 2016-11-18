@@ -20,10 +20,10 @@ const Clutter = imports.gi.Clutter;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
-const ExtensionUtils = imports.misc.extensionUtils;
 const Gettext = imports.gettext;
 const Tweener = imports.ui.tweener;
 
+const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
@@ -35,79 +35,9 @@ const util = Me.imports.util;
 const orderByFocus     = 0;
 const orderByRelevancy = 1;
 const matchSubstring = 0;
-const matchFuzzy     = 1;
 
 let container, containers, cursor;
 
-function escapeChars(text) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
-}
-
-function makeFilter(mode, text) {
-  return function(app) {
-    // start from zero, filters can change this up or down
-    // and the scores are summed
-    app.score = 0;
-    return text.split(' ').every(fragment => runFilter(mode, app, fragment));
-  };
-}
-
-function runFilter(mode, app, fragment) {
-  if (fragment == '')
-    return true;
-
-  fragment = escapeChars(fragment);
-
-  const matching = Convenience.getSettings().get_uint('matching');
-  const splitChar = (matching == matchFuzzy) ? '' : ' ';
-  const specialexp = new RegExp(/[-[\]{}()*+?.,\\^$|#]/);
-  const regexp = new RegExp(fragment.split(splitChar).reduce(function(a,b) {
-      // In order to treat special charactes as a whole,
-      // we manually identify and concatenate them
-      if (b == '\\')
-        return a+b;
-      else if (specialexp.test(b) && (a.charAt(a.length - 1) == '\\'))
-        return a.slice(0, a.length - 1) + '[^' + '\\' + b + ']*' + '\\' +  b;
-      else
-        return a + '[^' + b + ']*' + b;
-  }), "gi");
-
-  let match;
-  let gotMatch = false;
-  let score = 0;
-  const descriptionLowerCase = mode.description(app).toLowerCase();
-  const filteredDescription = escapeChars(descriptionLowerCase
-          .slice(mode.descriptionNameIndex(app), descriptionLowerCase.length));
-  // go through each match inside description
-  while ((match = regexp.exec(filteredDescription))) {
-
-    // A full match at the beginning is the best match
-    if ((match.index == 0) && match[0].length == fragment.length) {
-      score += 100;
-    }
-
-    // matches at beginning word boundaries are better than in the middle of words
-    const wordPrefixFactor =
-            (match.index == 0 || (match.index != 0) && filteredDescription.charAt(match.index - 1) == " ")
-            ? 1.2 : 0.0;
-
-    // matches nearer to the beginning are better than near the end
-    const precedenceFactor = 1.0 / (1 + match.index);
-
-    // fuzzyness can cause lots of stuff to match, penalize by match length
-    const fuzzynessFactor = 2.3 * (fragment.length - match[0].length) / match[0].length;
-
-    // join factors by summing
-    const newscore = precedenceFactor + wordPrefixFactor + fuzzynessFactor;
-
-    score = Math.max(score, newscore);
-
-    gotMatch = true;
-  }
-  app.score += score;
-
-  return gotMatch;
-}
 
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
@@ -117,14 +47,14 @@ function highlightText(text, query) {
   // Identify substring parts to be highlighted
   const matching = Convenience.getSettings().get_uint('matching');
   let queryExpression = "(";
-  let queries = (matching == matchFuzzy) ? query.split(/ |/) : query.split(" ");
+  let queries = (matching == util.matchFuzzy) ? query.split(/ |/) : query.split(" ");
   let queriesLength = queries.length;
   for (let i = 0; i < queriesLength - 1; i++) {
     if (queries[i] != "") {
-      queryExpression += escapeChars(queries[i]) + "|";
+      queryExpression += util.escapeChars(queries[i]) + "|";
     }
   }
-  queryExpression += escapeChars(queries[queriesLength - 1]) + ")";
+  queryExpression += util.escapeChars(queries[queriesLength - 1]) + ")";
 
   let queryRegExp = new RegExp(queryExpression, "i");
   let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
@@ -173,7 +103,7 @@ function _showUI(mode, entryText, previousWidth) {
   }, Convenience.getSettings().get_uint('activate-after-ms'));
 
   const filterByText = function(mode, apps, text) {
-      let filteredApps = apps.filter(makeFilter(mode, text));
+      let filteredApps = apps.filter(util.makeFilter(mode, text));
 
       // Always preserve focus order before typing
       const ordering = Convenience.getSettings().get_uint('ordering');
