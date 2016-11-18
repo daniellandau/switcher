@@ -1,4 +1,6 @@
 const GLib = imports.gi.GLib;
+const St = imports.gi.St;
+const Clutter = imports.gi.Clutter;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
