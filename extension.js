@@ -41,13 +41,6 @@ function _showUI(mode, entryText, previousWidth) {
 
   cursor = 0;
 
-  const debouncedActivateUnique = util.debounce(() => {
-    if (filteredApps.length === 1) {
-      cleanUI();
-      mode.activate(filteredApps[cursor]);
-    }
-  }, Convenience.getSettings().get_uint('activate-after-ms'));
-
   const cleanUI = function() {
     cleanBoxes();
     containers.reverse().forEach(c => {
@@ -57,16 +50,6 @@ function _showUI(mode, entryText, previousWidth) {
     container = null;
     containers = null;
   };
-
-  const switchMode = function () {
-    let previousText = entry.get_text();
-    cleanUI();
-    debouncedActivateUnique.cancel();
-    (mode.name() === "Switcher")
-      ? _showUI(launcher, previousText, width)
-      : _showUI(switcher, previousText, width);
-  };
-
 
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
@@ -84,6 +67,14 @@ function _showUI(mode, entryText, previousWidth) {
 
   const apps = mode.apps();
   let filteredApps = util.filterByText(mode, apps, entryText);
+
+  const debouncedActivateUnique = util.debounce(() => {
+    if (filteredApps.length === 1) {
+      cleanUI();
+      mode.activate(filteredApps[cursor]);
+    }
+  }, Convenience.getSettings().get_uint('activate-after-ms'));
+
 
   let boxes = makeBoxes(filteredApps, mode);
   util.updateHighlight(boxes, entryText, cursor);
@@ -267,6 +258,16 @@ function _showUI(mode, entryText, previousWidth) {
       boxLayout.remove_child(box.whole);
     });
   };
+
+  function switchMode () {
+    let previousText = entry.get_text();
+    cleanUI();
+    debouncedActivateUnique.cancel();
+    (mode.name() === "Switcher")
+      ? _showUI(launcher, previousText, width)
+      : _showUI(switcher, previousText, width);
+  };
+
 
   containers.forEach (c => {
     Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
