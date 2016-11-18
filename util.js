@@ -98,3 +98,8 @@ function runFilter(mode, app, fragment) {
 
   return gotMatch;
 }
+
+function fixWidths(box, width, shortcutWidth) {
+  box.whole.set_width(width);
+  box.shortcutBox && box.shortcutBox.set_width(shortcutWidth);
+}

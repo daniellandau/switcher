@@ -222,7 +222,7 @@ function _showUI(mode, entryText, previousWidth) {
 
   if (previousWidth && Number(previousWidth) === previousWidth) width = previousWidth;
 
-  boxes.forEach(box => fixWidths(box, width, shortcutWidth));
+  boxes.forEach(box => util.fixWidths(box, width, shortcutWidth));
   entry.set_width(width);
 
   // handle what we can on key press and the rest on key release
@@ -342,7 +342,7 @@ function _showUI(mode, entryText, previousWidth) {
 
       updateHighlight(boxes, o.text);
       boxes.forEach((box) => {
-        fixWidths(box, width, shortcutWidth);
+        util.fixWidths(box, width, shortcutWidth);
         boxLayout.insert_child_at_index(box.whole, -1);
       });
     }
@@ -365,11 +365,6 @@ function _showUI(mode, entryText, previousWidth) {
     c.show();
   });
   global.stage.set_key_focus(entry);
-}
-
-function fixWidths(box, width, shortcutWidth) {
-  box.whole.set_width(width);
-  box.shortcutBox && box.shortcutBox.set_width(shortcutWidth);
 }
 
 function init() {
