@@ -41,16 +41,6 @@ function _showUI(mode, entryText, previousWidth) {
 
   cursor = 0;
 
-  const cleanUI = function() {
-    cleanBoxes();
-    containers.reverse().forEach(c => {
-      Main.uiGroup.remove_actor(c);
-      Main.popModal(c);
-    })
-    container = null;
-    containers = null;
-  };
-
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
     return (apps.length > 0)
@@ -248,6 +238,12 @@ function _showUI(mode, entryText, previousWidth) {
     }
   });
 
+  containers.forEach (c => {
+    Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+    c.connect('button-press-event', cleanUI);
+    c.show();
+  });
+  global.stage.set_key_focus(entry);
 
   // In the bottom as a function statement so the variables closed
   // over are defined and so it's hoisted up
@@ -268,13 +264,15 @@ function _showUI(mode, entryText, previousWidth) {
       : _showUI(switcher, previousText, width);
   };
 
-
-  containers.forEach (c => {
-    Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
-    c.connect('button-press-event', cleanUI);
-    c.show();
-  });
-  global.stage.set_key_focus(entry);
+  function cleanUI () {
+    cleanBoxes();
+    containers.reverse().forEach(c => {
+      Main.uiGroup.remove_actor(c);
+      Main.popModal(c);
+    })
+    container = null;
+    containers = null;
+  };
 }
 
 function init() {
