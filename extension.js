@@ -258,7 +258,7 @@ function _showUI(mode, entryText, previousWidth) {
       : _showUI(switcher, previousText, width);
   };
 
-  // this and the following function contain copy pasted code
+  // this and the following function contain some of the same copy pasted code
   function cleanUI () {
     cleanBoxes();
     containers.reverse().forEach(c => {
