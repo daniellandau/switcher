@@ -32,12 +32,9 @@ const switcher = Me.imports.modes.switcher.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
 const util = Me.imports.util;
 
-const orderByFocus     = 0;
 const orderByRelevancy = 1;
-const matchSubstring = 0;
 
 let container, containers, cursor;
-
 
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
