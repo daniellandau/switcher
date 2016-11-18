@@ -20,7 +20,6 @@ const Clutter = imports.gi.Clutter;
 const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
-const GLib = imports.gi.GLib;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Gettext = imports.gettext;
 const Tweener = imports.ui.tweener;
@@ -31,6 +30,7 @@ const Convenience = Me.imports.convenience;
 const keyActivation = Me.imports.keyActivation.KeyActivation;
 const switcher = Me.imports.modes.switcher.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
+const util = Me.imports.util;
 
 const orderByFocus     = 0;
 const orderByRelevancy = 1;
@@ -165,7 +165,7 @@ function _showUI(mode, entryText, previousWidth) {
 
   cursor = 0;
 
-  const debouncedActivateUnique = debounce(() => {
+  const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
       cleanUI();
       mode.activate(filteredApps[cursor]);
@@ -467,28 +467,4 @@ function enable() {
 function disable() {
   Main.wm.removeKeybinding('show-switcher');
   Main.wm.removeKeybinding('show-launcher');
-}
-
-// from https://github.com/satya164/gjs-helpers
-const setTimeout = (f, ms) => {
-  return GLib.timeout_add(GLib.PRIORITY_DEFAULT, ms, () => {
-    f();
-
-    return false; // Don't repeat
-  }, null);
-};
-
-const clearTimeout = id => GLib.Source.remove(id);
-
-function debounce(f, ms) {
-  let timeoutId = null;
-  const debounced = function() {
-    if (timeoutId)
-      clearTimeout(timeoutId);
-    timeoutId = setTimeout(f, ms);
-  };
-  debounced.cancel = function () {
-    clearTimeout(timeoutId);
-  };
-  return debounced;
 }
