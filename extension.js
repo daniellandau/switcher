@@ -46,7 +46,7 @@ function _showUI(mode, entryText, previousWidth) {
     return (apps.length > 0)
       ? apps
           .slice(0, mode.MAX_NUM_ITEMS)
-          .map((a, i) => mode.makeBox(a, i, (app) => { cleanUI(); mode.activate(app); }))
+          .map((a, i) => mode.makeBox(a, i, (app) => { cleanUIWithFade(); mode.activate(app); }))
       : [ util.switchModeHint(), util.bringWindowInWorkspaceHint() ];
   };
 
@@ -60,7 +60,7 @@ function _showUI(mode, entryText, previousWidth) {
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
-      cleanUI();
+      cleanUIWithFade();
       mode.activate(filteredApps[cursor]);
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
@@ -70,7 +70,7 @@ function _showUI(mode, entryText, previousWidth) {
   util.updateHighlight(boxes, entryText, cursor);
 
   let entry =
-    new St.Entry({style_class: 'switcher-entry', hint_text: 'type filter'});
+    new St.Entry({style_class: 'switcher-entry'});
   entry.set_text(entryText);
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
@@ -123,13 +123,7 @@ function _showUI(mode, entryText, previousWidth) {
 
     // Exit
     if (symbol === Clutter.KEY_Escape) {
-      boxLayout.opacity = 255;
-      if (Convenience.getSettings().get_boolean('fade-enable')) {
-        Tweener.addTween(boxLayout, { opacity: 0, time: .5, transition: 'easeOutQuad', onComplete: cleanUI });
-      } else {
-        cleanUI();
-      }
-      entry.set_text("");
+      cleanUIWithFade();
     }
     // Switch mode
     else if (((symbol === Clutter.m) && control) ||
@@ -178,7 +172,7 @@ function _showUI(mode, entryText, previousWidth) {
     else if ((symbol === Clutter.KEY_Return) ||
              (symbol === Clutter.KEY_KP_Enter) ||
         ((symbol === Clutter.j) && control)) {
-      cleanUI();
+      cleanUIWithFade();
       if (filteredApps.length > 0) {
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
         if(mode.name() === "Switcher" && shift)
@@ -189,7 +183,7 @@ function _showUI(mode, entryText, previousWidth) {
     }
     // Activate entry by shortcut
     else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
-      cleanUI();
+      cleanUIWithFade();
       mode.activate(filteredApps[fkeyIndex]);
     }
     // Filter text
@@ -240,7 +234,7 @@ function _showUI(mode, entryText, previousWidth) {
 
   containers.forEach (c => {
     Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
-    c.connect('button-press-event', cleanUI);
+    c.connect('button-press-event', cleanUIWithFade);
     c.show();
   });
   global.stage.set_key_focus(entry);
@@ -264,15 +258,38 @@ function _showUI(mode, entryText, previousWidth) {
       : _showUI(switcher, previousText, width);
   };
 
+  // this and the following function contain copy pasted code
   function cleanUI () {
     cleanBoxes();
     containers.reverse().forEach(c => {
       Main.uiGroup.remove_actor(c);
       Main.popModal(c);
-    })
+    });
     container = null;
     containers = null;
   };
+
+  function cleanUIWithFade () {
+    containers.reverse().forEach(c => {
+      Main.popModal(c);
+    });
+
+
+    const cleanRest = function () {
+      cleanBoxes();
+      containers.reverse().forEach(c => {
+        Main.uiGroup.remove_actor(c);
+      });
+      container = null;
+      containers = null;
+    };
+
+    if (Convenience.getSettings().get_boolean('fade-enable')) {
+      Tweener.addTween(boxLayout, { opacity: 0, time: .5, transition: 'easeOutQuad', onComplete: cleanRest });
+    } else {
+      cleanRest();
+    }
+  }
 }
 
 function init() {
