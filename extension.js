@@ -32,8 +32,6 @@ const switcher = Me.imports.modes.switcher.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
 const util = Me.imports.util;
 
-const orderByRelevancy = 1;
-
 let container, containers, cursor;
 
 function _showUI(mode, entryText, previousWidth) {
@@ -49,24 +47,6 @@ function _showUI(mode, entryText, previousWidth) {
       mode.activate(filteredApps[cursor]);
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
-
-  const filterByText = function(mode, apps, text) {
-      let filteredApps = apps.filter(util.makeFilter(mode, text));
-
-      // Always preserve focus order before typing
-      const ordering = Convenience.getSettings().get_uint('ordering');
-      if ((ordering == orderByRelevancy) && text != "") {
-        filteredApps = filteredApps.sort(function(a, b) {
-          if (a.score > b.score)
-            return -1;
-          if (a.score < b.score)
-            return 1;
-          return 0;
-        });
-      }
-
-      return filteredApps;
-  };
 
   const cleanUI = function() {
     cleanBoxes();
@@ -125,7 +105,7 @@ function _showUI(mode, entryText, previousWidth) {
   boxLayout.set_vertical(true);
 
   const apps = mode.apps();
-  let filteredApps = filterByText(mode, apps, entryText);
+  let filteredApps = util.filterByText(mode, apps, entryText);
 
   let boxes = makeBoxes(filteredApps, mode);
   util.updateHighlight(boxes, entryText, cursor);
@@ -264,7 +244,7 @@ function _showUI(mode, entryText, previousWidth) {
         entryText.delete_text(textCursor - 1, textCursor);
       }
 
-      filteredApps = filterByText(mode, apps, o.text);
+      filteredApps = util.filterByText(mode, apps, o.text);
       if (Convenience.getSettings().get_boolean('activate-immediately') &&
           filteredApps.length === 1 &&
           symbol !== Clutter.Control_L &&
@@ -274,7 +254,7 @@ function _showUI(mode, entryText, previousWidth) {
 
 
       const otherMode = mode.name() === "Switcher" ? launcher : switcher;
-      const filteredAppsInOtherMode = filterByText(otherMode, otherMode.apps(), entry.get_text());
+      const filteredAppsInOtherMode = util.filterByText(otherMode, otherMode.apps(), entry.get_text());
 
       // switch automatically when we have zero apps, the other mode has some apps, and we are not
       // just releasing control, meaning e.g. that we just tried to switch the mode and this switches

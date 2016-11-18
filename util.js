@@ -4,6 +4,8 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
 const matchFuzzy     = 1;
+const orderByRelevancy = 1;
+
 
 // from https://github.com/satya164/gjs-helpers
 const setTimeout = (f, ms) => {
@@ -162,3 +164,21 @@ function destroyParent(child) {
     }
   }
 }
+
+function filterByText(mode, apps, text) {
+  let filteredApps = apps.filter(makeFilter(mode, text));
+
+  // Always preserve focus order before typing
+  const ordering = Convenience.getSettings().get_uint('ordering');
+  if ((ordering == orderByRelevancy) && text != "") {
+    filteredApps = filteredApps.sort(function(a, b) {
+      if (a.score > b.score)
+        return -1;
+      if (a.score < b.score)
+        return 1;
+      return 0;
+    });
+  }
+
+  return filteredApps;
+};
