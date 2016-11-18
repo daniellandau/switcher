@@ -304,7 +304,7 @@ function _showUI(mode, entryText, previousWidth) {
   // over are defined and so it's hoisted up
   function cleanBoxes() {
     boxes.forEach(box => {
-      box.iconBox.get_children().forEach(child => mode.destroyParent(child));
+      box.iconBox.get_children().forEach(child => util.destroyParent(child));
       box.iconBox.destroy();
       boxLayout.remove_child(box.whole);
     });

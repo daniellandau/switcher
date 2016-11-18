@@ -152,3 +152,13 @@ function highlightText(text, query) {
 
   return result.replace(/&/g, "&amp;");
 }
+
+function destroyParent(child) {
+  if (child) {
+    let parent = child.get_parent();
+    if (parent) {
+      parent.remove_actor(child);
+      parent.destroy();
+    }
+  }
+}

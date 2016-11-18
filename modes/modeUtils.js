@@ -8,6 +8,7 @@ const Gio = imports.gi.Gio;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
+const util = Me.imports.util;
 
 const keyActivation = Me.imports.keyActivation.KeyActivation;
 
@@ -88,7 +89,7 @@ const ModeUtils = (function () {
         iconBox.child = appRef.create_icon_texture(iconSize);
     } else {
         // To reuse the same icon, it's actor must not belong to any parent
-        destroyParent(appIcon);
+        util.destroyParent(appIcon);
         iconBox.child = appIcon;
 
         seenIDs[id] = true; // Dummy value
@@ -102,19 +103,9 @@ const ModeUtils = (function () {
     return { whole: button, iconBox: iconBox, shortcutBox: shortcutBox, label: label };
   };
 
-  let destroyParent = function(child) {
-    if (child) {
-      let parent = child.get_parent();
-      if (parent) {
-        parent.remove_actor(child);
-        parent.destroy();
-      }
-    }
-  };
 
   return {
     cleanIDs: cleanIDs,
-    destroyParent: destroyParent,
     makeBox: makeBox,
     shellApps: shellApps
   };
