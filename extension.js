@@ -91,7 +91,7 @@ function _showUI(mode, entryText, previousWidth) {
   })
   // sort primary last so it gets to the top of the modal stack
     .sort((a, b) => a === primaryMonitor ? 1 : -1);
-  if (Convenience.getSettings().get_boolean('fade-enable')) {
+  if (previousWidth === undefined && Convenience.getSettings().get_boolean('fade-enable')) {
     boxLayout.opacity = 0;
     Tweener.addTween(boxLayout, { opacity: 255, time: .5, transition: 'easeOutQuad'});
   }
