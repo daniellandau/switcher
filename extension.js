@@ -373,16 +373,11 @@ function init() {
 }
 
 function enable() {
-  // Since Gnome 3.16, Shell.KeyBindingMode is replaced by Shell.ActionMode
   Main.wm.addKeybinding(
-      'show-switcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE,
-      Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL
-                           : Shell.ActionMode.NORMAL,
+      'show-switcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL,
       () => _showUI(switcher, ""));
   Main.wm.addKeybinding(
-      'show-launcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE,
-      Shell.KeyBindingMode ? Shell.KeyBindingMode.NORMAL
-                           : Shell.ActionMode.NORMAL,
+      'show-launcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL,
       () => _showUI(launcher, ""));
 }
 
