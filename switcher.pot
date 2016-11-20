@@ -8,16 +8,54 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-07-17 17:12+0300\n"
+"POT-Creation-Date: 2016-11-20 12:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
+"X-Poedit-SearchPath-1: extension.js\n"
+"X-Poedit-SearchPath-2: onboarding.js\n"
+
+#: onboarding.js:19
+msgid "Use Super+w (or another shortcut you configured in settings) to start the switcher. Type space separated searches, use the arrow keys to navigate, and press Space to activate."
+msgstr ""
+
+#: onboarding.js:20
+msgid "There is a launcher mode too. Use Ctrl+Tab, Ctrl+Space or Ctrl+m to switch modes. If you are looking for an app that is not running, the mode switches automatically."
+msgstr ""
+
+#: onboarding.js:21
+msgid "There are a number of settings you can tweak to configure how the switcher looks and acts. Go to https://extensions.gnome.org/local/ to access settings."
+msgstr ""
+
+#: onboarding.js:22
+msgid "You can also click an item with the mouse/touchpad to activate."
+msgstr ""
+
+#: onboarding.js:23
+msgid "You can use Shift+Enter to bring the activated window to the current workspace."
+msgstr ""
+
+#: onboarding.js:53
+msgid "Switcher"
+msgstr ""
+
+#: onboarding.js:58
+msgid "Switcher tip of the day"
+msgstr ""
+
+#: onboarding.js:63
+msgid "Okay, got it. Don't show this again"
+msgstr ""
+
+#: onboarding.js:67
+msgid "I want to see this message again later"
+msgstr ""
 
 #: prefs.js:24
 msgid "Hotkey to activate switcher"

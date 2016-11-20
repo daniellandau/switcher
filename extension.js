@@ -31,6 +31,7 @@ const keyActivation = Me.imports.keyActivation.KeyActivation;
 const switcher = Me.imports.modes.switcher.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
 const util = Me.imports.util;
+const onboarding = Me.imports.onboarding;
 
 let container, containers, cursor;
 
@@ -43,11 +44,9 @@ function _showUI(mode, entryText, previousWidth) {
 
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
-    return (apps.length > 0)
-      ? apps
-          .slice(0, mode.MAX_NUM_ITEMS)
-          .map((a, i) => mode.makeBox(a, i, (app) => { cleanUIWithFade(); mode.activate(app); }))
-      : [ util.switchModeHint(), util.bringWindowInWorkspaceHint() ];
+    return apps
+      .slice(0, mode.MAX_NUM_ITEMS)
+      .map((a, i) => mode.makeBox(a, i, (app) => { cleanUIWithFade(); mode.activate(app); }));
   };
 
   const fontSize = Convenience.getSettings().get_uint('font-size');
@@ -304,6 +303,8 @@ function enable() {
   Main.wm.addKeybinding(
       'show-launcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL,
       () => _showUI(launcher, ""));
+
+  onboarding.showOne();
 }
 
 function disable() {
