@@ -61,7 +61,7 @@ function buildPrefsWidget() {
   vWidget.add(workspaceIndicatorWidget);
 
   let onlyOneWorkSpaceWidget = new Gtk.HBox();
-  addOnlyONeWorkspace(onlyOneWorkSpaceWidget, settings);
+  addOnlyOneWorkspace(onlyOneWorkSpaceWidget, settings);
   vWidget.add(onlyOneWorkSpaceWidget);
 
   let fadeEffectWidget = new Gtk.HBox();
@@ -244,7 +244,7 @@ function addWorkspaceIndicator(widget, settings) {
   widget.add(_switch);
 }
 
-function addOnlyONeWorkspace(widget, settings) {
+function addOnlyOneWorkspace(widget, settings) {
   widget.add(makeTitle(_("Show only apps in the current workspace")));
 
   let _switch = new Gtk.Switch({
