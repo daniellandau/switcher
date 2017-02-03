@@ -15,61 +15,70 @@ function init() {
 }
 
 function buildPrefsWidget() {
-  let settings = Convenience.getSettings();
-
   let vWidget = new Gtk.VBox({margin: 10});
 
+  buildWidgets().forEach(w => vWidget.add(w));
+  vWidget.show_all();
+  return vWidget;
+}
+
+function buildWidgets() {
+  let settings = Convenience.getSettings();
+
   let shortcutsWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
-    let switcherWidget = new Gtk.VBox();
-    addShortcut(switcherWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
-    shortcutsWidget.pack_start(switcherWidget, true, true, 0);
-    let launcherWidget = new Gtk.VBox();
-    addShortcut(launcherWidget, settings, 'show-launcher', _("Hotkey to activate launcher"));
-    shortcutsWidget.pack_start(launcherWidget, true, true, 0);
-  vWidget.add(shortcutsWidget);
+  let switcherWidget = new Gtk.VBox();
+  addShortcut(switcherWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
+  shortcutsWidget.pack_start(switcherWidget, true, true, 0);
+  let launcherWidget = new Gtk.VBox();
+  addShortcut(launcherWidget, settings, 'show-launcher', _("Hotkey to activate launcher"));
+  shortcutsWidget.pack_start(launcherWidget, true, true, 0);
 
   let changeExplanation = new Gtk.Label({margin_top: 5});
   changeExplanation.set_markup(_("Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"));
   changeExplanation.set_alignment(0, 0.5);
-  vWidget.add(changeExplanation);
 
-  addImmediately(vWidget, settings);
-  addActivateByKey(vWidget, settings);
+  const immediatelyWidgets = buildImmediately(settings);
+  const activateByWidgets = buildActivateByKey( settings);
 
   let behaviourWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
-    let matchingWidget = new Gtk.VBox();
-    addMatching(matchingWidget, settings);
-    behaviourWidget.pack_start(matchingWidget, true, true, 0);
-    let orderingWidget = new Gtk.VBox();
-    addOrdering(orderingWidget, settings);
-    behaviourWidget.pack_start(orderingWidget, true, true, 0);
-  vWidget.add(behaviourWidget);
+  let matchingWidget = new Gtk.VBox();
+  addMatching(matchingWidget, settings);
+  behaviourWidget.pack_start(matchingWidget, true, true, 0);
+  let orderingWidget = new Gtk.VBox();
+  addOrdering(orderingWidget, settings);
+  behaviourWidget.pack_start(orderingWidget, true, true, 0);
 
   let appearanceWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
-    let fontSizeWidget = new Gtk.VBox();
-    addFontSize(fontSizeWidget, settings);
-    appearanceWidget.add(fontSizeWidget);
-    let iconSizeWidget = new Gtk.VBox();
-    addIconSize(iconSizeWidget, settings);
-    appearanceWidget.add(iconSizeWidget);
-  vWidget.add(appearanceWidget);
+  let fontSizeWidget = new Gtk.VBox();
+  addFontSize(fontSizeWidget, settings);
+  appearanceWidget.add(fontSizeWidget);
+  let iconSizeWidget = new Gtk.VBox();
+  addIconSize(iconSizeWidget, settings);
+  appearanceWidget.add(iconSizeWidget);
 
-  addMaxWidth(vWidget, settings);
+  const maxWidthWidgets = buildMaxWidth(settings);
 
   let workspaceIndicatorWidget = new Gtk.HBox();
-    addWorkspaceIndicator(workspaceIndicatorWidget, settings);
-  vWidget.add(workspaceIndicatorWidget);
+  addWorkspaceIndicator(workspaceIndicatorWidget, settings);
 
   let onlyOneWorkSpaceWidget = new Gtk.HBox();
   addOnlyOneWorkspace(onlyOneWorkSpaceWidget, settings);
-  vWidget.add(onlyOneWorkSpaceWidget);
 
   let fadeEffectWidget = new Gtk.HBox();
   addFadeEffect(fadeEffectWidget, settings);
-  vWidget.add(fadeEffectWidget);
 
-  vWidget.show_all();
-  return vWidget;
+  return []
+    .concat(shortcutsWidget,
+            changeExplanation,
+            immediatelyWidgets,
+            activateByWidgets,
+            behaviourWidget,
+            appearanceWidget,
+            maxWidthWidgets,
+            workspaceIndicatorWidget,
+            onlyOneWorkSpaceWidget,
+            fadeEffectWidget
+           )
 }
 
 function addShortcut(widget, settings, shortcut, title) {
@@ -129,8 +138,8 @@ function addOrdering(widget, settings) {
     widget.add(input);
 }
 
-function addImmediately(widget, settings) {
-  widget.add(makeTitle(_("Immediate activation")));
+function buildImmediately(settings) {
+  const title = makeTitle(_("Immediate activation"));
 
   let input;
   let box = new Gtk.HBox();
@@ -147,12 +156,11 @@ function addImmediately(widget, settings) {
     input.set_sensitive(o.active);
   });
   box.add(_switch);
-  widget.add(box);
+
   label = new Gtk.Label();
   label.set_markup(_("Activate immediately this many milliseconds after last keystroke"));
   label.set_alignment(0, 0.5);
   label.set_padding(0, 9);
-  widget.add(label);
 
   input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
@@ -165,7 +173,7 @@ function addImmediately(widget, settings) {
   input.connect('value-changed', function(button) {
     settings.set_uint('activate-after-ms', button.get_value_as_int());
   });
-  widget.add(input);
+  return [title, box, label, input];
 }
 
 function addIconSize(widget, settings) {
@@ -202,8 +210,8 @@ function addFontSize(widget, settings) {
   widget.add(input);
 }
 
-function addMaxWidth(widget, settings) {
-  widget.add(makeTitle(_("Max width (%)")));
+function buildMaxWidth(settings) {
+  const title = makeTitle(_("Max width (%)"));
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
       lower: 10,
@@ -215,19 +223,19 @@ function addMaxWidth(widget, settings) {
   input.connect('value-changed', function(button) {
     settings.set_uint('max-width-percentage', button.get_value_as_int());
   });
-  widget.add(input);
+  return [title, input];
 }
 
-function addActivateByKey(widget, settings) {
-    widget.add(makeTitle(_("Activate by pressing a key matching the index in the list")));
-    let options = [_("Disable"), _("Function keys"), _("Number keys")];
-    let input = new Gtk.ComboBoxText();
-    options.forEach(o => input.append_text(o));
-    input.set_active(settings.get_uint('activate-by-key'));
-    input.connect('changed', function() {
-        settings.set_uint('activate-by-key', input.get_active());
-    });
-    widget.add(input);
+function buildActivateByKey(settings) {
+  const title = makeTitle(_("Activate by pressing a key matching the index in the list"));
+  let options = [_("Disable"), _("Function keys"), _("Number keys")];
+  let input = new Gtk.ComboBoxText();
+  options.forEach(o => input.append_text(o));
+  input.set_active(settings.get_uint('activate-by-key'));
+  input.connect('changed', function() {
+    settings.set_uint('activate-by-key', input.get_active());
+  });
+  return [title, input];
 }
 
 function addWorkspaceIndicator(widget, settings) {
