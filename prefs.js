@@ -3,10 +3,12 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 
 const ExtensionUtils = imports.misc.extensionUtils;
-const Convenience = ExtensionUtils.getCurrentExtension().imports.convenience;
+var Me = ExtensionUtils.getCurrentExtension();
+const Convenience = Me.imports.convenience;
 
 const Gettext = imports.gettext.domain('switcher');
 const _ = Gettext.gettext;
+const getOnboardingMessages = Me.imports.onboardingmessages.messages;
 
 let entry, settings;
 
@@ -17,6 +19,7 @@ function init() {
 function buildPrefsWidget() {
   let vWidget = new Gtk.VBox({margin: 10});
 
+  // print(getOnboardingMessages(_));
   buildWidgets().forEach(w => vWidget.add(w));
   vWidget.show_all();
   return vWidget;
