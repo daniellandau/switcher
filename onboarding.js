@@ -18,6 +18,10 @@ const SHOWN_BUT_SHOW_AGAIN = 2;
 function showOne() {
   const settings = Convenience.getSettings();
 
+  if (settings.get_boolean('never-show-onboarding')) {
+    return;
+  }
+
   let message, settingsKey;
 
   for (let i = 0; i < messages.length; ++i) {

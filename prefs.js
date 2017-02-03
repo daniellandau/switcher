@@ -19,7 +19,6 @@ function init() {
 function buildPrefsWidget() {
   let vWidget = new Gtk.VBox({margin: 10});
 
-  // print(getOnboardingMessages(_));
   buildWidgets().forEach(w => vWidget.add(w));
   vWidget.show_all();
   return vWidget;
@@ -70,6 +69,8 @@ function buildWidgets() {
   let fadeEffectWidget = new Gtk.HBox();
   addFadeEffect(fadeEffectWidget, settings);
 
+  const onboardingWidgets = []; // TODO finish this buildOnboarding(settings);
+
   return []
     .concat(shortcutsWidget,
             changeExplanation,
@@ -80,7 +81,8 @@ function buildWidgets() {
             maxWidthWidgets,
             workspaceIndicatorWidget,
             onlyOneWorkSpaceWidget,
-            fadeEffectWidget
+            fadeEffectWidget,
+            onboardingWidgets
            )
 }
 
@@ -281,6 +283,33 @@ function addFadeEffect(widget, settings) {
     settings.set_boolean('fade-enable', o.active);
   });
   widget.add(_switch);
+}
+
+function buildOnboarding(settings) {
+  const title = makeTitle(_("Onboarding"));
+
+  let box = new Gtk.HBox();
+  let label = new Gtk.Label();
+  label.set_markup(_("Never show onboarding messages"));
+  label.set_alignment(0, 0.5);
+  box.add(label);
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('never-show-onboarding'),
+    halign: Gtk.Align.END
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('never-show-onboarding', o.active);
+  });
+  box.add(_switch);
+
+  // TODO find a better widget to show these
+  const messages = getOnboardingMessages(_).map(msg => {
+    const label = new Gtk.Label();
+    label.set_markup(msg);
+    label.set_alignment(0, 0.5);
+    return label;
+  });
+  return [title, box].concat(messages);
 }
 
 function makeTitle(markup) {

@@ -53,6 +53,10 @@
             <default>false</default>
             <summary>Toggle Window Fade</summary>
         </key>
+        <key type="b" name="never-show-onboarding">
+            <default>false</default>
+            <summary>Never show onboarding</summary>
+        </key>
         <key type="u" name="onboarding-1">
             <default>0</default>
             <summary>0 for not shown, 1 for shown and never again, 2 for shown but show again</summary>
