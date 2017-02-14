@@ -57,12 +57,13 @@ function showOne() {
   notification.setTransient(false);
   notification.setResident(false);
 
-  notification.addAction(_("Okay, got it. Don't show this again"), function () {
+  notification.addAction(_("Ok"), function () {
     settings.set_uint(settingsKey, DO_NOT_SHOW_AGAIN);
   });
 
-  notification.addAction(_("I want to see this message again later"), function () {
-    settings.set_uint(settingsKey, SHOWN_BUT_SHOW_AGAIN);
+  notification.addAction(_("Never show messages from switcher"), function () {
+    settings.set_uint(settingsKey, DO_NOT_SHOW_AGAIN);
+    settings.set_boolean('never-show-onboarding', true);
   });
 
   notification.connect('activated', function () {
