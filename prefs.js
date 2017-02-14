@@ -69,7 +69,7 @@ function buildWidgets() {
   let fadeEffectWidget = new Gtk.HBox();
   addFadeEffect(fadeEffectWidget, settings);
 
-  const onboardingWidgets = []; // TODO finish this buildOnboarding(settings);
+  const onboardingWidgets = buildOnboarding(settings);
 
   return []
     .concat(shortcutsWidget,
@@ -293,6 +293,33 @@ function buildOnboarding(settings) {
   label.set_markup(_("Never show onboarding messages"));
   label.set_alignment(0, 0.5);
   box.add(label);
+
+  const showMessages = new Gtk.Button({ label: _("Read onboarding messages")});
+  const popover = new Gtk.Popover(showMessages);
+  popover.set_relative_to(showMessages);
+  const vbox = new Gtk.VBox();
+  vbox.set_margin_start(5);
+  vbox.set_margin_end(5);
+  vbox.set_margin_bottom(5);
+  popover.add(vbox);
+  showMessages.connect('clicked', function () {
+    popover.show_all();
+  });
+
+  getOnboardingMessages(_)
+    .map((msg, i) => {
+      const label = new Gtk.Label();
+      label.set_markup((i + 1) + '. ' + msg);
+      label.set_alignment(0, 0.5);
+      label.set_line_wrap(true);
+      label.set_margin_top(5);
+      label.set_max_width_chars(72);
+      return label;
+    })
+    .forEach(l => vbox.add(l));
+
+  box.add(showMessages);
+
   let _switch = new Gtk.Switch({
     active: settings.get_boolean('never-show-onboarding'),
     halign: Gtk.Align.END
@@ -302,14 +329,8 @@ function buildOnboarding(settings) {
   });
   box.add(_switch);
 
-  // TODO find a better widget to show these
-  const messages = getOnboardingMessages(_).map(msg => {
-    const label = new Gtk.Label();
-    label.set_markup(msg);
-    label.set_alignment(0, 0.5);
-    return label;
-  });
-  return [title, box].concat(messages);
+
+  return [title, box];
 }
 
 function makeTitle(markup) {
