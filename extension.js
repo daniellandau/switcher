@@ -92,7 +92,7 @@ function _showUI(mode, entryText, previousWidth) {
     .sort((a, b) => a === primaryMonitor ? 1 : -1);
   if (previousWidth === undefined && Convenience.getSettings().get_boolean('fade-enable')) {
     boxLayout.opacity = 0;
-    Tweener.addTween(boxLayout, { opacity: 255, time: .5, transition: 'easeOutQuad'});
+    Tweener.addTween(boxLayout, { opacity: 255, time: .35, transition: 'easeOutQuad'});
   }
   container.add_actor(boxLayout);
 
@@ -284,7 +284,7 @@ function _showUI(mode, entryText, previousWidth) {
     };
 
     if (Convenience.getSettings().get_boolean('fade-enable')) {
-      Tweener.addTween(boxLayout, { opacity: 0, time: .5, transition: 'easeOutQuad', onComplete: cleanRest });
+      Tweener.addTween(boxLayout, { opacity: 0, time: .35, transition: 'easeOutQuad', onComplete: cleanRest });
     } else {
       cleanRest();
     }
