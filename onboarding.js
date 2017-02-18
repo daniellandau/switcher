@@ -66,12 +66,9 @@ function showOne() {
     settings.set_uint(settingsKey, DO_NOT_SHOW_AGAIN);
   });
 
-  notification.connect('activated', function () {
-    showOne();
-    Main.panel.closeCalendar();
+  notification.connect('destroy', function() {
+    settings.set_uint(settingsKey, DO_NOT_SHOW_AGAIN);
   });
-
-  notification.connect('destroy', function() {});
 
   source.notify(notification);
 }
