@@ -286,15 +286,25 @@ function addFadeEffect(widget, settings) {
 }
 
 function buildOnboarding(settings) {
-  const title = makeTitle(_("Onboarding"));
+  const title = makeTitle(_("Usage tips"));
 
   let box = new Gtk.HBox();
   let label = new Gtk.Label();
-  label.set_markup(_("Never show onboarding messages"));
+  label.set_markup(_("Never show usage tips"));
   label.set_alignment(0, 0.5);
   box.add(label);
 
-  const showMessages = new Gtk.Button({ label: _("Read onboarding messages")});
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('never-show-onboarding'),
+    halign: Gtk.Align.END
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('never-show-onboarding', o.active);
+  });
+  box.add(_switch);
+
+  const showMessages = new Gtk.Button({ label: _("Read all tips")});
+  showMessages.set_margin_top(10);
   const popover = new Gtk.Popover(showMessages);
   popover.set_relative_to(showMessages);
   const vbox = new Gtk.VBox();
@@ -318,19 +328,7 @@ function buildOnboarding(settings) {
     })
     .forEach(l => vbox.add(l));
 
-  box.add(showMessages);
-
-  let _switch = new Gtk.Switch({
-    active: settings.get_boolean('never-show-onboarding'),
-    halign: Gtk.Align.END
-  });
-  _switch.connect('notify::active', function (o) {
-    settings.set_boolean('never-show-onboarding', o.active);
-  });
-  box.add(_switch);
-
-
-  return [title, box];
+  return [title, box, showMessages];
 }
 
 function makeTitle(markup) {
