@@ -52,18 +52,18 @@ function showOne() {
   source.policy = new MessageTray.NotificationPolicy({forceExpanded: true});
   Main.messageTray.add(source);
 
-  let notification = new MessageTray.Notification(source, _("Switcher tip of the day"), message);
+  let notification = new MessageTray.Notification(source, _("Switcher usage tip"), message);
   notification.setUrgency(MessageTray.Urgency.LOW);
   notification.setTransient(false);
   notification.setResident(false);
 
-  notification.addAction(_("Ok"), function () {
-    settings.set_uint(settingsKey, DO_NOT_SHOW_AGAIN);
-  });
-
-  notification.addAction(_("Never show messages from switcher"), function () {
+  notification.addAction(_("Never show usage tips"), function () {
     settings.set_uint(settingsKey, DO_NOT_SHOW_AGAIN);
     settings.set_boolean('never-show-onboarding', true);
+  });
+
+  notification.addAction(_("Ok"), function () {
+    settings.set_uint(settingsKey, DO_NOT_SHOW_AGAIN);
   });
 
   notification.connect('activated', function () {
