@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-18 17:01+0200\n"
-"PO-Revision-Date: 2017-02-18 17:03+0200\n"
+"POT-Creation-Date: 2017-02-19 10:46+0200\n"
+"PO-Revision-Date: 2017-02-19 10:46+0200\n"
 "Last-Translator: Daniel Landau <daniel@landau.fi>\n"
 "Language-Team: \n"
 "Language: fi_FI\n"
@@ -20,21 +20,45 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 
-#: onboarding.js:50
-msgid "Switcher"
-msgstr "Vaihtaja"
+#: onboardingmessages.js:3
+msgid ""
+"Use Super+w (or another shortcut you configured in settings) to start the "
+"switcher. Type space separated searches, use the arrow keys to navigate, and "
+"press Space to activate."
+msgstr ""
+"Näppäile Super+w (tai muu asetuksissa säätämäsi pikänäppäin) käynnistääksesi "
+"vaihtajan. Kirjoita välilyönnillä eroteltuja hakusanoja, käytä "
+"nuolinäppäimiä navigointiin ja paina Enter aktivoidaksesi."
 
-#: onboarding.js:55
-msgid "Switcher usage tip"
-msgstr "Vaihtajan käyttövinkki"
+#: onboardingmessages.js:4
+msgid ""
+"There is a launcher mode too. Use Ctrl+Tab, Ctrl+Space or Ctrl+m to switch "
+"modes. If you are looking for an app that is not running, the mode switches "
+"automatically."
+msgstr ""
+"Vaihtajassa on myös käynnistinmoodi. Näppäile Ctrl+Tab, Ctrl+Välilyönti tai "
+"Ctrl+m vaihtaaksesi moodia. Jos etsit ohjelmaa, joka ei ole päällä, moodi "
+"vaihtuu automaattisesti."
 
-#: onboarding.js:60 prefs.js:293
-msgid "Never show usage tips"
-msgstr "Älä näytä käyttövinkkejä"
+#: onboardingmessages.js:5
+msgid ""
+"There are a number of settings you can tweak to configure how the switcher "
+"looks and acts. Go to https://extensions.gnome.org/local/ to access settings."
+msgstr ""
+"Asetuksissa on erinäisiä säätöjä joilla voi muuttaa miltä vaihtaja näyttää "
+"ja miten se käyttäytyy. Avaa https://extensions.gnome.org/local/ "
+"muuttaaksesi asetuksia."
 
-#: onboarding.js:65
-msgid "Ok"
-msgstr "Ok"
+#: onboardingmessages.js:6
+msgid "You can also click an item with the mouse/touchpad to activate."
+msgstr "Voit myös klikata hiirellä/kosketuslevyllä aktivoidaksesi."
+
+#: onboardingmessages.js:7
+msgid ""
+"You can use Shift+Enter to bring the activated window to the current "
+"workspace."
+msgstr ""
+"Näppäile Shift+Enter tuodaksesi aktivoidun ikkunan nykyiseen työtilaan."
 
 #: prefs.js:32
 msgid "Hotkey to activate switcher"
@@ -136,48 +160,25 @@ msgstr "Fade-efekti"
 msgid "Usage tips"
 msgstr "Käyttövinkit"
 
+#: prefs.js:293
+msgid "Never show usage tips"
+msgstr "Älä näytä käyttövinkkejä"
+
 #: prefs.js:306
 msgid "Read all tips"
 msgstr "Lue kaikki vinkit"
 
+#~ msgid "Switcher"
+#~ msgstr "Vaihtaja"
+
+#~ msgid "Switcher usage tip"
+#~ msgstr "Vaihtajan käyttövinkki"
+
+#~ msgid "Ok"
+#~ msgstr "Ok"
+
 #~ msgid "Switcher tip of the day"
 #~ msgstr "Vaihtajan päivän vinkki"
-
-#~ msgid ""
-#~ "Use Super+w (or another shortcut you configured in settings) to start the "
-#~ "switcher. Type space separated searches, use the arrow keys to navigate, "
-#~ "and press Space to activate."
-#~ msgstr ""
-#~ "Näppäile Super+w (tai muu asetuksissa säätämäsi pikänäppäin) "
-#~ "käynnistääksesi vaihtajan. Kirjoita välilyönnillä eroteltuja hakusanoja, "
-#~ "käytä nuolinäppäimiä navigointiin ja paina Enter aktivoidaksesi."
-
-#~ msgid ""
-#~ "There is a launcher mode too. Use Ctrl+Tab, Ctrl+Space or Ctrl+m to "
-#~ "switch modes. If you are looking for an app that is not running, the mode "
-#~ "switches automatically."
-#~ msgstr ""
-#~ "Vaihtajassa on myös käynnistinmoodi. Näppäile Ctrl+Tab, Ctrl+Välilyönti "
-#~ "tai Ctrl+m vaihtaaksesi moodia. Jos etsit ohjelmaa, joka ei ole päällä, "
-#~ "moodi vaihtuu automaattisesti."
-
-#~ msgid ""
-#~ "There are a number of settings you can tweak to configure how the "
-#~ "switcher looks and acts. Go to https://extensions.gnome.org/local/ to "
-#~ "access settings."
-#~ msgstr ""
-#~ "Asetuksissa on erinäisiä säätöjä joilla voi muuttaa miltä vaihtaja "
-#~ "näyttää ja miten se käyttäytyy. Avaa https://extensions.gnome.org/local/ "
-#~ "muuttaaksesi asetuksia."
-
-#~ msgid "You can also click an item with the mouse/touchpad to activate."
-#~ msgstr "Voit myös klikata hiirellä/kosketuslevyllä aktivoidaksesi."
-
-#~ msgid ""
-#~ "You can use Shift+Enter to bring the activated window to the current "
-#~ "workspace."
-#~ msgstr ""
-#~ "Näppäile Shift+Enter tuodaksesi aktivoidun ikkunan nykyiseen työtilaan."
 
 #~ msgid "Okay, got it. Don't show this again"
 #~ msgstr "Ok, ymmärsin. Älä näytä uudelleen."
