@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-19 10:45+0200\n"
+"POT-Creation-Date: 2017-02-19 14:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,6 +20,23 @@ msgstr ""
 "X-Poedit-SearchPath-0: prefs.js\n"
 "X-Poedit-SearchPath-1: extension.js\n"
 "X-Poedit-SearchPath-2: onboardingmessages.js\n"
+"X-Poedit-SearchPath-3: onboarding.js\n"
+
+#: onboarding.js:51
+msgid "Switcher"
+msgstr ""
+
+#: onboarding.js:56
+msgid "Switcher usage tip"
+msgstr ""
+
+#: onboarding.js:61 prefs.js:293
+msgid "Never show usage tips"
+msgstr ""
+
+#: onboarding.js:66
+msgid "Ok"
+msgstr ""
 
 #: onboardingmessages.js:3
 msgid "Use Super+w (or another shortcut you configured in settings) to start the switcher. Type space separated searches, use the arrow keys to navigate, and press Space to activate."
@@ -135,10 +152,6 @@ msgstr ""
 
 #: prefs.js:289
 msgid "Usage tips"
-msgstr ""
-
-#: prefs.js:293
-msgid "Never show usage tips"
 msgstr ""
 
 #: prefs.js:306

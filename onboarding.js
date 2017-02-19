@@ -7,7 +7,7 @@ const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
-const messages = Me.imports.onboardingmessages.messages(_);
+const getMessages = Me.imports.onboardingmessages.messages;
 
 const NEVER_SHOWN          = 0;
 const DO_NOT_SHOW_AGAIN    = 1;
@@ -17,6 +17,7 @@ const SHOWN_BUT_SHOW_AGAIN = 2;
 
 function showOne() {
   const settings = Convenience.getSettings();
+  const messages = getMessages(_);
 
   if (settings.get_boolean('never-show-onboarding')) {
     return;

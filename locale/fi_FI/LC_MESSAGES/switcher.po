@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-19 10:46+0200\n"
-"PO-Revision-Date: 2017-02-19 10:46+0200\n"
+"POT-Creation-Date: 2017-02-19 14:00+0200\n"
+"PO-Revision-Date: 2017-02-19 14:00+0200\n"
 "Last-Translator: Daniel Landau <daniel@landau.fi>\n"
 "Language-Team: \n"
 "Language: fi_FI\n"
@@ -19,6 +19,22 @@ msgstr ""
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
+
+#: onboarding.js:51
+msgid "Switcher"
+msgstr "Vaihtaja"
+
+#: onboarding.js:56
+msgid "Switcher usage tip"
+msgstr "Vaihtajan käyttövinkki"
+
+#: onboarding.js:61 prefs.js:293
+msgid "Never show usage tips"
+msgstr "Älä näytä käyttövinkkejä"
+
+#: onboarding.js:66
+msgid "Ok"
+msgstr "Ok"
 
 #: onboardingmessages.js:3
 msgid ""
@@ -160,22 +176,9 @@ msgstr "Fade-efekti"
 msgid "Usage tips"
 msgstr "Käyttövinkit"
 
-#: prefs.js:293
-msgid "Never show usage tips"
-msgstr "Älä näytä käyttövinkkejä"
-
 #: prefs.js:306
 msgid "Read all tips"
 msgstr "Lue kaikki vinkit"
-
-#~ msgid "Switcher"
-#~ msgstr "Vaihtaja"
-
-#~ msgid "Switcher usage tip"
-#~ msgstr "Vaihtajan käyttövinkki"
-
-#~ msgid "Ok"
-#~ msgstr "Ok"
 
 #~ msgid "Switcher tip of the day"
 #~ msgstr "Vaihtajan päivän vinkki"
