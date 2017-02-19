@@ -3,7 +3,7 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 
 const ExtensionUtils = imports.misc.extensionUtils;
-var Me = ExtensionUtils.getCurrentExtension();
+const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
 const Gettext = imports.gettext.domain('switcher');
