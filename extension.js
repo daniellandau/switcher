@@ -232,7 +232,9 @@ function _showUI(mode, entryText, previousWidth) {
   });
 
   containers.forEach (c => {
-    Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+    let actionMode = (typeof Shell.ActionMode !== 'undefined') ?
+        { actionMode: Shell.ActionMode.SYSTEM_MODAL } : {};
+    Main.pushModal(c, actionMode);
     c.connect('button-press-event', cleanUIWithFade);
     c.show();
   });
@@ -297,14 +299,21 @@ function init() {
 }
 
 function enable() {
-  Main.wm.addKeybinding(
-      'show-switcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL,
-      () => _showUI(switcher, ""));
-  Main.wm.addKeybinding(
-      'show-launcher', Convenience.getSettings(), Meta.KeyBindingFlags.NONE, Shell.ActionMode.NORMAL,
-      () => _showUI(launcher, ""));
+    let actionMode = (typeof Shell.ActionMode !== 'undefined') ?
+        Shell.ActionMode.NORMAL : Shell.KeyBindingMode.NORMAL;
 
-  onboarding.showOne();
+    Main.wm.addKeybinding('show-switcher',
+                          Convenience.getSettings(),
+                          Meta.KeyBindingFlags.NONE,
+                          actionMode,
+                          () => _showUI(switcher, ""));
+    Main.wm.addKeybinding('show-launcher',
+                          Convenience.getSettings(),
+                          Meta.KeyBindingFlags.NONE,
+                          actionMode,
+                          () => _showUI(launcher, ""));
+
+    onboarding.showOne();
 }
 
 function disable() {
