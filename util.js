@@ -122,8 +122,8 @@ function updateHighlight(boxes, query, cursor) {
 
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
-  if (query == "")
-    return text;
+  if (query == '')
+    return text.replace(/&/g, '&amp;');
 
   // Identify substring parts to be highlighted
   const matching = Convenience.getSettings().get_uint('matching');
@@ -154,7 +154,7 @@ function highlightText(text, query) {
     }
   }
 
-  return result.replace(/&/g, "&amp;");
+  return result.replace(/&/g, '&amp;');
 }
 
 function destroyParent(child) {
