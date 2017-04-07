@@ -270,7 +270,11 @@ function _showUI(mode, entryText, previousWidth) {
 
   function cleanUIWithFade () {
     containers.reverse().forEach(c => {
-      Main.popModal(c);
+      try {
+        Main.popModal(c);
+      } catch (e) {
+        print('Switcher got an error', e);
+      }
     });
 
 
