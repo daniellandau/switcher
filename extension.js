@@ -279,6 +279,7 @@ function _showUI(mode, entryText, previousWidth) {
       containers.reverse().forEach(c => {
         Main.uiGroup.remove_actor(c);
       });
+      boxLayout.destroy();
       container = null;
       containers = null;
     };
