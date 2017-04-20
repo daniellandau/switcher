@@ -264,6 +264,7 @@ function _showUI(mode, entryText, previousWidth) {
       Main.uiGroup.remove_actor(c);
       Main.popModal(c);
     });
+    boxLayout.destroy();
     container = null;
     containers = null;
   };
