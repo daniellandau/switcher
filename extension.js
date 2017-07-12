@@ -41,6 +41,7 @@ function _showUI(mode, entryText, previousWidth) {
     return;
 
   cursor = 0;
+  util.reinit();
 
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();

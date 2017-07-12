@@ -108,16 +108,28 @@ function fixWidths(box, width, shortcutWidth) {
   box.shortcutBox && box.shortcutBox.set_width(shortcutWidth);
 }
 
+let latestHighLightedText = null;
+
+function reinit() {
+  latestHighLightedText = null;
+}
+
 function updateHighlight(boxes, query, cursor) {
   boxes.forEach(box => {
     box.whole.remove_style_class_name('switcher-highlight');
+    box.label.remove_style_pseudo_class('selected');
 
     const highlightedText = highlightText(box.label.get_text(), query);
     box.label.clutter_text.set_markup(highlightedText);
   });
 
-  boxes.length > cursor &&
+  if (boxes.length > cursor) {
     boxes[cursor].whole.add_style_class_name('switcher-highlight');
+    if (latestHighLightedText !== boxes[cursor].label.text) {
+      boxes[cursor].label.add_style_pseudo_class('selected');
+    }
+    latestHighLightedText = boxes[cursor].label.text;
+  }
 }
 
 function highlightText(text, query) {
