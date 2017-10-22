@@ -1,0 +1,70 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR peter.p.perron@gmail.com, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-02-17 08:17+0100\n"
+"PO-Revision-Date: 2017-10-21 22:58-0400\n"
+"Last-Translator: Peter Perron <peter.p.perron@gmail.com>\n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.3\n"
+
+#: prefs.js:49
+msgid "Hotkey to activate switcher"
+msgstr "Touche raccourci pour activer Switcher"
+
+#: prefs.js:73
+msgid "Key"
+msgstr "Touche"
+
+#: prefs.js:82
+msgid "Immediate activation"
+msgstr "Activation immediate"
+
+#: prefs.js:87
+msgid "When there is just one result, activate immediately"
+msgstr "Lorsqu'il n'y a qu'un seul résultat, activer immédiatement"
+
+#: prefs.js:101
+msgid "Activate immediately this many milliseconds after last keystroke"
+msgstr "Activer automatiquement si aucune touche n'est enfoncée pendant ce nombre de millisecondes"
+
+#: prefs.js:121
+msgid "Icon size (px)"
+msgstr "Taille des icônes (px)"
+
+#: prefs.js:138
+msgid "Font size (px)"
+msgstr "Taille de la police (px)"
+
+#: prefs.js:155
+msgid "Max width (%)"
+msgstr "Largeur maximale (%)"
+
+#: prefs.js:171
+msgid "Activate by pressing a key matching the index in the list"
+msgstr "Activer en appuyant sur une touche correspondante à l'index dans la liste"
+
+#: prefs.js:172
+msgid "Disable"
+msgstr "Désactivé"
+
+#: prefs.js:172
+msgid "Function keys"
+msgstr "Touches fonctions"
+
+#: prefs.js:172
+msgid "Number keys"
+msgstr "Touches numériques"
+
+#: prefs.js:183
+msgid "Show workspace indicators"
+msgstr "Afficher les indicateurs d'espaces de travail"
