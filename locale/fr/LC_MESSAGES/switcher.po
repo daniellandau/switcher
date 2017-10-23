@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-17 08:17+0100\n"
-"PO-Revision-Date: 2017-10-21 22:58-0400\n"
+"POT-Creation-Date: 2017-02-19 14:00+0200\n"
+"PO-Revision-Date: 2017-10-22 23:22-0400\n"
 "Last-Translator: Peter Perron <peter.p.perron@gmail.com>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -17,54 +17,165 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.0.3\n"
 
-#: prefs.js:49
+#: onboarding.js:51
+msgid "Switcher"
+msgstr "Switcher"
+
+#: onboarding.js:56
+msgid "Switcher usage tip"
+msgstr "Astuce d'utilisation de Switcher"
+
+#: onboarding.js:61 prefs.js:293
+msgid "Never show usage tips"
+msgstr "Ne jamais afficher les astuces"
+
+#: onboarding.js:66
+msgid "Ok"
+msgstr "Ok"
+
+#: onboardingmessages.js:3
+msgid ""
+"Use Super+w (or another shortcut you configured in settings) to start the "
+"switcher. Type space separated searches, use the arrow keys to navigate, and "
+"press Space to activate."
+msgstr ""
+"Utilisez Super+w (ou autre raccourci configuré dans les paramètres) pour "
+"afficher le sélecteur. Inscrivez des mots-clés séparés par des espaces, "
+"utilisez les flèches pour naviguer dans les résultats et appuyez sur \"entrer"
+"\" pour activer l'application."
+
+#: onboardingmessages.js:4
+msgid ""
+"There is a launcher mode too. Use Ctrl+Tab, Ctrl+Space or Ctrl+m to switch "
+"modes. If you are looking for an app that is not running, the mode switches "
+"automatically."
+msgstr ""
+"Il y a aussi un mode lanceur d'applications. Utilisez Ctrl+Tab, Ctrl+Espace "
+"ou Ctrl+m pour changer le mode. Si vous cherchez une application qui n'est "
+"pas en cours d'exécution, le mode changera automatiquement."
+
+#: onboardingmessages.js:5
+msgid ""
+"There are a number of settings you can tweak to configure how the switcher "
+"looks and acts. Go to https://extensions.gnome.org/local/ to access settings."
+msgstr ""
+"Il y a un éventail de paramètres que vous pouvez configurer pour ajuster la "
+"façon dont le sélecteur s'affiche et réagit. Rendez-vous à https://"
+"extensions.gnome.org/local/ pour accéder à la configuration."
+
+#: onboardingmessages.js:6
+msgid "You can also click an item with the mouse/touchpad to activate."
+msgstr "Vous pouvez aussi cliquer sur un item avec la souris pour l'activer."
+
+#: onboardingmessages.js:7
+msgid ""
+"You can use Shift+Enter to bring the activated window to the current "
+"workspace."
+msgstr ""
+"Vous pouvez utiliser Maj+Entrer pour apporter l'application désirée dans "
+"l'espace de travail actif."
+
+#: prefs.js:32
 msgid "Hotkey to activate switcher"
 msgstr "Touche raccourci pour activer Switcher"
 
-#: prefs.js:73
+#: prefs.js:35
+msgid "Hotkey to activate launcher"
+msgstr "Touche raccourci pour activer le lanceur d'applications"
+
+#: prefs.js:39
+msgid "Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"
+msgstr ""
+"Utilisez Ctrl+Tab ou Ctrl+Espace pour permuter entre le sélecteur "
+"d'application et le lanceur d'application"
+
+#: prefs.js:114
 msgid "Key"
 msgstr "Touche"
 
-#: prefs.js:82
+#: prefs.js:123
+msgid "Pattern matching algorithm"
+msgstr "Algorithme de recherche de motifs"
+
+#: prefs.js:124
+msgid "Strict"
+msgstr "Strict"
+
+#: prefs.js:124
+msgid "Fuzzy"
+msgstr "Logique floue"
+
+#: prefs.js:135
+msgid "Ordering criteria"
+msgstr "Critère de tri"
+
+#: prefs.js:136
+msgid "Last focused"
+msgstr "Dernier focus"
+
+#: prefs.js:136
+msgid "Most relevant"
+msgstr "Plus pertinent"
+
+#: prefs.js:147
 msgid "Immediate activation"
 msgstr "Activation immediate"
 
-#: prefs.js:87
+#: prefs.js:152
 msgid "When there is just one result, activate immediately"
 msgstr "Lorsqu'il n'y a qu'un seul résultat, activer immédiatement"
 
-#: prefs.js:101
+#: prefs.js:166
 msgid "Activate immediately this many milliseconds after last keystroke"
-msgstr "Activer automatiquement si aucune touche n'est enfoncée pendant ce nombre de millisecondes"
+msgstr ""
+"Activer automatiquement si aucune touche n'est enfoncée pendant ce nombre de "
+"millisecondes"
 
-#: prefs.js:121
+#: prefs.js:185
 msgid "Icon size (px)"
 msgstr "Taille des icônes (px)"
 
-#: prefs.js:138
+#: prefs.js:202
 msgid "Font size (px)"
 msgstr "Taille de la police (px)"
 
-#: prefs.js:155
+#: prefs.js:219
 msgid "Max width (%)"
 msgstr "Largeur maximale (%)"
 
-#: prefs.js:171
+#: prefs.js:235
 msgid "Activate by pressing a key matching the index in the list"
-msgstr "Activer en appuyant sur une touche correspondante à l'index dans la liste"
+msgstr ""
+"Activer en appuyant sur une touche correspondante à l'index dans la liste"
 
-#: prefs.js:172
+#: prefs.js:236
 msgid "Disable"
 msgstr "Désactivé"
 
-#: prefs.js:172
+#: prefs.js:236
 msgid "Function keys"
 msgstr "Touches fonctions"
 
-#: prefs.js:172
+#: prefs.js:236
 msgid "Number keys"
 msgstr "Touches numériques"
 
-#: prefs.js:183
+#: prefs.js:247
 msgid "Show workspace indicators"
 msgstr "Afficher les indicateurs d'espaces de travail"
+
+#: prefs.js:261
+msgid "Show only apps in the current workspace"
+msgstr "Afficher seulement les applications de l'espace de travail actif"
+
+#: prefs.js:275
+msgid "Fade Effect"
+msgstr "Effet de fondu"
+
+#: prefs.js:289
+msgid "Usage tips"
+msgstr "Astuces d'utilisation"
+
+#: prefs.js:306
+msgid "Read all tips"
+msgstr "Lire toutes les astuces"
