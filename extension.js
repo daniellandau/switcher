@@ -207,12 +207,13 @@ function _showUI(mode, entryText, previousWidth) {
 
 
       const otherMode = mode.name() === "Switcher" ? launcher : switcher;
-      const filteredAppsInOtherMode = util.filterByText(otherMode, otherMode.apps(), entry.get_text());
+      // thunk so we don't calculate this before needed
+      const filteredAppsInOtherModeThunk = () => util.filterByText(otherMode, otherMode.apps(), entry.get_text());
 
       // switch automatically when we have zero apps, the other mode has some apps, and we are not
       // just releasing control, meaning e.g. that we just tried to switch the mode and this switches
       // it back
-      if (filteredApps.length === 0 && filteredAppsInOtherMode.length > 0 && !control) {
+      if (filteredApps.length === 0 && !control && filteredAppsInOtherModeThunk().length > 0) {
         switchMode();
       }
 
