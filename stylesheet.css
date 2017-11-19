@@ -33,8 +33,10 @@
   background-color: #447dbc;
 }
 
-.switcher-entry {
+StEntry.switcher-entry {
   margin: .4em;
+  /* set explicitly the color (https://github.com/daniellandau/switcher/issues/58) */
+  color: #ffffff;
 }
 
 .switcher-shortcut {
