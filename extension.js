@@ -55,12 +55,15 @@ function _showUI(mode, entryText, previousWidth) {
 
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
-    return apps.slice(0, mode.MAX_NUM_ITEMS).map((a, i) =>
-      mode.makeBox(a, i, app => {
-        cleanUIWithFade();
-        mode.activate(app);
-      })
-    );
+    return apps
+      .slice(0, mode.MAX_NUM_ITEMS)
+      .map((a, i) =>
+        mode.makeBox(a, i, app => {
+          cleanUIWithFade();
+          mode.activate(app);
+        })
+      )
+      .filter(x => x);
   };
 
   timeit('before getSettings');
