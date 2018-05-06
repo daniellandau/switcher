@@ -188,20 +188,34 @@ function destroyParent(child) {
   }
 }
 
-function filterByText(mode, apps, text) {
-  let filteredApps = apps.filter(makeFilter(mode, text));
-
-  // Always preserve focus order before typing
-  const ordering = Convenience.getSettings().get_uint('ordering');
-  if ((ordering == orderByRelevancy) && text != "") {
-    filteredApps = filteredApps.sort(function(a, b) {
-      if (a.score > b.score)
-        return -1;
-      if (a.score < b.score)
-        return 1;
-      return 0;
-    });
-  }
-
-  return filteredApps;
+const filterCache = {
+  Launcher: {},
+  Switcher: {}
 };
+function filterByText(mode, apps, text) {
+  const get = () => {
+    let filteredApps = apps.filter(makeFilter(mode, text));
+
+    // Always preserve focus order before typing
+    const ordering = Convenience.getSettings().get_uint('ordering');
+    if (ordering == orderByRelevancy && text != '') {
+      filteredApps = filteredApps.sort(function(a, b) {
+        if (a.score > b.score) return -1;
+        if (a.score < b.score) return 1;
+        return 0;
+      });
+    }
+
+    return filteredApps;
+  };
+  const update = () => {
+    filterCache[mode.name()][text] = get();
+  };
+  const cachedFiltered = filterCache[mode.name()][text];
+  if (!!cachedFiltered) {
+    return cachedFiltered;
+    setTimeout(update, 10);
+  }
+  update();
+  return filterCache[mode.name()][text];
+}

@@ -28,9 +28,22 @@ const ModeUtils = (function() {
         return app.get_id();
       });
 
-  let shellApps = () => appInfos().map(function(appID) {
-    return Shell.AppSystem.get_default().lookup_app(appID);
-  });
+  let shellAppCache = { lastIndexed: null, apps: [] };
+  let shellApps = () => {
+    const get = () =>
+      appInfos().map(function(appID) {
+        return Shell.AppSystem.get_default().lookup_app(appID);
+      });
+    const update = () => {
+      shellAppCache.lastIndexed = new Date();
+      shellAppCache.apps = get();
+    };
+    if (!shellAppCache.lastIndexed) {
+      update();
+    }
+    util.setTimeout(update, 100);
+    return shellAppCache.apps;
+  };
 
   let appIcons = {};
   let iconSize = null;
