@@ -193,6 +193,7 @@ const filterCache = {
   Switcher: {}
 };
 function filterByText(mode, apps, text) {
+  const cacheKey = text + apps.length;
   const get = () => {
     let filteredApps = apps.filter(makeFilter(mode, text));
 
@@ -209,13 +210,13 @@ function filterByText(mode, apps, text) {
     return filteredApps;
   };
   const update = () => {
-    filterCache[mode.name()][text] = get();
+    filterCache[mode.name()][cacheKey] = get();
   };
-  const cachedFiltered = filterCache[mode.name()][text];
+  const cachedFiltered = filterCache[mode.name()][cacheKey];
   if (!!cachedFiltered) {
     return cachedFiltered;
     setTimeout(update, 10);
   }
   update();
-  return filterCache[mode.name()][text];
+  return filterCache[mode.name()][cacheKey];
 }
