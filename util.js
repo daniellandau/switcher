@@ -188,10 +188,7 @@ function destroyParent(child) {
   }
 }
 
-const filterCache = {
-  Launcher: {},
-  Switcher: {}
-};
+const launcherFilterCache = {};
 function filterByText(mode, apps, text) {
   const cacheKey = text + apps.length;
   const get = () => {
@@ -209,14 +206,17 @@ function filterByText(mode, apps, text) {
 
     return filteredApps;
   };
+
+  if (mode.name() === 'Switcher') return get();
+
   const update = () => {
-    filterCache[mode.name()][cacheKey] = get();
+    launcherFilterCache[cacheKey] = get();
   };
-  const cachedFiltered = filterCache[mode.name()][cacheKey];
+  const cachedFiltered = launcherFilterCache[cacheKey];
   if (!!cachedFiltered) {
     setTimeout(update, 10);
     return cachedFiltered;
   }
   update();
-  return filterCache[mode.name()][cacheKey];
+  return launcherFilterCache[cacheKey];
 }
