@@ -5,17 +5,21 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
-const matchFuzzy     = 1;
+const matchFuzzy = 1;
 const orderByRelevancy = 1;
-
 
 // from https://github.com/satya164/gjs-helpers
 const setTimeout = (f, ms) => {
-  return GLib.timeout_add(GLib.PRIORITY_DEFAULT, ms, () => {
-    f();
+  return GLib.timeout_add(
+    GLib.PRIORITY_DEFAULT,
+    ms,
+    () => {
+      f();
 
-    return false; // Don't repeat
-  }, null);
+      return false; // Don't repeat
+    },
+    null
+  );
 };
 
 const clearTimeout = id => GLib.Source.remove(id);
@@ -23,18 +27,17 @@ const clearTimeout = id => GLib.Source.remove(id);
 function debounce(f, ms) {
   let timeoutId = null;
   const debounced = function() {
-    if (timeoutId)
-      clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(f, ms);
   };
-  debounced.cancel = function () {
+  debounced.cancel = function() {
     clearTimeout(timeoutId);
   };
   return debounced;
 }
 
 function escapeChars(text) {
-  return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, "\\$&");
+  return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&');
 }
 
 function makeFilter(mode, text) {
@@ -47,49 +50,55 @@ function makeFilter(mode, text) {
 }
 
 function runFilter(mode, app, fragment) {
-  if (fragment == '')
-    return true;
+  if (fragment == '') return true;
 
   fragment = escapeChars(fragment);
 
   const matching = Convenience.getSettings().get_uint('matching');
-  const splitChar = (matching == matchFuzzy) ? '' : ' ';
+  const splitChar = matching == matchFuzzy ? '' : ' ';
   const specialexp = new RegExp(/[-[\]{}()*+?.,\\^$|#]/);
-  const regexp = new RegExp(fragment.split(splitChar).reduce(function(a,b) {
+  const regexp = new RegExp(
+    fragment.split(splitChar).reduce(function(a, b) {
       // In order to treat special charactes as a whole,
       // we manually identify and concatenate them
-      if (b == '\\')
-        return a+b;
-      else if (specialexp.test(b) && (a.charAt(a.length - 1) == '\\'))
-        return a.slice(0, a.length - 1) + '[^' + '\\' + b + ']*' + '\\' +  b;
-      else
-        return a + '[^' + b + ']*' + b;
-  }), "gi");
+      if (b == '\\') return a + b;
+      else if (specialexp.test(b) && a.charAt(a.length - 1) == '\\')
+        return a.slice(0, a.length - 1) + '[^' + '\\' + b + ']*' + '\\' + b;
+      else return a + '[^' + b + ']*' + b;
+    }),
+    'gi'
+  );
 
   let match;
   let gotMatch = false;
   let score = 0;
   const descriptionLowerCase = mode.description(app).toLowerCase();
-  const filteredDescription = escapeChars(descriptionLowerCase
-          .slice(mode.descriptionNameIndex(app), descriptionLowerCase.length));
+  const filteredDescription = escapeChars(
+    descriptionLowerCase.slice(
+      mode.descriptionNameIndex(app),
+      descriptionLowerCase.length
+    )
+  );
   // go through each match inside description
   while ((match = regexp.exec(filteredDescription))) {
-
     // A full match at the beginning is the best match
-    if ((match.index == 0) && match[0].length == fragment.length) {
+    if (match.index == 0 && match[0].length == fragment.length) {
       score += 100;
     }
 
     // matches at beginning word boundaries are better than in the middle of words
     const wordPrefixFactor =
-            (match.index == 0 || (match.index != 0) && filteredDescription.charAt(match.index - 1) == " ")
-            ? 1.2 : 0.0;
+      match.index == 0 ||
+      (match.index != 0 && filteredDescription.charAt(match.index - 1) == ' ')
+        ? 1.2
+        : 0.0;
 
     // matches nearer to the beginning are better than near the end
     const precedenceFactor = 1.0 / (1 + match.index);
 
     // fuzzyness can cause lots of stuff to match, penalize by match length
-    const fuzzynessFactor = 2.3 * (fragment.length - match[0].length) / match[0].length;
+    const fuzzynessFactor =
+      2.3 * (fragment.length - match[0].length) / match[0].length;
 
     // join factors by summing
     const newscore = precedenceFactor + wordPrefixFactor + fuzzynessFactor;
@@ -134,33 +143,33 @@ function updateHighlight(boxes, query, cursor) {
 
 function highlightText(text, query) {
   // Don't apply highlighting if there's no input
-  if (query == '')
-    return text.replace(/&/g, '&amp;');
+  if (query == '') return text.replace(/&/g, '&amp;');
 
   // Identify substring parts to be highlighted
   const matching = Convenience.getSettings().get_uint('matching');
-  let queryExpression = "(";
-  let queries = (matching == matchFuzzy) ? query.split(/ |/) : query.split(" ");
+  let queryExpression = '(';
+  let queries = matching == matchFuzzy ? query.split(/ |/) : query.split(' ');
   let queriesLength = queries.length;
   for (let i = 0; i < queriesLength - 1; i++) {
-    if (queries[i] != "") {
-      queryExpression += escapeChars(queries[i]) + "|";
+    if (queries[i] != '') {
+      queryExpression += escapeChars(queries[i]) + '|';
     }
   }
-  queryExpression += escapeChars(queries[queriesLength - 1]) + ")";
+  queryExpression += escapeChars(queries[queriesLength - 1]) + ')';
 
-  let queryRegExp = new RegExp(queryExpression, "i");
-  let tokenRegExp = new RegExp("^" + queryExpression + "$", "i");
+  let queryRegExp = new RegExp(queryExpression, 'i');
+  let tokenRegExp = new RegExp('^' + queryExpression + '$', 'i');
 
   // Build resulting string from highlighted and non-highlighted strings
-  let result = "";
+  let result = '';
   let tokens = text.split(queryRegExp);
   let tokensLength = tokens.length;
   for (let i = 0; i < tokensLength; i++) {
     if (tokens[i].match(tokenRegExp)) {
-      result += '<u><span underline_color=\"#4a90d9\" foreground=\"#ffffff\">' +
-                tokens[i] +
-                '</span></u>';
+      result +=
+        '<u><span underline_color="#4a90d9" foreground="#ffffff">' +
+        tokens[i] +
+        '</span></u>';
     } else {
       result += tokens[i];
     }
