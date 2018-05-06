@@ -214,8 +214,8 @@ function filterByText(mode, apps, text) {
   };
   const cachedFiltered = filterCache[mode.name()][cacheKey];
   if (!!cachedFiltered) {
-    return cachedFiltered;
     setTimeout(update, 10);
+    return cachedFiltered;
   }
   update();
   return filterCache[mode.name()][cacheKey];
