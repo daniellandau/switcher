@@ -31,7 +31,7 @@ function debounce(f, ms) {
     timeoutId = setTimeout(f, ms);
   };
   debounced.cancel = function() {
-    clearTimeout(timeoutId);
+    if (timeoutId) clearTimeout(timeoutId);
   };
   return debounced;
 }
