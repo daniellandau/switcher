@@ -214,7 +214,7 @@ function filterByText(mode, apps, text) {
   };
   const cachedFiltered = launcherFilterCache[cacheKey];
   if (!!cachedFiltered) {
-    setTimeout(update, 10);
+    setTimeout(update, 500);
     return cachedFiltered;
   }
   update();

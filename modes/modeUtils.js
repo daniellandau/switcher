@@ -40,8 +40,9 @@ const ModeUtils = (function() {
     };
     if (!shellAppCache.lastIndexed) {
       update();
+    } else {
+      util.setTimeout(update, 500);
     }
-    util.setTimeout(update, 100);
     return shellAppCache.apps;
   };
 
