@@ -71,20 +71,29 @@ const ModeUtils = (function() {
 
   let seenIDs = {};
   let cleanIDs = () => (seenIDs = {});
-  let makeBox = function(app, appRef, description, index, onActivate) {
-    const button = new St.Button({ style_class: 'switcher-box' });
-    const box = new St.BoxLayout();
+  let makeBox = function(app, appRef, description, index, onActivate, oldBox) {
+    // This disconnect causes an error message in the log, but not doing it seems to
+    // be fine. Leave it out until further information or issues.
+    // if (oldBox.whole) oldBox.whole.disconnect(oldBox.activationCallback);
+    const whole =
+      oldBox.whole || new St.Button({ style_class: 'switcher-box' });
+    const box = oldBox.whole ? undefined : new St.BoxLayout();
 
-    const label = new St.Label({
-      style_class: 'switcher-label',
-      y_align: Clutter.ActorAlign.CENTER
-    });
+    const label =
+      oldBox.label ||
+      new St.Label({
+        style_class: 'switcher-label',
+        y_align: Clutter.ActorAlign.CENTER
+      });
     label.clutter_text.set_text(description);
     label.set_x_expand(true);
-    box.insert_child_at_index(label, 0);
+    if (!oldBox.label) box.insert_child_at_index(label, 0);
 
     let shortcutBox;
-    if (Convenience.getSettings().get_uint('activate-by-key')) {
+    if (
+      !oldBox.label &&
+      Convenience.getSettings().get_uint('activate-by-key')
+    ) {
       const shortcut = new St.Label({
         style_class: 'switcher-shortcut',
         text: keyActivation.getKeyDesc(index + 1)
@@ -99,29 +108,32 @@ const ModeUtils = (function() {
     // window beyond the first.
     // In another case, some windows may use a custom app id, forcing us to
     // create an icon.
-    const iconBox = new St.Bin({ style_class: 'switcher-icon' });
+    const iconBox =
+      oldBox.iconBox || new St.Bin({ style_class: 'switcher-icon' });
     const id = appRef.get_id();
     let appIcon = getAppIcon(appRef);
     if (seenIDs.hasOwnProperty(id) || appIcon === undefined) {
       iconBox.child = appRef.create_icon_texture(iconSize);
     } else {
       // To reuse the same icon, it's actor must not belong to any parent
-      util.destroyParent(appIcon);
+      util.detachParent(appIcon);
       iconBox.child = appIcon;
 
       seenIDs[id] = true; // Dummy value
     }
-    box.insert_child_at_index(iconBox, 0);
-    button.connect('clicked', () => onActivate(app));
-    button.set_child(box);
-    button.set_fill(true, true);
-    button.set_track_hover(true);
+    if (!oldBox.iconBox) box.insert_child_at_index(iconBox, 0);
+    const activationCallback = () => onActivate(app);
+    whole.connect('clicked', activationCallback);
+    if (!oldBox.whole) whole.set_child(box);
+    whole.set_fill(true, true);
+    whole.set_track_hover(true);
 
     return {
-      whole: button,
+      whole: whole,
       iconBox: iconBox,
       shortcutBox: shortcutBox,
-      label: label
+      label: label,
+      activationCallback: activationCallback
     };
   };
 

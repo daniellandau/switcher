@@ -10,12 +10,12 @@ const Convenience = Me.imports.convenience;
 
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
-const Launcher = (function () {
+const Launcher = (function() {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 10;
 
   let name = function() {
-    return "Launcher";
+    return 'Launcher';
   };
 
   let apps = function() {
@@ -28,7 +28,7 @@ const Launcher = (function () {
 
   let description = function(app) {
     try {
-      return app.get_name().replace(/&/g, "&amp;");
+      return app.get_name().replace(/&/g, '&amp;');
     } catch (e) {
       print(e);
       return 'Could not get name';
@@ -39,8 +39,15 @@ const Launcher = (function () {
     return 0; // Workspace indicators are not used
   };
 
-  let makeBox = function(app, index, onActivate) {
-    return modeUtils.makeBox(app, app, description(app), index, onActivate);
+  let makeBox = function(app, index, onActivate, oldBox) {
+    return modeUtils.makeBox(
+      app,
+      app,
+      description(app),
+      index,
+      onActivate,
+      oldBox
+    );
   };
 
   return {
@@ -53,4 +60,4 @@ const Launcher = (function () {
     makeBox: makeBox,
     cleanIDs: modeUtils.cleanIDs
   };
-}());
+})();

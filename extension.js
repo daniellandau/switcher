@@ -32,15 +32,23 @@ const switcher = Me.imports.modes.switcher.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
 const util = Me.imports.util;
 const onboarding = Me.imports.onboarding;
+window.setTimeout = util.setTimeout;
+const promiseModule = Me.imports.promise;
 
-let container, containers, cursor;
+let container,
+  containers,
+  cursor,
+  sequenceNumber = 0;
 
+const enableDebugLog = false;
 const enablePerfTracing = false;
-let previous = null;
+let previous = null,
+  previousMessage = null;
 function timeit(msg) {
   if (!enablePerfTracing) return;
   const now = new Date();
-  if (previous) log('TIMING', now - previous, msg);
+  if (previous) log('TIMING', now - previous, previousMessage + ' → ' + msg);
+  previousMessage = msg;
   previous = now;
 }
 
@@ -52,18 +60,29 @@ function _showUI(mode, entryText, previousWidth) {
 
   cursor = 0;
   util.reinit();
-
+  let boxes = [];
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
-    return apps
+    const newBoxes = apps
       .slice(0, mode.MAX_NUM_ITEMS)
       .map((a, i) =>
-        mode.makeBox(a, i, app => {
-          cleanUIWithFade();
-          mode.activate(app);
-        })
+        mode.makeBox(
+          a,
+          i,
+          app => {
+            cleanUIWithFade();
+            mode.activate(app);
+          },
+          boxes.length > i ? boxes[i] : {}
+        )
       )
       .filter(x => x);
+    if (newBoxes.length < boxes.length) {
+      for (let i = newBoxes.length; i < boxes.length; ++i) {
+        destroyBox(boxes[i]);
+      }
+    }
+    return newBoxes;
   };
 
   timeit('before getSettings');
@@ -86,8 +105,8 @@ function _showUI(mode, entryText, previousWidth) {
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
 
-  timeit('before makeBoxes');
-  let boxes = makeBoxes(filteredApps, mode);
+  timeit('before makeBoxes 1');
+  boxes = makeBoxes(filteredApps, mode);
   timeit('after makeBoxes');
   util.updateHighlight(boxes, entryText, cursor);
   timeit('after updateHighlight');
@@ -237,6 +256,8 @@ function _showUI(mode, entryText, previousWidth) {
     // Filter text
     else {
       // Delete last character
+      sequenceNumber += 1;
+      const sequenceNumberAtBeginning = sequenceNumber;
       timeit('key-release');
       if (symbol === Clutter.h && control) {
         const entryText = entry.get_clutter_text();
@@ -245,55 +266,122 @@ function _showUI(mode, entryText, previousWidth) {
         entryText.delete_text(textCursor - 1, textCursor);
       }
 
-      filteredApps = util.filterByText(mode, apps, o.text);
-      if (
-        Convenience.getSettings().get_boolean('activate-immediately') &&
-        filteredApps.length === 1 &&
-        symbol !== Clutter.Control_L &&
-        symbol !== Clutter.Control_R
-      ) {
-        debouncedActivateUnique();
-      }
+      Promise.resolve()
+        .then(() => {
+          if (sequenceNumber !== sequenceNumberAtBeginning) {
+            if (enableDebugLog)
+              log(
+                'Skipping because sequence number has changed',
+                sequenceNumberAtBeginning,
+                sequenceNumber
+              );
+            return Promise.reject(1);
+          }
 
-      const otherMode = mode.name() === 'Switcher' ? launcher : switcher;
-      // thunk so we don't calculate this before needed
-      const filteredAppsInOtherModeThunk = () => {
-        timeit('before filter');
-        const result = util.filterByText(
-          otherMode,
-          otherMode.apps(),
-          entry.get_text()
-        );
-        timeit('after filter');
-        return result;
-      };
+          filteredApps = util.filterByText(mode, apps, o.text);
+          return Promise.resolve();
+        })
+        .then(() => {
+          if (sequenceNumber !== sequenceNumberAtBeginning) {
+            if (enableDebugLog)
+              log(
+                'Skipping because sequence number has changed',
+                sequenceNumberAtBeginning,
+                sequenceNumber
+              );
+            return Promise.reject(2);
+          }
 
-      // switch automatically when we have zero apps, the other mode has some apps, and we are not
-      // just releasing control, meaning e.g. that we just tried to switch the mode and this switches
-      // it back
-      if (
-        filteredApps.length === 0 &&
-        !control &&
-        filteredAppsInOtherModeThunk().length > 0
-      ) {
-        switchMode();
-      }
+          if (
+            Convenience.getSettings().get_boolean('activate-immediately') &&
+            filteredApps.length === 1 &&
+            symbol !== Clutter.Control_L &&
+            symbol !== Clutter.Control_R
+          ) {
+            debouncedActivateUnique();
+          }
 
-      cleanBoxes();
-      boxes = makeBoxes(filteredApps, mode);
+          const otherMode = mode.name() === 'Switcher' ? launcher : switcher;
+          // thunk so we don't calculate this before needed
+          const filteredAppsInOtherModeThunk = () => {
+            timeit('before filter');
+            const result = util.filterByText(
+              otherMode,
+              otherMode.apps(),
+              entry.get_text()
+            );
+            timeit('after filter');
+            return result;
+          };
 
-      // If there's less boxes then in previous cursor position,
-      // set cursor to the last box
-      if (cursor + 1 > boxes.length) cursor = Math.max(boxes.length - 1, 0);
+          // switch automatically when we have zero apps, the other mode has some apps, and we are not
+          // just releasing control, meaning e.g. that we just tried to switch the mode and this switches
+          // it back
+          if (
+            filteredApps.length === 0 &&
+            !control &&
+            filteredAppsInOtherModeThunk().length > 0
+          ) {
+            switchMode();
+            return Promise.reject('switched mode');
+          }
+          return Promise.resolve();
+        })
+        .then(() => {
+          if (sequenceNumber !== sequenceNumberAtBeginning) {
+            if (enableDebugLog)
+              log(
+                'Skipping because sequence number has changed',
+                sequenceNumberAtBeginning,
+                sequenceNumber
+              );
+            return Promise.reject(4);
+          }
 
-      timeit('before updatehighlight');
-      util.updateHighlight(boxes, o.text, cursor);
-      timeit('after updatehighlight');
-      boxes.forEach(box => {
-        util.fixWidths(box, width, shortcutWidth);
-        boxLayout.insert_child_at_index(box.whole, -1);
-      });
-      timeit('after width fixes');
+          timeit('before makeBoxes 2');
+          boxes = makeBoxes(filteredApps, mode);
+          return Promise.resolve();
+        })
+        .then(() => {
+          if (sequenceNumber !== sequenceNumberAtBeginning) {
+            if (enableDebugLog)
+              log(
+                'Skipping because sequence number has changed',
+                sequenceNumberAtBeginning,
+                sequenceNumber
+              );
+            return Promise.reject(5);
+          }
+
+          // If there's less boxes then in previous cursor position,
+          // set cursor to the last box
+          if (cursor + 1 > boxes.length) cursor = Math.max(boxes.length - 1, 0);
+
+          timeit('before updatehighlight');
+          util.updateHighlight(boxes, o.text, cursor);
+          return Promise.resolve();
+        })
+        .then(() => {
+          if (sequenceNumber !== sequenceNumberAtBeginning) {
+            if (enableDebugLog)
+              log(
+                'Skipping because sequence number has changed',
+                sequenceNumberAtBeginning,
+                sequenceNumber
+              );
+            return Promise.reject(6);
+          }
+
+          timeit('after updatehighlight');
+          boxes.forEach(box => {
+            util.fixWidths(box, width, shortcutWidth);
+            util.detachParent(box.whole);
+            boxLayout.insert_child_at_index(box.whole, -1);
+          });
+          timeit('after width fixes');
+          return Promise.resolve();
+        })
+        .catch(e => enableDebugLog && log('Skipped after ' + e + ' steps'));
     }
   });
 
@@ -307,11 +395,12 @@ function _showUI(mode, entryText, previousWidth) {
   // In the bottom as a function statement so the variables closed
   // over are defined and so it's hoisted up
   function cleanBoxes() {
-    boxes.forEach(box => {
-      box.iconBox.get_children().forEach(child => util.destroyParent(child));
-      box.iconBox.destroy();
-      boxLayout.remove_child(box.whole);
-    });
+    boxes.forEach(destroyBox);
+  }
+  function destroyBox(box) {
+    box.iconBox.get_children().forEach(child => util.detachParent(child));
+    box.iconBox.destroy();
+    boxLayout.remove_child(box.whole);
   }
 
   function switchMode() {
