@@ -10,6 +10,8 @@ const Convenience = Me.imports.convenience;
 
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
+let onlyCurrentWorkspaceToggled = false;
+
 const Switcher = (function() {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 15;
@@ -18,19 +20,22 @@ const Switcher = (function() {
     return 'Switcher';
   };
 
-  let apps = function() {
-    // Get all windows in activation order
+  let filter = function(apps) {
     let onlyCurrentWorkspace = Convenience.getSettings().get_boolean(
       'only-current-workspace'
     );
     let currentWorkspace = global.screen.get_active_workspace_index();
-    let tabList = global.display
-      .get_tab_list(Meta.TabList.NORMAL, null)
-      .filter(
-        app =>
-          !onlyCurrentWorkspace ||
-          app.get_workspace().index() === currentWorkspace
-      );
+    return apps.filter(
+      app =>
+        (!onlyCurrentWorkspace && !onlyCurrentWorkspaceToggled) ||
+        (onlyCurrentWorkspace && onlyCurrentWorkspaceToggled) ||
+        app.get_workspace().index() === currentWorkspace
+    );
+  };
+
+  let apps = function() {
+    // Get all windows in activation order
+    let tabList = global.display.get_tab_list(Meta.TabList.NORMAL, null);
 
     // swap the first two, so we can switch quickly back and forth
     if (tabList.length >= 2) {
@@ -90,6 +95,7 @@ const Switcher = (function() {
     MAX_NUM_ITEMS: MAX_NUM_ITEMS,
     name: name,
     apps: apps,
+    filter: filter,
     activate: activate,
     description: description,
     descriptionNameIndex: descriptionNameIndex,

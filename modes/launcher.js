@@ -54,6 +54,7 @@ const Launcher = (function() {
     MAX_NUM_ITEMS: MAX_NUM_ITEMS,
     name: name,
     apps: apps,
+    filter: x => true,
     activate: activate,
     description: description,
     descriptionNameIndex: descriptionNameIndex,

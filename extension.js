@@ -28,7 +28,8 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
 const keyActivation = Me.imports.keyActivation.KeyActivation;
-const switcher = Me.imports.modes.switcher.Switcher;
+const switcherModule = Me.imports.modes.switcher;
+const switcher = switcherModule.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
 const util = Me.imports.util;
 const onboarding = Me.imports.onboarding;
@@ -95,7 +96,7 @@ function _showUI(mode, entryText, previousWidth) {
 
   const apps = mode.apps();
   timeit('after apps()');
-  let filteredApps = util.filterByText(mode, apps, entryText);
+  let filteredApps = mode.filter(util.filterByText(mode, apps, entryText));
   timeit('after filter');
 
   const debouncedActivateUnique = util.debounce(() => {
@@ -207,6 +208,8 @@ function _showUI(mode, entryText, previousWidth) {
     ) {
       cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
       util.updateHighlight(boxes, o.text, cursor);
+    } else if (symbol === Clutter.w && control) {
+      switcherModule.onlyCurrentWorkspaceToggled = !switcherModule.onlyCurrentWorkspaceToggled;
     }
   });
 
@@ -278,7 +281,7 @@ function _showUI(mode, entryText, previousWidth) {
             return Promise.reject(1);
           }
 
-          filteredApps = util.filterByText(mode, apps, o.text);
+          filteredApps = mode.filter(util.filterByText(mode, apps, o.text));
           return Promise.resolve();
         })
         .then(() => {
@@ -418,6 +421,7 @@ function _showUI(mode, entryText, previousWidth) {
 
   // this and the following function contain some of the same copy pasted code
   function cleanUI() {
+    switcherModule.onlyCurrentWorkspaceToggled = false;
     cleanBoxes();
     containers.reverse().forEach(c => {
       Main.uiGroup.remove_actor(c);
@@ -429,6 +433,7 @@ function _showUI(mode, entryText, previousWidth) {
   }
 
   function cleanUIWithFade() {
+    switcherModule.onlyCurrentWorkspaceToggled = false;
     containers.reverse().forEach(c => {
       try {
         Main.popModal(c);

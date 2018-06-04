@@ -5,5 +5,6 @@ function messages(_) {
     _("There are a number of settings you can tweak to configure how the switcher looks and acts. Go to https://extensions.gnome.org/local/ to access settings."),
     _("You can also click an item with the mouse/touchpad to activate."),
     _("You can use Shift+Enter to bring the activated window to the current workspace."),
+    _("If you want to toggle on the fly showing only windows in the current workspace or all windows, use Ctrl+w."),
   ]
 };
