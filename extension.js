@@ -112,7 +112,8 @@ function _showUI(mode, entryText, previousWidth) {
   util.updateHighlight(boxes, entryText, cursor);
   timeit('after updateHighlight');
 
-  let entry = new St.Entry({ style_class: 'switcher-entry' });
+  /* use "search-entry" style from overview, combining it with our own */
+  let entry = new St.Entry({ style_class: 'search-entry switcher-entry' })
   entry.set_text(entryText);
   boxLayout.insert_child_at_index(entry, 0);
   boxes.forEach(box => boxLayout.insert_child_at_index(box.whole, -1));
