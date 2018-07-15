@@ -158,10 +158,11 @@ function _showUI(mode, entryText, previousWidth) {
   let shortcutWidth = boxes
     .map(box => (box.shortcutBox ? box.shortcutBox.width : 0))
     .reduce((a, b) => Math.max(a, b), 0);
+  let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
   const maxWidth =
     Main.layoutManager.primaryMonitor.width *
     0.01 *
-    Convenience.getSettings().get_uint('max-width-percentage');
+    Convenience.getSettings().get_uint('max-width-percentage') * scaleFactor;
   if (width > maxWidth) width = maxWidth;
   if (width < maxWidth / 2) width = maxWidth / 2;
 
