@@ -468,7 +468,7 @@ function _showUI(mode, entryText, previousWidth) {
 }
 
 function init() {
-  Gettext.textdomain('switcher');
+  Gettext.domain('switcher');
   Gettext.bindtextdomain('switcher', Me.path + '/locale');
 }
 

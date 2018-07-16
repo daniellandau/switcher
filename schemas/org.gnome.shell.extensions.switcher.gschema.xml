@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schemalist>
+<schemalist gettext-domain="switcher">
     <schema id="org.gnome.shell.extensions.switcher" path="/org/gnome/shell/extensions/switcher/">
         <key type="as" name="show-launcher">
             <default><![CDATA[['<Super>x']]]></default>
