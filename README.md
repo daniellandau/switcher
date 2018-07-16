@@ -12,7 +12,7 @@ checkout to the correct place as
 
 ```
 cd ~/.local/share/gnome-shell/extensions
-git clone git@github.com:daniellandau/switcher.git switcher@landau.fi
+git clone https://github.com/daniellandau/switcher.git switcher@landau.fi
 ```
 
 You can then enable the extension with Gnome Tweak Tool.
