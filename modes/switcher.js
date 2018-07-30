@@ -10,7 +10,7 @@ const Convenience = Me.imports.convenience;
 
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
-let onlyCurrentWorkspaceToggled = false;
+var onlyCurrentWorkspaceToggled = false;
 
 const Switcher = (function() {
   // Limit the number of displayed items
