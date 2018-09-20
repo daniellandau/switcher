@@ -8,6 +8,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
+const util = Me.imports.util;
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
 var onlyCurrentWorkspaceToggled = false;
@@ -24,7 +25,7 @@ const Switcher = (function() {
     let onlyCurrentWorkspace = Convenience.getSettings().get_boolean(
       'only-current-workspace'
     );
-    let currentWorkspace = global.screen.get_active_workspace_index();
+    let currentWorkspace = util.getCurrentWorkspace();
     return apps.filter(
       app =>
         (!onlyCurrentWorkspace && !onlyCurrentWorkspaceToggled) ||

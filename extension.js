@@ -247,7 +247,7 @@ function _showUI(mode, entryText, previousWidth) {
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
         if (mode.name() === 'Switcher' && shift)
           filteredApps[cursor].change_workspace_by_index(
-            global.screen.get_active_workspace_index(),
+            util.getCurrentWorkspace(),
             true
           );
         mode.activate(filteredApps[cursor]);

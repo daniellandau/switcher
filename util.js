@@ -49,6 +49,15 @@ function makeFilter(mode, text) {
   };
 }
 
+function getCurrentWorkspace() {
+  try {
+    return global.screen.get_active_workspace_index();
+  } catch (_) {
+    let workspaceManager = global.workspace_manager;
+    return workspaceManager.get_active_workspace();
+  }
+}
+
 function runFilter(mode, app, fragment) {
   if (fragment == '') return true;
 
