@@ -9,7 +9,7 @@ const matchFuzzy = 1;
 const orderByRelevancy = 1;
 
 // from https://github.com/satya164/gjs-helpers
-const setTimeout = (f, ms) => {
+var setTimeout = (f, ms) => {
   return GLib.timeout_add(
     GLib.PRIORITY_DEFAULT,
     ms,
@@ -22,7 +22,7 @@ const setTimeout = (f, ms) => {
   );
 };
 
-const clearTimeout = id => GLib.Source.remove(id);
+var clearTimeout = id => GLib.Source.remove(id);
 
 function debounce(f, ms) {
   let timeoutId = null;

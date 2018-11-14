@@ -10,7 +10,7 @@ const Convenience = Me.imports.convenience;
 
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
-const Launcher = (function() {
+var Launcher = (function() {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 10;
 

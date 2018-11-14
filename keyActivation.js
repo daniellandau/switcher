@@ -55,7 +55,7 @@ const numberKeySymbols = {
   }
 };
 
-const KeyActivation = (function () {
+var KeyActivation = (function () {
   var getActivateByKey = function() {
     return Convenience.getSettings().get_uint('activate-by-key');
   };

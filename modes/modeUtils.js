@@ -12,7 +12,7 @@ const util = Me.imports.util;
 
 const keyActivation = Me.imports.keyActivation.KeyActivation;
 
-const ModeUtils = (function() {
+var ModeUtils = (function() {
   // From _loadApps() in GNOME Shell's appDisplay.js
   let appInfos = () =>
     Gio.AppInfo.get_all()

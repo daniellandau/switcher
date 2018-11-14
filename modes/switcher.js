@@ -13,7 +13,7 @@ const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
 var onlyCurrentWorkspaceToggled = false;
 
-const Switcher = (function() {
+var Switcher = (function() {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 15;
 
