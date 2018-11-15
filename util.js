@@ -54,7 +54,7 @@ function getCurrentWorkspace() {
     return global.screen.get_active_workspace_index();
   } catch (_) {
     let workspaceManager = global.workspace_manager;
-    return workspaceManager.get_active_workspace();
+    return workspaceManager.get_active_workspace_index();
   }
 }
 
