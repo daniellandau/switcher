@@ -11,6 +11,7 @@ Download from https://extensions.gnome.org/extension/973/switcher/ or
 checkout to the correct place as
 
 ```
+mkdir -p ~/.local/share/gnome-shell/extensions # only needed if this is the first extension you install
 cd ~/.local/share/gnome-shell/extensions
 git clone https://github.com/daniellandau/switcher.git switcher@landau.fi
 ```
