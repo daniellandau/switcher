@@ -1,4 +1,4 @@
-const GLib = imports.gi.GLib;
+const MainLoop = imports.mainloop;
 const St = imports.gi.St;
 const Clutter = imports.gi.Clutter;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -10,19 +10,13 @@ const orderByRelevancy = 1;
 
 // from https://github.com/satya164/gjs-helpers
 var setTimeout = (f, ms) => {
-  return GLib.timeout_add(
-    GLib.PRIORITY_DEFAULT,
-    ms,
-    () => {
-      f();
-
-      return false; // Don't repeat
-    },
-    null
-  );
+  return MainLoop.timeout_add(ms, () => {
+    f();
+    return false; // Don't repeat
+  });
 };
 
-var clearTimeout = id => GLib.Source.remove(id);
+var clearTimeout = id => MainLoop.source_remove(id);
 
 function debounce(f, ms) {
   let timeoutId = null;
