@@ -28,7 +28,7 @@ var Launcher = (function() {
 
   let description = function(app) {
     try {
-      return app.get_name().replace(/&/g, '&amp;');
+      return app.get_name();
     } catch (e) {
       print(e);
       return 'Could not get name';
