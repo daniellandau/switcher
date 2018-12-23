@@ -44,9 +44,9 @@ function makeFilter(mode, text) {
 }
 
 function getCurrentWorkspace() {
-  try {
+  if (global.screen) {
     return global.screen.get_active_workspace_index();
-  } catch (_) {
+  } else {
     let workspaceManager = global.workspace_manager;
     return workspaceManager.get_active_workspace_index();
   }
