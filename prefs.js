@@ -17,11 +17,14 @@ function init() {
 }
 
 function buildPrefsWidget() {
+  let scrollableArea = new Gtk.ScrolledWindow();
   let vWidget = new Gtk.VBox({margin: 10});
 
   buildWidgets().forEach(w => vWidget.add(w));
-  vWidget.show_all();
-  return vWidget;
+  scrollableArea.add(vWidget);
+  scrollableArea.set_size_request(800, -1);
+  scrollableArea.show_all();
+  return scrollableArea;
 }
 
 function buildWidgets() {
