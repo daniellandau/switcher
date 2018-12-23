@@ -107,7 +107,7 @@ function runFilter(mode, app, fragment) {
 
     // fuzzyness can cause lots of stuff to match, penalize by match length
     const fuzzynessFactor =
-      2.3 * (fragment.length - match[0].length) / match[0].length;
+      (2.3 * (fragment.length - match[0].length)) / match[0].length;
 
     // join factors by summing
     const newscore = precedenceFactor + wordPrefixFactor + fuzzynessFactor;
