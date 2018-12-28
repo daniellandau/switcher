@@ -10,6 +10,10 @@ const Convenience = Me.imports.convenience;
 
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
+let stats = Convenience.getJson(
+  'launcher-stats'
+);
+
 var Launcher = (function() {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 10;
@@ -19,11 +23,20 @@ var Launcher = (function() {
   };
 
   let apps = function() {
-    return modeUtils.shellApps();
+    return modeUtils.shellApps().sort((a, b) => {
+      if (a.get_id() in stats && !(b.get_id() in stats)) return -1
+      if (b.get_id() in stats && !(a.get_id() in stats)) return 1
+      if (!(a.get_id() in stats) && !(b.get_id() in stats)) return 0
+      return stats[a.get_id()] < stats[b.get_id()] ? 1 : -1;
+    })
   };
 
   let activate = function(app) {
     app.open_new_window(-1);
+    const key = app.get_id();
+    if (key in stats) stats[key] += 1;
+    else stats[key] = 1;
+    Convenience.setJson('launcher-stats', stats);
   };
 
   let description = function(app) {

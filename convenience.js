@@ -22,6 +22,19 @@ function getSettings() {
   return settings;
 }
 
+function getJson(key) {
+  try {
+    return JSON.parse(getSettings().get_string(key));
+  } catch (e) {
+    print(e);
+    return null;
+  }
+}
+
+function setJson(key, value) {
+  getSettings().set_string(key, JSON.stringify(value));
+}
+
 /**
  * initTranslations:
  * @domain: (optional): the gettext domain to use

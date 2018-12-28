@@ -489,6 +489,7 @@ function enable() {
   );
 
   onboarding.showOne();
+  util.initLauncherCache(launcher)
 }
 
 function disable() {
