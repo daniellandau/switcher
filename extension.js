@@ -260,10 +260,10 @@ function _showUI(mode, entryText, previousWidth) {
     }
     // Filter text
     else {
-      // Delete last character
       sequenceNumber += 1;
       const sequenceNumberAtBeginning = sequenceNumber;
       timeit('key-release');
+      // Delete last character
       if (symbol === Clutter.h && control) {
         const entryText = entry.get_clutter_text();
         let textCursor = entryText.get_cursor_position();
