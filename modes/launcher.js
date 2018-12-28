@@ -48,10 +48,6 @@ var Launcher = (function() {
     }
   };
 
-  let descriptionNameIndex = function(app) {
-    return 0; // Workspace indicators are not used
-  };
-
   let makeBox = function(app, index, onActivate, oldBox) {
     return modeUtils.makeBox(
       app,
@@ -70,7 +66,6 @@ var Launcher = (function() {
     filter: x => x,
     activate: activate,
     description: description,
-    descriptionNameIndex: descriptionNameIndex,
     makeBox: makeBox,
     cleanIDs: modeUtils.cleanIDs
   };

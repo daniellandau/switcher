@@ -70,15 +70,6 @@ var Switcher = (function() {
     return workspace + appName + ' → ' + app.get_title();
   };
 
-  let descriptionNameIndex = function(app) {
-    if (Convenience.getSettings().get_boolean('workspace-indicator')) {
-      const workspace = app.get_workspace().index() + 1;
-      return workspace.toString().length + 2;
-    } else {
-      return 0;
-    }
-  };
-
   let makeBox = function(app, index, onActivate, oldBox) {
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
     if (!appRef) return null;
@@ -99,7 +90,6 @@ var Switcher = (function() {
     filter: filter,
     activate: activate,
     description: description,
-    descriptionNameIndex: descriptionNameIndex,
     makeBox: makeBox,
     cleanIDs: modeUtils.cleanIDs
   };

@@ -77,10 +77,7 @@ function runFilter(mode, app, fragment) {
   let score = 0;
   const descriptionLowerCase = mode.description(app).toLowerCase();
   const filteredDescription = escapeChars(
-    descriptionLowerCase.slice(
-      mode.descriptionNameIndex(app),
-      descriptionLowerCase.length
-    )
+    descriptionLowerCase
   );
   // go through each match inside description
   while ((match = regexp.exec(filteredDescription))) {
