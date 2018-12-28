@@ -39,6 +39,8 @@ const promiseModule = Me.imports.promise;
 let container,
   containers,
   cursor,
+  keybindings = [],
+  initialHotkeyConsumed,
   sequenceNumber = 0;
 
 const enableDebugLog = false;
@@ -59,6 +61,8 @@ function _showUI(mode, entryText, previousWidth) {
 
   timeit('init');
 
+  // Initialize to false when showing from nothing, to true when switching mode
+  initialHotkeyConsumed = !!previousWidth;
   cursor = 0;
   util.reinit();
   let boxes = [];
@@ -236,6 +240,12 @@ function _showUI(mode, entryText, previousWidth) {
     ) {
       // pass, these where handled already in keypress
     }
+    // Exit on repeat press
+    else if (
+      keybindings.includes(global.display.get_keybinding_action(e.get_key_code(), e.get_state())) && initialHotkeyConsumed
+    ) {
+      cleanUIWithFade();
+    }
     // Activate selected entry
     else if (
       symbol === Clutter.KEY_Return ||
@@ -388,6 +398,8 @@ function _showUI(mode, entryText, previousWidth) {
         })
         .catch(e => enableDebugLog && log('Skipped after ' + e + ' steps'));
     }
+
+    initialHotkeyConsumed = true;
   });
 
   containers.forEach(c => {
@@ -473,20 +485,20 @@ function init() {
 }
 
 function enable() {
-  Main.wm.addKeybinding(
+  keybindings.push(Main.wm.addKeybinding(
     'show-switcher',
     Convenience.getSettings(),
     Meta.KeyBindingFlags.NONE,
     Shell.ActionMode.NORMAL,
     () => _showUI(switcher, '')
-  );
-  Main.wm.addKeybinding(
+  ));
+  keybindings.push(Main.wm.addKeybinding(
     'show-launcher',
     Convenience.getSettings(),
     Meta.KeyBindingFlags.NONE,
     Shell.ActionMode.NORMAL,
     () => _showUI(launcher, '')
-  );
+  ));
 
   onboarding.showOne();
   util.initLauncherCache(launcher)
