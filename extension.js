@@ -1,5 +1,5 @@
 // Switcher is a Gnome Shell extension allowing quickly switching windows by typing
-// Copyright (C) 2015-2018  Daniel Landau
+// Copyright (C) 2015-2019  Daniel Landau
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -271,7 +271,25 @@ function _showUI(mode, entryText, previousWidth) {
     // Filter text
     else {
       sequenceNumber += 1;
+      let skipStep = 1;
       const sequenceNumberAtBeginning = sequenceNumber;
+      function maybeSkip(result) {
+        return new Promise((resolve, reject) => {
+          if (sequenceNumber !== sequenceNumberAtBeginning) {
+            if (enableDebugLog)
+              log(
+                'Skipping because sequence number has changed',
+                sequenceNumberAtBeginning,
+                sequenceNumber
+              );
+            setTimeout(() => reject(skipStep), 0);
+          } else {
+            skipStep += 1;
+            setTimeout(() => resolve(result), 0);
+          }
+        })
+      }
+
       timeit('key-release');
       // Delete last character
       if (symbol === Clutter.h && control) {
@@ -282,31 +300,13 @@ function _showUI(mode, entryText, previousWidth) {
       }
 
       Promise.resolve()
+        .then(maybeSkip)
         .then(() => {
-          if (sequenceNumber !== sequenceNumberAtBeginning) {
-            if (enableDebugLog)
-              log(
-                'Skipping because sequence number has changed',
-                sequenceNumberAtBeginning,
-                sequenceNumber
-              );
-            return Promise.reject(1);
-          }
-
           filteredApps = mode.filter(util.filterByText(mode, apps, o.text));
           return Promise.resolve();
         })
+        .then(maybeSkip)
         .then(() => {
-          if (sequenceNumber !== sequenceNumberAtBeginning) {
-            if (enableDebugLog)
-              log(
-                'Skipping because sequence number has changed',
-                sequenceNumberAtBeginning,
-                sequenceNumber
-              );
-            return Promise.reject(2);
-          }
-
           if (
             Convenience.getSettings().get_boolean('activate-immediately') &&
             filteredApps.length === 1 &&
@@ -342,32 +342,14 @@ function _showUI(mode, entryText, previousWidth) {
           }
           return Promise.resolve();
         })
+        .then(maybeSkip)
         .then(() => {
-          if (sequenceNumber !== sequenceNumberAtBeginning) {
-            if (enableDebugLog)
-              log(
-                'Skipping because sequence number has changed',
-                sequenceNumberAtBeginning,
-                sequenceNumber
-              );
-            return Promise.reject(4);
-          }
-
           timeit('before makeBoxes 2');
           boxes = makeBoxes(filteredApps, mode);
           return Promise.resolve();
         })
+        .then(maybeSkip)
         .then(() => {
-          if (sequenceNumber !== sequenceNumberAtBeginning) {
-            if (enableDebugLog)
-              log(
-                'Skipping because sequence number has changed',
-                sequenceNumberAtBeginning,
-                sequenceNumber
-              );
-            return Promise.reject(5);
-          }
-
           // If there's less boxes then in previous cursor position,
           // set cursor to the last box
           if (cursor + 1 > boxes.length) cursor = Math.max(boxes.length - 1, 0);
@@ -376,17 +358,8 @@ function _showUI(mode, entryText, previousWidth) {
           util.updateHighlight(boxes, o.text, cursor);
           return Promise.resolve();
         })
+        .then(maybeSkip)
         .then(() => {
-          if (sequenceNumber !== sequenceNumberAtBeginning) {
-            if (enableDebugLog)
-              log(
-                'Skipping because sequence number has changed',
-                sequenceNumberAtBeginning,
-                sequenceNumber
-              );
-            return Promise.reject(6);
-          }
-
           timeit('after updatehighlight');
           boxes.forEach(box => {
             util.fixWidths(box, width, shortcutWidth);
