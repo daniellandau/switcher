@@ -47,10 +47,14 @@ const enableDebugLog = false;
 const enablePerfTracing = false;
 let previous = null,
   previousMessage = null;
+
+function leftpad(str, n) {
+  return ('                          ' + str).slice(-n);
+}
 function timeit(msg) {
   if (!enablePerfTracing) return;
   const now = new Date();
-  if (previous) log('TIMING', now - previous, previousMessage + ' → ' + msg);
+  if (previous) log(`TIMING${leftpad(now - previous, 6)}   ${leftpad(previousMessage, 25)} → ${msg}`);
   previousMessage = msg;
   previous = now;
 }
