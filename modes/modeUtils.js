@@ -72,9 +72,7 @@ var ModeUtils = (function() {
   let seenIDs = {};
   let cleanIDs = () => (seenIDs = {});
   let makeBox = function(app, appRef, description, index, onActivate, oldBox) {
-    // This disconnect causes an error message in the log, but not doing it seems to
-    // be fine. Leave it out until further information or issues.
-    // if (oldBox.whole) oldBox.whole.disconnect(oldBox.activationCallback);
+    if (oldBox.whole) oldBox.whole.disconnect(oldBox.activationCallbackId);
     const whole =
       oldBox.whole || new St.Button({ style_class: 'switcher-box' });
     const box = oldBox.whole ? undefined : new St.BoxLayout();
@@ -123,7 +121,7 @@ var ModeUtils = (function() {
     }
     if (!oldBox.iconBox) box.insert_child_at_index(iconBox, 0);
     const activationCallback = () => onActivate(app);
-    whole.connect('clicked', activationCallback);
+    const activationCallbackId = whole.connect('clicked', activationCallback);
     if (!oldBox.whole) whole.set_child(box);
     whole.set_fill(true, true);
     whole.set_track_hover(true);
@@ -133,7 +131,8 @@ var ModeUtils = (function() {
       iconBox: iconBox,
       shortcutBox: shortcutBox,
       label: label,
-      activationCallback: activationCallback
+      activationCallback: activationCallback,
+      activationCallbackId: activationCallbackId
     };
   };
 
