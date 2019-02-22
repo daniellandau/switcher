@@ -48,6 +48,8 @@ let container,
   initialHotkeyConsumed,
   sequenceNumber = 0;
 
+let onboardingShownThisSession = false;
+
 const enableDebugLog = false;
 const enablePerfTracing = false;
 let previous = null,
@@ -495,7 +497,10 @@ function enable() {
     () => _showUI(launcher, '')
   ));
 
-  onboarding.showOne();
+  if (!onboardingShownThisSession) {
+    onboardingShownThisSession = true;
+    onboarding.showOne();
+  }
 }
 
 function disable() {
