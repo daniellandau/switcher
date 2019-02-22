@@ -39,6 +39,11 @@ const promiseModule = Me.imports.promise;
 let container,
   containers,
   cursor,
+  boxLayout,
+  entry,
+  keyPress,
+  boxes,
+  keyRelease,
   keybindings = [],
   initialHotkeyConsumed,
   sequenceNumber = 0;
@@ -59,9 +64,9 @@ function timeit(msg) {
   previous = now;
 }
 
-function _showUI(mode, entryText, previousWidth) {
+function _showUI(mode, entryText, previousWidth, switching) {
   'use strict';
-  if (container) return;
+  if (container && !switching) return;
 
   timeit('init');
 
@@ -69,7 +74,7 @@ function _showUI(mode, entryText, previousWidth) {
   initialHotkeyConsumed = !!previousWidth;
   cursor = 0;
   util.reinit();
-  let boxes = [];
+  boxes = [];
   const makeBoxes = function(apps, mode) {
     mode.cleanIDs();
     const newBoxes = apps
@@ -97,9 +102,11 @@ function _showUI(mode, entryText, previousWidth) {
   timeit('before getSettings');
   const fontSize = Convenience.getSettings().get_uint('font-size');
   timeit('after getSettings');
-  let boxLayout = new St.BoxLayout({ style_class: 'switcher-box-layout' });
-  boxLayout.set_style('font-size: ' + fontSize + 'px');
-  boxLayout.set_vertical(true);
+  if (!switching) {
+    boxLayout = new St.BoxLayout({ style_class: 'switcher-box-layout' });
+    boxLayout.set_style('font-size: ' + fontSize + 'px');
+    boxLayout.set_vertical(true);
+  }
   timeit('after boxlayout');
 
   const apps = mode.apps();
@@ -121,44 +128,48 @@ function _showUI(mode, entryText, previousWidth) {
   timeit('after updateHighlight');
 
   /* use "search-entry" style from overview, combining it with our own */
-  let entry = new St.Entry({ style_class: 'search-entry switcher-entry' })
-  entry.set_text(entryText);
-  boxLayout.insert_child_at_index(entry, 0);
+  if (!switching) {
+    entry = new St.Entry({ style_class: 'search-entry switcher-entry' })
+    entry.set_text(entryText);
+    boxLayout.insert_child_at_index(entry, 0);
+  }
   boxes.forEach(box => boxLayout.insert_child_at_index(box.whole, -1));
 
   let primaryMonitor = Main.layoutManager.primaryMonitor;
   let allMonitors = Main.layoutManager.monitors;
 
-  containers = allMonitors
-    .map(monitor => {
-      let tmpContainer = new St.Bin({ reactive: true });
-      tmpContainer.set_alignment(St.Align.MIDDLE, St.Align.START);
-      tmpContainer.set_width(monitor.width);
-      tmpContainer.set_height(monitor.height);
-      tmpContainer.set_position(monitor.x, monitor.y);
+  if (!switching) {
+    containers = allMonitors
+      .map(monitor => {
+        let tmpContainer = new St.Bin({ reactive: true });
+        tmpContainer.set_alignment(St.Align.MIDDLE, St.Align.START);
+        tmpContainer.set_width(monitor.width);
+        tmpContainer.set_height(monitor.height);
+        tmpContainer.set_position(monitor.x, monitor.y);
 
-      Main.uiGroup.add_actor(tmpContainer);
-      if (monitor === primaryMonitor) container = tmpContainer;
-      return tmpContainer;
-    })
+        Main.uiGroup.add_actor(tmpContainer);
+        if (monitor === primaryMonitor) container = tmpContainer;
+        return tmpContainer;
+      })
     // sort primary last so it gets to the top of the modal stack
-    .sort((a, b) => (a === primaryMonitor ? 1 : -1));
+      .sort((a, b) => (a === primaryMonitor ? 1 : -1));
 
-  timeit('after containers');
+    timeit('after containers');
 
-  if (
-    previousWidth === undefined &&
-    Convenience.getSettings().get_boolean('fade-enable')
-  ) {
-    boxLayout.opacity = 0;
-    Tweener.addTween(boxLayout, {
-      opacity: 255,
-      time: 0.35,
-      transition: 'easeOutQuad'
-    });
+    if (
+      previousWidth === undefined &&
+        Convenience.getSettings().get_boolean('fade-enable')
+    ) {
+      boxLayout.opacity = 0;
+      Tweener.addTween(boxLayout, {
+        opacity: 255,
+        time: 0.35,
+        transition: 'easeOutQuad'
+      });
+    }
+    container.add_actor(boxLayout);
+    timeit('added actor');
   }
-  container.add_actor(boxLayout);
-  timeit('added actor');
 
   let width = boxes
     .map(box => box.whole.width)
@@ -181,8 +192,12 @@ function _showUI(mode, entryText, previousWidth) {
   entry.set_width(width);
   timeit('set width');
 
+  if (switching) {
+    entry.disconnect(keyPress)
+    entry.disconnect(keyRelease)
+  }
   // handle what we can on key press and the rest on key release
-  entry.connect('key-press-event', (o, e) => {
+  keyPress = entry.connect('key-press-event', (o, e) => {
     timeit('init key-press');
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
@@ -223,7 +238,7 @@ function _showUI(mode, entryText, previousWidth) {
     }
   });
 
-  entry.connect('key-release-event', (o, e) => {
+  keyRelease = entry.connect('key-release-event', (o, e) => {
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
     const symbol = e.get_key_symbol();
@@ -379,11 +394,13 @@ function _showUI(mode, entryText, previousWidth) {
     initialHotkeyConsumed = true;
   });
 
-  containers.forEach(c => {
-    Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
-    c.connect('button-press-event', cleanUIWithFade);
-    c.show();
-  });
+  if (!switching) {
+    containers.forEach(c => {
+      Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+      c.connect('button-press-event', cleanUIWithFade);
+      c.show();
+    });
+  }
   global.stage.set_key_focus(entry);
 
   // In the bottom as a function statement so the variables closed
@@ -399,14 +416,15 @@ function _showUI(mode, entryText, previousWidth) {
 
   function switchMode() {
     let previousText = entry.get_text();
-    timeit('before cleanui');
-    cleanUI();
-    timeit('after cleanui');
+    const switching = true;
+    timeit('before cleanboxes');
+    cleanBoxes();
+    timeit('after cleanboxes');
     debouncedActivateUnique.cancel();
     timeit('after cancel');
     mode.name() === 'Switcher'
-      ? _showUI(launcher, previousText, width)
-      : _showUI(switcher, previousText, width);
+      ? _showUI(launcher, previousText, width, switching)
+      : _showUI(switcher, previousText, width, switching);
     timeit('after showui');
   }
 
