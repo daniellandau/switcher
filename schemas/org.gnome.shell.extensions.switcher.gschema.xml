@@ -85,9 +85,5 @@
           <default>"{}"</default>
           <summary>Launcher stats stored as json.</summary>
         </key>
-        <key type="s" name="launcher-search-strings-stats">
-          <default>"{}"</default>
-          <summary>Launcher most searched strings stored as json.</summary>
-        </key>
     </schema>
 </schemalist>

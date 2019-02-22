@@ -187,7 +187,6 @@ function detachParent(child) {
   }
 }
 
-const stats = Convenience.getJson('launcher-search-strings-stats')
 const launcherFilterCache = {};
 function filterByText(mode, apps, text) {
   const cacheKey = text + apps.length;
@@ -211,9 +210,6 @@ function filterByText(mode, apps, text) {
 
   const update = () => {
     launcherFilterCache[cacheKey] = get();
-    if (text in stats) stats[text] += 1;
-    else stats[text] = 1;
-    setTimeout(() => Convenience.setJson('launcher-search-strings-stats', stats), 100);
   };
   const cachedFiltered = launcherFilterCache[cacheKey];
   if (!!cachedFiltered) {
@@ -222,25 +218,4 @@ function filterByText(mode, apps, text) {
   }
   update();
   return launcherFilterCache[cacheKey];
-}
-
-function initLauncherCache(launcher) {
-  const apps = launcher.apps()
-  Object.keys(stats).sort((a, b) => stats[a] < stats[b] ? 1 : -1)
-    .slice(0, 10)
-    .forEach(text => {
-      const cacheKey = text + apps.length;
-      let filteredApps = apps.filter(makeFilter(launcher, text));
-
-      // Always preserve focus order before typing
-      const ordering = Convenience.getSettings().get_uint('ordering');
-      if (ordering == orderByRelevancy && text != '') {
-        filteredApps = filteredApps.sort(function(a, b) {
-          if (a.score > b.score) return -1;
-          if (a.score < b.score) return 1;
-          return 0;
-        });
-      }
-      launcherFilterCache[cacheKey] = filteredApps;
-    })
 }
