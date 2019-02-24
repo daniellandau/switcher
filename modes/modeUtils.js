@@ -29,7 +29,7 @@ var ModeUtils = (function() {
       });
 
   let shellAppCache = { lastIndexed: null, apps: [] };
-  let shellApps = () => {
+  let shellApps = (force) => {
     const get = () =>
       appInfos().map(function(appID) {
         return Shell.AppSystem.get_default().lookup_app(appID);
@@ -38,7 +38,7 @@ var ModeUtils = (function() {
       shellAppCache.lastIndexed = new Date();
       shellAppCache.apps = get();
     };
-    if (!shellAppCache.lastIndexed) {
+    if (!shellAppCache.lastIndexed || !!force) {
       update();
     } else {
       util.setTimeout(update, 500);

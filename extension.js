@@ -31,6 +31,7 @@ const keyActivation = Me.imports.keyActivation.KeyActivation;
 const switcherModule = Me.imports.modes.switcher;
 const switcher = switcherModule.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
+const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 const util = Me.imports.util;
 const onboarding = Me.imports.onboarding;
 window.setTimeout = util.setTimeout;
@@ -69,6 +70,7 @@ function timeit(msg) {
 function _showUI(mode, entryText, previousWidth, switching) {
   'use strict';
   if (container && !switching) return;
+  if (!switching) modeUtils.shellApps(true); // force update shell app cache
 
   timeit('init');
 
