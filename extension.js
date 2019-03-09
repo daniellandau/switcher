@@ -62,7 +62,13 @@ function leftpad(str, n) {
 function timeit(msg) {
   if (!enablePerfTracing) return;
   const now = new Date();
-  if (previous) log(`TIMING${leftpad(now - previous, 6)}   ${leftpad(previousMessage, 25)} → ${msg}`);
+  if (previous)
+    log(
+      `TIMING${leftpad(now - previous, 6)}   ${leftpad(
+        previousMessage,
+        25
+      )} → ${msg}`
+    );
   previousMessage = msg;
   previous = now;
 }
@@ -133,7 +139,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
 
   /* use "search-entry" style from overview, combining it with our own */
   if (!switching) {
-    entry = new St.Entry({ style_class: 'search-entry switcher-entry' })
+    entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
     entry.set_text(entryText);
     boxLayout.insert_child_at_index(entry, 0);
   }
@@ -155,14 +161,14 @@ function _showUI(mode, entryText, previousWidth, switching) {
         if (monitor === primaryMonitor) container = tmpContainer;
         return tmpContainer;
       })
-    // sort primary last so it gets to the top of the modal stack
+      // sort primary last so it gets to the top of the modal stack
       .sort((a, b) => (a === primaryMonitor ? 1 : -1));
 
     timeit('after containers');
 
     if (
       previousWidth === undefined &&
-        Convenience.getSettings().get_boolean('fade-enable')
+      Convenience.getSettings().get_boolean('fade-enable')
     ) {
       boxLayout.opacity = 0;
       Tweener.addTween(boxLayout, {
@@ -185,7 +191,8 @@ function _showUI(mode, entryText, previousWidth, switching) {
   const maxWidth =
     Main.layoutManager.primaryMonitor.width *
     0.01 *
-    Convenience.getSettings().get_uint('max-width-percentage') * scaleFactor;
+    Convenience.getSettings().get_uint('max-width-percentage') *
+    scaleFactor;
   if (width > maxWidth) width = maxWidth;
   if (width < maxWidth / 2) width = maxWidth / 2;
 
@@ -197,8 +204,8 @@ function _showUI(mode, entryText, previousWidth, switching) {
   timeit('set width');
 
   if (switching) {
-    entry.disconnect(keyPress)
-    entry.disconnect(keyRelease)
+    entry.disconnect(keyPress);
+    entry.disconnect(keyRelease);
   }
   // handle what we can on key press and the rest on key release
   keyPress = entry.connect('key-press-event', (o, e) => {
@@ -265,7 +272,10 @@ function _showUI(mode, entryText, previousWidth, switching) {
     }
     // Exit on repeat press
     else if (
-      keybindings.includes(global.display.get_keybinding_action(e.get_key_code(), e.get_state())) && initialHotkeyConsumed
+      keybindings.includes(
+        global.display.get_keybinding_action(e.get_key_code(), e.get_state())
+      ) &&
+      initialHotkeyConsumed
     ) {
       cleanUIWithFade();
     }
@@ -310,7 +320,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
             skipStep += 1;
             setTimeout(() => resolve(result), 0);
           }
-        })
+        });
       }
 
       timeit('key-release');
@@ -490,20 +500,24 @@ function init() {
 }
 
 function enable() {
-  keybindings.push(Main.wm.addKeybinding(
-    'show-switcher',
-    Convenience.getSettings(),
-    Meta.KeyBindingFlags.NONE,
-    Shell.ActionMode.NORMAL,
-    () => _showUI(switcher, '')
-  ));
-  keybindings.push(Main.wm.addKeybinding(
-    'show-launcher',
-    Convenience.getSettings(),
-    Meta.KeyBindingFlags.NONE,
-    Shell.ActionMode.NORMAL,
-    () => _showUI(launcher, '')
-  ));
+  keybindings.push(
+    Main.wm.addKeybinding(
+      'show-switcher',
+      Convenience.getSettings(),
+      Meta.KeyBindingFlags.NONE,
+      Shell.ActionMode.NORMAL,
+      () => _showUI(switcher, '')
+    )
+  );
+  keybindings.push(
+    Main.wm.addKeybinding(
+      'show-launcher',
+      Convenience.getSettings(),
+      Meta.KeyBindingFlags.NONE,
+      Shell.ActionMode.NORMAL,
+      () => _showUI(launcher, '')
+    )
+  );
 
   if (!onboardingShownThisSession) {
     onboardingShownThisSession = true;
