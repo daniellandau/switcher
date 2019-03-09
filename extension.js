@@ -334,7 +334,13 @@ function _showUI(mode, entryText, previousWidth, switching) {
             Convenience.getSettings().get_boolean('activate-immediately') &&
             filteredApps.length === 1 &&
             symbol !== Clutter.Control_L &&
-            symbol !== Clutter.Control_R
+            symbol !== Clutter.Control_R &&
+            // Don't activate the unique result if it's also the only result
+            // https://github.com/daniellandau/switcher/issues/77
+            // Don't do this logic in Launcher mode as it's somewhat expensive
+            // and we expect to always have more than one app installed anyways
+            (mode.name() !== 'Switcher' ||
+              mode.filter(util.filterByText(mode, apps, '')).length > 1)
           ) {
             debouncedActivateUnique();
           }
