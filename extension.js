@@ -45,6 +45,7 @@ let container,
   keyPress,
   boxes,
   keyRelease,
+  previousEntryContent,
   keybindings = [],
   initialHotkeyConsumed,
   sequenceNumber = 0;
@@ -80,6 +81,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
 
   timeit('init');
 
+  previousEntryContent = entryText;
   // Initialize to false when showing from nothing, to true when switching mode
   initialHotkeyConsumed = !!previousWidth;
   cursor = 0;
@@ -281,9 +283,10 @@ function _showUI(mode, entryText, previousWidth, switching) {
     }
     // Activate selected entry
     else if (
-      symbol === Clutter.KEY_Return ||
-      symbol === Clutter.KEY_KP_Enter ||
-      (symbol === Clutter.j && control)
+      (symbol === Clutter.KEY_Return ||
+       symbol === Clutter.KEY_KP_Enter ||
+       (symbol === Clutter.j && control)) &&
+        o.text === previousEntryContent
     ) {
       cleanUIWithFade();
       if (filteredApps.length > 0) {
@@ -411,6 +414,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
         .catch(e => enableDebugLog && log('Skipped after ' + e + ' steps'));
     }
 
+    previousEntryContent = o.text;
     initialHotkeyConsumed = true;
   });
 
