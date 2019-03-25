@@ -252,6 +252,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
   });
 
   keyRelease = entry.connect('key-release-event', (o, e) => {
+    const entryContent = o.text;
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
     const symbol = e.get_key_symbol();
@@ -414,7 +415,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
         .catch(e => enableDebugLog && log('Skipped after ' + e + ' steps'));
     }
 
-    previousEntryContent = o.text;
+    previousEntryContent = entryContent;
     initialHotkeyConsumed = true;
   });
 
