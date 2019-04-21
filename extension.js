@@ -77,7 +77,7 @@ function timeit(msg) {
 function _showUI(mode, entryText, previousWidth, switching) {
   'use strict';
   if (container && !switching) return;
-  if (!switching) modeUtils.shellApps(true); // force update shell app cache
+  if (!switching) setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
 
   timeit('init');
 
