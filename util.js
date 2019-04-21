@@ -39,6 +39,7 @@ function makeFilter(mode, text) {
     // start from zero, filters can change this up or down
     // and the scores are summed
     app.score = 0;
+    app.cachedDescription = escapeChars(mode.description(app).toLowerCase());
     return text.split(' ').every(fragment => runFilter(mode, app, fragment));
   };
 }
@@ -75,10 +76,7 @@ function runFilter(mode, app, fragment) {
   let match;
   let gotMatch = false;
   let score = 0;
-  const descriptionLowerCase = mode.description(app).toLowerCase();
-  const filteredDescription = escapeChars(
-    descriptionLowerCase
-  );
+  const filteredDescription = app.cachedDescription;
   // go through each match inside description
   while ((match = regexp.exec(filteredDescription))) {
     // A full match at the beginning is the best match
