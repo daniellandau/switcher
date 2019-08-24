@@ -41,7 +41,10 @@ var Launcher = (function() {
 
   let description = function(app) {
     try {
-      return app.get_name();
+      const appInfo = app.get_app_info();
+      const originalName = appInfo.get_string('Name');
+      const executable = appInfo.get_string('Exec');
+      return `${app.get_name()} [${originalName}] (${executable})`;
     } catch (e) {
       print(e);
       return 'Could not get name';
