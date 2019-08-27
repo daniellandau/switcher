@@ -1,4 +1,4 @@
-// -*- mode: js; js-indent-level: 4; indent-tabs-mode: nil -*-
+// -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*-
 
 /* ------------------------------------------------------------------------- */
 "use strict";
