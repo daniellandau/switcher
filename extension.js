@@ -95,8 +95,9 @@ function _showUI(mode, entryText, previousWidth, switching) {
         mode.makeBox(
           a,
           i,
-          app => {
-            cleanUIWithFade();
+          (app, modifiers) => {
+            if (!(mode.name() === 'Launcher' && modifiers.control))
+              cleanUIWithFade();
             mode.activate(app);
           },
           boxes.length > i ? boxes[i] : {}
@@ -289,7 +290,8 @@ function _showUI(mode, entryText, previousWidth, switching) {
        (symbol === Clutter.j && control)) &&
         o.text === previousEntryContent
     ) {
-      cleanUIWithFade();
+      if (!(mode.name() === 'Launcher' && (control && !(symbol === Clutter.j))))
+        cleanUIWithFade();
       if (filteredApps.length > 0) {
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
         if (mode.name() === 'Switcher' && shift)

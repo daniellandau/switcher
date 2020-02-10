@@ -29,7 +29,7 @@ var ModeUtils = (function() {
       });
 
   let shellAppCache = { lastIndexed: null, apps: [] };
-  let shellApps = (force) => {
+  let shellApps = force => {
     const get = () =>
       appInfos().map(function(appID) {
         return Shell.AppSystem.get_default().lookup_app(appID);
@@ -120,7 +120,14 @@ var ModeUtils = (function() {
       seenIDs[id] = true; // Dummy value
     }
     if (!oldBox.iconBox) box.insert_child_at_index(iconBox, 0);
-    const activationCallback = () => onActivate(app);
+    const activationCallback = () => {
+      const e = Clutter.get_current_event();
+      const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
+      const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
+      const alt = (e.get_state() & Clutter.ModifierType.META_MASK) !== 0;
+      const super_ = (e.get_state() & Clutter.ModifierType.SUPER_MASK) !== 0;
+      onActivate(app, { control, shift, alt, super_ });
+    };
     const activationCallbackId = whole.connect('clicked', activationCallback);
     if (!oldBox.whole) whole.set_child(box);
     whole.set_fill(true, true);
