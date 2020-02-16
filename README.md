@@ -16,7 +16,7 @@ cd ~/.local/share/gnome-shell/extensions
 git clone https://github.com/daniellandau/switcher.git switcher@landau.fi
 ```
 
-You can then enable the extension with Gnome Tweak Tool.
+Log out and back in of GNOME Shell, and you can then enable the extension with Gnome Tweaks.
 
 ### How to use
 
