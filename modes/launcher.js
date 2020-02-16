@@ -60,13 +60,13 @@ var Launcher = (function() {
   };
 
   return {
-    MAX_NUM_ITEMS: MAX_NUM_ITEMS,
-    name: name,
-    apps: apps,
+    MAX_NUM_ITEMS,
+    name,
+    apps,
     filter: x => x,
-    activate: activate,
-    description: description,
-    makeBox: makeBox,
+    activate,
+    description,
+    makeBox,
     cleanIDs: modeUtils.cleanIDs
   };
 })();

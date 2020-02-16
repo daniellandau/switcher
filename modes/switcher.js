@@ -84,13 +84,13 @@ var Switcher = (function() {
   };
 
   return {
-    MAX_NUM_ITEMS: MAX_NUM_ITEMS,
-    name: name,
-    apps: apps,
-    filter: filter,
-    activate: activate,
-    description: description,
-    makeBox: makeBox,
+    MAX_NUM_ITEMS,
+    name,
+    apps,
+    filter,
+    activate,
+    description,
+    makeBox,
     cleanIDs: modeUtils.cleanIDs
   };
 })();
