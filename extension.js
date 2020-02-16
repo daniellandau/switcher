@@ -307,6 +307,9 @@ function _showUI(mode, entryText, previousWidth, switching) {
       cleanUIWithFade();
       mode.activate(filteredApps[fkeyIndex]);
     }
+    else if (entryContent === previousEntryContent) {
+      // nothing
+    }
     // Filter text
     else {
       sequenceNumber += 1;
