@@ -154,8 +154,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
   if (!switching) {
     containers = allMonitors
       .map(monitor => {
-        let tmpContainer = new St.Bin({ reactive: true });
-        tmpContainer.set_alignment(St.Align.MIDDLE, St.Align.START);
+        let tmpContainer = new St.Bin({ reactive: true, x_align: St.Align.MIDDLE, y_align: St.Align.MIDDLE });
         tmpContainer.set_width(monitor.width);
         tmpContainer.set_height(monitor.height);
         tmpContainer.set_position(monitor.x, monitor.y);
