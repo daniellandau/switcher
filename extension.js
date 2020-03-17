@@ -179,7 +179,15 @@ function _showUI(mode, entryText, previousWidth, switching) {
         transition: 'easeOutQuad'
       });
     }
-    container.add_actor(boxLayout);
+    const boxContainer = new St.BoxLayout();
+    boxContainer.add(boxLayout, {
+      expand: true,
+      x_fill: false,
+      x_align: St.Align.MIDDLE,
+      y_fill: false,
+      y_align: St.Align.TOP
+    });
+    container.add_actor(boxContainer);
     timeit('added actor');
   }
 
