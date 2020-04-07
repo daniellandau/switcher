@@ -72,6 +72,9 @@ function buildWidgets() {
   let fadeEffectWidget = new Gtk.HBox();
   addFadeEffect(fadeEffectWidget, settings);
 
+  let activeDisplayWidget = new Gtk.HBox();
+  addActiveDisplay(activeDisplayWidget, settings);
+
   const onboardingWidgets = buildOnboarding(settings);
 
   return []
@@ -85,6 +88,7 @@ function buildWidgets() {
             workspaceIndicatorWidget,
             onlyOneWorkSpaceWidget,
             fadeEffectWidget,
+            activeDisplayWidget,
             onboardingWidgets
            )
 }
@@ -284,6 +288,20 @@ function addFadeEffect(widget, settings) {
   });
   _switch.connect('notify::active', function (o) {
     settings.set_boolean('fade-enable', o.active);
+  });
+  widget.add(_switch);
+}
+
+function addActiveDisplay(widget, settings) {
+  widget.add(makeTitle(_("Show Switcher on active display")));
+
+  let _switch = new Gtk.Switch({
+    active: settings.get_boolean('on-active-display'),
+    margin_top: 15,
+    halign: Gtk.Align.END
+  });
+  _switch.connect('notify::active', function (o) {
+    settings.set_boolean('on-active-display', o.active);
   });
   widget.add(_switch);
 }
