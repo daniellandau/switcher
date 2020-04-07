@@ -53,6 +53,10 @@
             <default>false</default>
             <summary>Toggle Window Fade</summary>
         </key>
+        <key type="b" name="on-active-display">
+            <default>false</default>
+            <summary>Should the Switcher appear on the active display instead of the primary</summary>
+        </key>
         <key type="b" name="never-show-onboarding">
             <default>false</default>
             <summary>Never show onboarding</summary>

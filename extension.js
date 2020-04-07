@@ -148,7 +148,8 @@ function _showUI(mode, entryText, previousWidth, switching) {
   }
   boxes.forEach(box => boxLayout.insert_child_at_index(box.whole, -1));
 
-  let primaryMonitor = Main.layoutManager.primaryMonitor;
+  let useActiveMonitor = Convenience.getSettings().get_boolean('on-active-display')
+  let selectedMonitor = useActiveMonitor ? Main.layoutManager.currentMonitor : Main.layoutManager.primaryMonitor;
   let allMonitors = Main.layoutManager.monitors;
 
   if (!switching) {
@@ -160,11 +161,11 @@ function _showUI(mode, entryText, previousWidth, switching) {
         tmpContainer.set_position(monitor.x, monitor.y);
 
         Main.uiGroup.add_actor(tmpContainer);
-        if (monitor === primaryMonitor) container = tmpContainer;
+        if (monitor === selectedMonitor) container = tmpContainer;
         return tmpContainer;
       })
       // sort primary last so it gets to the top of the modal stack
-      .sort((a, b) => (a === primaryMonitor ? 1 : -1));
+      .sort((a, b) => (a === selectedMonitor ? 1 : -1));
 
     timeit('after containers');
 
@@ -199,7 +200,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
     .reduce((a, b) => Math.max(a, b), 0);
   let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
   const maxWidth =
-    Main.layoutManager.primaryMonitor.width *
+    selectedMonitor.width *
     0.01 *
     Convenience.getSettings().get_uint('max-width-percentage') *
     scaleFactor;
