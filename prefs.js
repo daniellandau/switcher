@@ -223,7 +223,7 @@ function addFontSize(widget, settings) {
 }
 
 function buildMaxWidth(settings) {
-  const title = makeTitle(_("Max width (%)"));
+  const title = makeTitle(_("Width (%)"));
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
       lower: 10,

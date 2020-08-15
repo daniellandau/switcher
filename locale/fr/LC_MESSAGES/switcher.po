@@ -140,8 +140,8 @@ msgid "Font size (px)"
 msgstr "Taille de la police (px)"
 
 #: prefs.js:219
-msgid "Max width (%)"
-msgstr "Largeur maximale (%)"
+msgid "Width (%)"
+msgstr "Largeur (%)"
 
 #: prefs.js:235
 msgid "Activate by pressing a key matching the index in the list"
