@@ -30,8 +30,8 @@
             <summary>Icon size</summary>
         </key>
         <key type="u" name="max-width-percentage">
-            <default>95</default>
-            <summary>Maximum percentage of screen width to take</summary>
+            <default>80</default>
+            <summary>Percentage of screen width to take</summary>
         </key>
         <key type="u" name="activate-by-key">
             <default>0</default>

@@ -46,8 +46,8 @@ msgid "Font size (px)"
 msgstr "Schriftgröße (px)"
 
 #: prefs.js:155
-msgid "Max width (%)"
-msgstr "Maximale Breite (%)"
+msgid "Width (%)"
+msgstr "Breite (%)"
 
 #: prefs.js:171
 msgid "Activate by pressing a key matching the index in the list"

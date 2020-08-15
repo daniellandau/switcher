@@ -192,23 +192,15 @@ function _showUI(mode, entryText, previousWidth, switching) {
     timeit('added actor');
   }
 
-  let width = boxes
-    .map(box => box.whole.width)
-    .reduce((a, b) => Math.max(a, b), 0);
   let shortcutWidth = boxes
     .map(box => (box.shortcutBox ? box.shortcutBox.width : 0))
     .reduce((a, b) => Math.max(a, b), 0);
   let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-  const maxWidth =
+  const width =
     selectedMonitor.width *
     0.01 *
     Convenience.getSettings().get_uint('max-width-percentage') *
     scaleFactor;
-  if (width > maxWidth) width = maxWidth;
-  if (width < maxWidth / 2) width = maxWidth / 2;
-
-  if (previousWidth && Number(previousWidth) === previousWidth)
-    width = previousWidth;
 
   boxes.forEach(box => util.fixWidths(box, width, shortcutWidth));
   entry.set_width(width);
