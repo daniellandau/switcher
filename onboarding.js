@@ -1,4 +1,5 @@
 const Gio = imports.gi.Gio;
+const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 const St = imports.gi.St;
 const MessageTray = imports.ui.messageTray;
@@ -14,6 +15,32 @@ const DO_NOT_SHOW_AGAIN    = 1;
 const SHOWN_BUT_SHOW_AGAIN = 2;
 
 
+var MyNotificationPolicy = GObject.registerClass({
+}, class MyNotificationPolicy extends MessageTray.NotificationPolicy {
+  get enable() {
+    return true;
+  }
+
+  get enableSound() {
+    return true;
+  }
+
+  get showBanners() {
+    return true;
+  }
+
+  get forceExpanded() {
+    return true;
+  }
+
+  get showInLockScreen() {
+    return false;
+  }
+
+  get detailsInLockScreen() {
+    return false;
+  }
+});
 
 function showOne() {
   const settings = Convenience.getSettings();
@@ -50,11 +77,11 @@ function showOne() {
 
   let source = new MessageTray.Source(_("Switcher"),
                                   'swicher-onboarding');
-  source.policy = new MessageTray.NotificationPolicy({forceExpanded: true});
+  source.policy = new MyNotificationPolicy();
   Main.messageTray.add(source);
 
   let notification = new MessageTray.Notification(source, _("Switcher usage tip"), message);
-  notification.setUrgency(MessageTray.Urgency.LOW);
+  notification.setUrgency(MessageTray.Urgency.HIGH);
   notification.setTransient(false);
   notification.setResident(false);
 
