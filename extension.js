@@ -87,7 +87,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
   cursor = 0;
   util.reinit();
   boxes = [];
-  const makeBoxes = function(apps, mode) {
+  const makeBoxes = function (apps, mode) {
     mode.cleanIDs();
     const newBoxes = apps
       .slice(0, mode.MAX_NUM_ITEMS)
@@ -103,7 +103,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
           boxes.length > i ? boxes[i] : {}
         )
       )
-      .filter(x => x);
+      .filter((x) => x);
     if (newBoxes.length < boxes.length) {
       for (let i = newBoxes.length; i < boxes.length; ++i) {
         destroyBox(boxes[i]);
@@ -146,16 +146,24 @@ function _showUI(mode, entryText, previousWidth, switching) {
     entry.set_text(entryText);
     boxLayout.insert_child_at_index(entry, 0);
   }
-  boxes.forEach(box => boxLayout.insert_child_at_index(box.whole, -1));
+  boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
 
-  let useActiveMonitor = Convenience.getSettings().get_boolean('on-active-display')
-  let selectedMonitor = useActiveMonitor ? Main.layoutManager.currentMonitor : Main.layoutManager.primaryMonitor;
+  let useActiveMonitor = Convenience.getSettings().get_boolean(
+    'on-active-display'
+  );
+  let selectedMonitor = useActiveMonitor
+    ? Main.layoutManager.currentMonitor
+    : Main.layoutManager.primaryMonitor;
   let allMonitors = Main.layoutManager.monitors;
 
   if (!switching) {
     containers = allMonitors
-      .map(monitor => {
-        let tmpContainer = new St.Bin({ reactive: true, x_align: St.Align.MIDDLE, y_align: St.Align.START });
+      .map((monitor) => {
+        let tmpContainer = new St.Bin({
+          reactive: true,
+          x_align: St.Align.MIDDLE,
+          y_align: St.Align.START
+        });
         tmpContainer.set_width(monitor.width);
         tmpContainer.set_height(monitor.height);
         tmpContainer.set_position(monitor.x, monitor.y);
@@ -193,7 +201,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
   }
 
   let shortcutWidth = boxes
-    .map(box => (box.shortcutBox ? box.shortcutBox.width : 0))
+    .map((box) => (box.shortcutBox ? box.shortcutBox.width : 0))
     .reduce((a, b) => Math.max(a, b), 0);
   let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
   const width =
@@ -202,7 +210,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
     Convenience.getSettings().get_uint('max-width-percentage') *
     scaleFactor;
 
-  boxes.forEach(box => util.fixWidths(box, width, shortcutWidth));
+  boxes.forEach((box) => util.fixWidths(box, width, shortcutWidth));
   entry.set_width(width);
   timeit('set width');
 
@@ -286,11 +294,11 @@ function _showUI(mode, entryText, previousWidth, switching) {
     // Activate selected entry
     else if (
       (symbol === Clutter.KEY_Return ||
-       symbol === Clutter.KEY_KP_Enter ||
-       (symbol === Clutter.j && control)) &&
-        o.text === previousEntryContent
+        symbol === Clutter.KEY_KP_Enter ||
+        (symbol === Clutter.j && control)) &&
+      o.text === previousEntryContent
     ) {
-      if (!(mode.name() === 'Launcher' && (control && !(symbol === Clutter.j))))
+      if (!(mode.name() === 'Launcher' && control && !(symbol === Clutter.j)))
         cleanUIWithFade();
       if (filteredApps.length > 0) {
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
@@ -306,8 +314,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
     else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
       cleanUIWithFade();
       mode.activate(filteredApps[fkeyIndex]);
-    }
-    else if (entryContent === previousEntryContent) {
+    } else if (entryContent === previousEntryContent) {
       // nothing
     }
     // Filter text
@@ -409,7 +416,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
         .then(maybeSkip)
         .then(() => {
           timeit('after updatehighlight');
-          boxes.forEach(box => {
+          boxes.forEach((box) => {
             util.fixWidths(box, width, shortcutWidth);
             util.detachParent(box.whole);
             boxLayout.insert_child_at_index(box.whole, -1);
@@ -417,7 +424,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
           timeit('after width fixes');
           return Promise.resolve();
         })
-        .catch(e => enableDebugLog && log('Skipped after ' + e + ' steps'));
+        .catch((e) => enableDebugLog && log('Skipped after ' + e + ' steps'));
     }
 
     previousEntryContent = entryContent;
@@ -425,7 +432,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
   });
 
   if (!switching) {
-    containers.forEach(c => {
+    containers.forEach((c) => {
       Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
       c.connect('button-press-event', cleanUIWithFade);
       c.show();
@@ -439,7 +446,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
     boxes.forEach(destroyBox);
   }
   function destroyBox(box) {
-    box.iconBox.get_children().forEach(child => util.detachParent(child));
+    box.iconBox.get_children().forEach((child) => util.detachParent(child));
     box.iconBox.destroy();
     boxLayout.remove_child(box.whole);
   }
@@ -462,7 +469,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
   function cleanUI() {
     switcherModule.onlyCurrentWorkspaceToggled = false;
     cleanBoxes();
-    containers.reverse().forEach(c => {
+    containers.reverse().forEach((c) => {
       Main.uiGroup.remove_actor(c);
       Main.popModal(c);
     });
@@ -473,7 +480,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
 
   function cleanUIWithFade() {
     switcherModule.onlyCurrentWorkspaceToggled = false;
-    containers.reverse().forEach(c => {
+    containers.reverse().forEach((c) => {
       try {
         Main.popModal(c);
       } catch (e) {
@@ -481,9 +488,9 @@ function _showUI(mode, entryText, previousWidth, switching) {
       }
     });
 
-    const cleanRest = function() {
+    const cleanRest = function () {
       cleanBoxes();
-      containers.reverse().forEach(c => {
+      containers.reverse().forEach((c) => {
         Main.uiGroup.remove_actor(c);
       });
       boxLayout.destroy();
