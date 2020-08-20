@@ -122,31 +122,12 @@ function _showUI(mode, entryText, previousWidth, switching) {
   }
   timeit('after boxlayout');
 
-  const apps = mode.apps();
-  timeit('after apps()');
-  let filteredApps = mode.filter(util.filterByText(mode, apps, entryText));
-  timeit('after filter');
-
-  const debouncedActivateUnique = util.debounce(() => {
-    if (filteredApps.length === 1) {
-      cleanUIWithFade();
-      mode.activate(filteredApps[cursor]);
-    }
-  }, Convenience.getSettings().get_uint('activate-after-ms'));
-
-  timeit('before makeBoxes 1');
-  boxes = makeBoxes(filteredApps, mode);
-  timeit('after makeBoxes');
-  util.updateHighlight(boxes, entryText, cursor);
-  timeit('after updateHighlight');
-
   /* use "search-entry" style from overview, combining it with our own */
   if (!switching) {
     entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
     entry.set_text(entryText);
     boxLayout.insert_child_at_index(entry, 0);
   }
-  boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
 
   let useActiveMonitor = Convenience.getSettings().get_boolean(
     'on-active-display'
@@ -200,24 +181,46 @@ function _showUI(mode, entryText, previousWidth, switching) {
     timeit('added actor');
   }
 
-  let shortcutWidth = boxes
-    .map((box) => (box.shortcutBox ? box.shortcutBox.width : 0))
-    .reduce((a, b) => Math.max(a, b), 0);
   let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
   const width =
     selectedMonitor.width *
     0.01 *
     Convenience.getSettings().get_uint('max-width-percentage') *
     scaleFactor;
-
-  boxes.forEach((box) => util.fixWidths(box, width, shortcutWidth));
   entry.set_width(width);
-  timeit('set width');
+
+  if (!switching) {
+    containers.forEach((c) => {
+      Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+      c.connect('button-press-event', cleanUIWithFade);
+      c.show();
+    });
+  }
+  global.stage.set_key_focus(entry);
+
+  const apps = mode.apps();
+  timeit('after apps()');
+  let filteredApps = mode.filter(util.filterByText(mode, apps, entryText));
+  timeit('after filter');
+
+  const debouncedActivateUnique = util.debounce(() => {
+    if (filteredApps.length === 1) {
+      cleanUIWithFade();
+      mode.activate(filteredApps[cursor]);
+    }
+  }, Convenience.getSettings().get_uint('activate-after-ms'));
+
+  timeit('before makeBoxes 1');
+  boxes = makeBoxes(filteredApps, mode);
+  timeit('after makeBoxes');
+  util.updateHighlight(boxes, entryText, cursor);
+  timeit('after updateHighlight');
 
   if (switching) {
     entry.disconnect(keyPress);
     entry.disconnect(keyRelease);
   }
+
   // handle what we can on key press and the rest on key release
   keyPress = entry.connect('key-press-event', (o, e) => {
     timeit('init key-press');
@@ -431,15 +434,6 @@ function _showUI(mode, entryText, previousWidth, switching) {
     initialHotkeyConsumed = true;
   });
 
-  if (!switching) {
-    containers.forEach((c) => {
-      Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
-      c.connect('button-press-event', cleanUIWithFade);
-      c.show();
-    });
-  }
-  global.stage.set_key_focus(entry);
-
   // In the bottom as a function statement so the variables closed
   // over are defined and so it's hoisted up
   function cleanBoxes() {
@@ -509,6 +503,16 @@ function _showUI(mode, entryText, previousWidth, switching) {
       cleanRest();
     }
   }
+  setTimeout(() => {
+    boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
+
+    let shortcutWidth = boxes
+      .map((box) => (box.shortcutBox ? box.shortcutBox.width : 0))
+      .reduce((a, b) => Math.max(a, b), 0);
+
+    boxes.forEach((box) => util.fixWidths(box, width, shortcutWidth));
+    timeit('set width');
+  }, 0);
 }
 
 function init() {
