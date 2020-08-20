@@ -47,8 +47,7 @@ let container,
   keyRelease,
   previousEntryContent,
   keybindings = [],
-  initialHotkeyConsumed,
-  sequenceNumber = 0;
+  initialHotkeyConsumed;
 
 let onboardingShownThisSession = false;
 
@@ -74,16 +73,15 @@ function timeit(msg) {
   previous = now;
 }
 
-function _showUI(mode, entryText, previousWidth, switching) {
+function _showUI(mode, entryText) {
   'use strict';
-  if (container && !switching) return;
-  if (!switching) setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
+  if (container) return;
+  setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
 
-  timeit('init');
+  const modes = [switcher, launcher];
 
   previousEntryContent = entryText;
-  // Initialize to false when showing from nothing, to true when switching mode
-  initialHotkeyConsumed = !!previousWidth;
+  initialHotkeyConsumed = false;
   cursor = 0;
   util.reinit();
   boxes = [];
@@ -112,22 +110,15 @@ function _showUI(mode, entryText, previousWidth, switching) {
     return newBoxes;
   };
 
-  timeit('before getSettings');
   const fontSize = Convenience.getSettings().get_uint('font-size');
-  timeit('after getSettings');
-  if (!switching) {
-    boxLayout = new St.BoxLayout({ style_class: 'switcher-box-layout' });
-    boxLayout.set_style('font-size: ' + fontSize + 'px');
-    boxLayout.set_vertical(true);
-  }
-  timeit('after boxlayout');
+  boxLayout = new St.BoxLayout({ style_class: 'switcher-box-layout' });
+  boxLayout.set_style('font-size: ' + fontSize + 'px');
+  boxLayout.set_vertical(true);
 
   /* use "search-entry" style from overview, combining it with our own */
-  if (!switching) {
-    entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
-    entry.set_text(entryText);
-    boxLayout.insert_child_at_index(entry, 0);
-  }
+  entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
+  entry.set_text(entryText);
+  boxLayout.insert_child_at_index(entry, 0);
 
   let useActiveMonitor = Convenience.getSettings().get_boolean(
     'on-active-display'
@@ -137,49 +128,41 @@ function _showUI(mode, entryText, previousWidth, switching) {
     : Main.layoutManager.primaryMonitor;
   let allMonitors = Main.layoutManager.monitors;
 
-  if (!switching) {
-    containers = allMonitors
-      .map((monitor) => {
-        let tmpContainer = new St.Bin({
-          reactive: true,
-          x_align: St.Align.MIDDLE,
-          y_align: St.Align.START
-        });
-        tmpContainer.set_width(monitor.width);
-        tmpContainer.set_height(monitor.height);
-        tmpContainer.set_position(monitor.x, monitor.y);
-
-        Main.uiGroup.add_actor(tmpContainer);
-        if (monitor === selectedMonitor) container = tmpContainer;
-        return tmpContainer;
-      })
-      // sort primary last so it gets to the top of the modal stack
-      .sort((a, b) => (a === selectedMonitor ? 1 : -1));
-
-    timeit('after containers');
-
-    if (
-      previousWidth === undefined &&
-      Convenience.getSettings().get_boolean('fade-enable')
-    ) {
-      boxLayout.opacity = 0;
-      Tweener.addTween(boxLayout, {
-        opacity: 255,
-        time: 0.35,
-        transition: 'easeOutQuad'
+  containers = allMonitors
+    .map((monitor) => {
+      let tmpContainer = new St.Bin({
+        reactive: true,
+        x_align: St.Align.MIDDLE,
+        y_align: St.Align.START
       });
-    }
-    const boxContainer = new St.BoxLayout();
-    boxContainer.add(boxLayout, {
-      expand: true,
-      x_fill: false,
-      x_align: St.Align.MIDDLE,
-      y_fill: false,
-      y_align: St.Align.TOP
+      tmpContainer.set_width(monitor.width);
+      tmpContainer.set_height(monitor.height);
+      tmpContainer.set_position(monitor.x, monitor.y);
+
+      Main.uiGroup.add_actor(tmpContainer);
+      if (monitor === selectedMonitor) container = tmpContainer;
+      return tmpContainer;
+    })
+    // sort primary last so it gets to the top of the modal stack
+    .sort((a, b) => (a === selectedMonitor ? 1 : -1));
+
+  if (Convenience.getSettings().get_boolean('fade-enable')) {
+    boxLayout.opacity = 0;
+    Tweener.addTween(boxLayout, {
+      opacity: 255,
+      time: 0.35,
+      transition: 'easeOutQuad'
     });
-    container.add_actor(boxContainer);
-    timeit('added actor');
   }
+  const boxContainer = new St.BoxLayout();
+  boxContainer.add(boxLayout, {
+    expand: true,
+    x_fill: false,
+    x_align: St.Align.MIDDLE,
+    y_fill: false,
+    y_align: St.Align.TOP
+  });
+  container.add_actor(boxContainer);
 
   let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
   const width =
@@ -189,19 +172,15 @@ function _showUI(mode, entryText, previousWidth, switching) {
     scaleFactor;
   entry.set_width(width);
 
-  if (!switching) {
-    containers.forEach((c) => {
-      Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
-      c.connect('button-press-event', cleanUIWithFade);
-      c.show();
-    });
-  }
+  containers.forEach((c) => {
+    Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+    c.connect('button-press-event', cleanUIWithFade);
+    c.show();
+  });
   global.stage.set_key_focus(entry);
 
   const apps = mode.apps();
-  timeit('after apps()');
   let filteredApps = mode.filter(util.filterByText(mode, apps, entryText));
-  timeit('after filter');
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
@@ -210,20 +189,11 @@ function _showUI(mode, entryText, previousWidth, switching) {
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
 
-  timeit('before makeBoxes 1');
   boxes = makeBoxes(filteredApps, mode);
-  timeit('after makeBoxes');
   util.updateHighlight(boxes, entryText, cursor);
-  timeit('after updateHighlight');
-
-  if (switching) {
-    entry.disconnect(keyPress);
-    entry.disconnect(keyRelease);
-  }
 
   // handle what we can on key press and the rest on key release
   keyPress = entry.connect('key-press-event', (o, e) => {
-    timeit('init key-press');
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
     const symbol = e.get_key_symbol();
@@ -231,14 +201,6 @@ function _showUI(mode, entryText, previousWidth, switching) {
     // Exit
     if (symbol === Clutter.KEY_Escape) {
       cleanUIWithFade();
-    }
-    // Switch mode
-    else if (
-      (symbol === Clutter.m && control) ||
-      (symbol === Clutter.KEY_Tab && control) ||
-      (symbol === Clutter.KEY_space && control)
-    ) {
-      switchMode();
     }
     // Next entry
     else if (
@@ -301,7 +263,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
         (symbol === Clutter.j && control)) &&
       o.text === previousEntryContent
     ) {
-      if (!(mode.name() === 'Launcher' && control && !(symbol === Clutter.j)))
+      if (!(mode.name() === 'Launcher' && control && symbol !== Clutter.j))
         cleanUIWithFade();
       if (filteredApps.length > 0) {
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
@@ -322,27 +284,6 @@ function _showUI(mode, entryText, previousWidth, switching) {
     }
     // Filter text
     else {
-      sequenceNumber += 1;
-      let skipStep = 1;
-      const sequenceNumberAtBeginning = sequenceNumber;
-      function maybeSkip(result) {
-        return new Promise((resolve, reject) => {
-          if (sequenceNumber !== sequenceNumberAtBeginning) {
-            if (enableDebugLog)
-              log(
-                'Skipping because sequence number has changed',
-                sequenceNumberAtBeginning,
-                sequenceNumber
-              );
-            setTimeout(() => reject(skipStep), 0);
-          } else {
-            skipStep += 1;
-            setTimeout(() => resolve(result), 0);
-          }
-        });
-      }
-
-      timeit('key-release');
       // Delete last character
       if (symbol === Clutter.h && control) {
         const entryText = entry.get_clutter_text();
@@ -351,83 +292,37 @@ function _showUI(mode, entryText, previousWidth, switching) {
         entryText.delete_text(textCursor - 1, textCursor);
       }
 
-      Promise.resolve()
-        .then(maybeSkip)
-        .then(() => {
-          filteredApps = mode.filter(util.filterByText(mode, apps, o.text));
-          return Promise.resolve();
-        })
-        .then(maybeSkip)
-        .then(() => {
-          if (
-            Convenience.getSettings().get_boolean('activate-immediately') &&
-            filteredApps.length === 1 &&
-            symbol !== Clutter.Control_L &&
-            symbol !== Clutter.Control_R &&
-            // Don't activate the unique result if it's also the only result
-            // https://github.com/daniellandau/switcher/issues/77
-            // Don't do this logic in Launcher mode as it's somewhat expensive
-            // and we expect to always have more than one app installed anyways
-            (mode.name() !== 'Switcher' ||
-              mode.filter(util.filterByText(mode, apps, '')).length > 1)
-          ) {
-            debouncedActivateUnique();
-          }
+      filteredApps = mode.filter(util.filterByText(mode, apps, o.text));
+      if (
+        Convenience.getSettings().get_boolean('activate-immediately') &&
+        filteredApps.length === 1 &&
+        symbol !== Clutter.Control_L &&
+        symbol !== Clutter.Control_R &&
+        // Don't activate the unique result if it's also the only result
+        // https://github.com/daniellandau/switcher/issues/77
+        // Don't do this logic in Launcher mode as it's somewhat expensive
+        // and we expect to always have more than one app installed anyways
+        (mode.name() !== 'Switcher' ||
+          mode.filter(util.filterByText(mode, apps, '')).length > 1)
+      ) {
+        debouncedActivateUnique();
+      }
 
-          const otherMode = mode.name() === 'Switcher' ? launcher : switcher;
-          // thunk so we don't calculate this before needed
-          const filteredAppsInOtherModeThunk = () => {
-            timeit('before filter');
-            const result = util.filterByText(
-              otherMode,
-              otherMode.apps(),
-              entry.get_text()
-            );
-            timeit('after filter');
-            return result;
-          };
+      boxes = makeBoxes(filteredApps, mode);
+      // If there's less boxes then in previous cursor position,
+      // set cursor to the last box
+      if (cursor + 1 > boxes.length) cursor = Math.max(boxes.length - 1, 0);
 
-          // switch automatically when we have zero apps, the other mode has some apps, and we are not
-          // just releasing control, meaning e.g. that we just tried to switch the mode and this switches
-          // it back
-          if (
-            filteredApps.length === 0 &&
-            !control &&
-            filteredAppsInOtherModeThunk().length > 0
-          ) {
-            switchMode();
-            return Promise.reject('switched mode');
-          }
-          return Promise.resolve();
-        })
-        .then(maybeSkip)
-        .then(() => {
-          timeit('before makeBoxes 2');
-          boxes = makeBoxes(filteredApps, mode);
-          return Promise.resolve();
-        })
-        .then(maybeSkip)
-        .then(() => {
-          // If there's less boxes then in previous cursor position,
-          // set cursor to the last box
-          if (cursor + 1 > boxes.length) cursor = Math.max(boxes.length - 1, 0);
+      util.updateHighlight(boxes, o.text, cursor);
+      let shortcutWidth = boxes
+        .map((box) => (box.shortcutBox ? box.shortcutBox.width : 0))
+        .reduce((a, b) => Math.max(a, b), 0);
 
-          timeit('before updatehighlight');
-          util.updateHighlight(boxes, o.text, cursor);
-          return Promise.resolve();
-        })
-        .then(maybeSkip)
-        .then(() => {
-          timeit('after updatehighlight');
-          boxes.forEach((box) => {
-            util.fixWidths(box, width, shortcutWidth);
-            util.detachParent(box.whole);
-            boxLayout.insert_child_at_index(box.whole, -1);
-          });
-          timeit('after width fixes');
-          return Promise.resolve();
-        })
-        .catch((e) => enableDebugLog && log('Skipped after ' + e + ' steps'));
+      boxes.forEach((box) => {
+        util.fixWidths(box, width, shortcutWidth);
+        util.detachParent(box.whole);
+        boxLayout.insert_child_at_index(box.whole, -1);
+      });
     }
 
     previousEntryContent = entryContent;
@@ -443,20 +338,6 @@ function _showUI(mode, entryText, previousWidth, switching) {
     box.iconBox.get_children().forEach((child) => util.detachParent(child));
     box.iconBox.destroy();
     boxLayout.remove_child(box.whole);
-  }
-
-  function switchMode() {
-    let previousText = entry.get_text();
-    const switching = true;
-    timeit('before cleanboxes');
-    cleanBoxes();
-    timeit('after cleanboxes');
-    debouncedActivateUnique.cancel();
-    timeit('after cancel');
-    mode.name() === 'Switcher'
-      ? _showUI(launcher, previousText, width, switching)
-      : _showUI(switcher, previousText, width, switching);
-    timeit('after showui');
   }
 
   // this and the following function contain some of the same copy pasted code
@@ -503,16 +384,21 @@ function _showUI(mode, entryText, previousWidth, switching) {
       cleanRest();
     }
   }
-  setTimeout(() => {
-    boxes.forEach((box) => boxLayout.insert_child_at_index(box.whole, -1));
+  let i = 0;
+  let shortcutWidth = boxes
+    .map((box) => (box.shortcutBox ? box.shortcutBox.width : 0))
+    .reduce((a, b) => Math.max(a, b), 0);
 
-    let shortcutWidth = boxes
-      .map((box) => (box.shortcutBox ? box.shortcutBox.width : 0))
-      .reduce((a, b) => Math.max(a, b), 0);
-
-    boxes.forEach((box) => util.fixWidths(box, width, shortcutWidth));
-    timeit('set width');
-  }, 0);
+  function showSingleBox() {
+    if (i < boxes.length) {
+      const box = boxes[i];
+      boxLayout.insert_child_at_index(box.whole, -1);
+      util.fixWidths(box, width, shortcutWidth);
+      i += 1;
+      setTimeout(showSingleBox, 0);
+    }
+  }
+  setTimeout(showSingleBox, 0);
 }
 
 function init() {
