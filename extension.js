@@ -73,14 +73,14 @@ function timeit(msg) {
   previous = now;
 }
 
-function _showUI(mode, entryText) {
+function _showUI(mode) {
   'use strict';
   if (container) return;
   setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
 
   const modes = [switcher, launcher];
 
-  previousEntryContent = entryText;
+  previousEntryContent = '';
   initialHotkeyConsumed = false;
   cursor = 0;
   util.reinit();
@@ -117,7 +117,6 @@ function _showUI(mode, entryText) {
 
   /* use "search-entry" style from overview, combining it with our own */
   entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
-  entry.set_text(entryText);
   boxLayout.insert_child_at_index(entry, 0);
 
   let useActiveMonitor = Convenience.getSettings().get_boolean(
@@ -180,7 +179,8 @@ function _showUI(mode, entryText) {
   global.stage.set_key_focus(entry);
 
   const apps = mode.apps();
-  let filteredApps = mode.filter(util.filterByText(mode, apps, entryText));
+  let filteredApps = apps;
+  boxes = makeBoxes(filteredApps, mode);
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
@@ -188,9 +188,6 @@ function _showUI(mode, entryText) {
       mode.activate(filteredApps[cursor]);
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
-
-  boxes = makeBoxes(filteredApps, mode);
-  util.updateHighlight(boxes, entryText, cursor);
 
   // handle what we can on key press and the rest on key release
   keyPress = entry.connect('key-press-event', (o, e) => {
@@ -413,7 +410,7 @@ function enable() {
       Convenience.getSettings(),
       Meta.KeyBindingFlags.NONE,
       Shell.ActionMode.NORMAL,
-      () => _showUI(switcher, '')
+      () => _showUI(switcher)
     )
   );
   keybindings.push(
@@ -422,7 +419,7 @@ function enable() {
       Convenience.getSettings(),
       Meta.KeyBindingFlags.NONE,
       Shell.ActionMode.NORMAL,
-      () => _showUI(launcher, '')
+      () => _showUI(launcher)
     )
   );
 
