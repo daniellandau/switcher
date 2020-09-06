@@ -393,6 +393,8 @@ function _showUI(mode) {
       util.fixWidths(box, width, shortcutWidth);
       i += 1;
       setTimeout(showSingleBox, 0);
+    } else {
+      util.updateHighlight(boxes, '', cursor);
     }
   }
   setTimeout(showSingleBox, 0);
