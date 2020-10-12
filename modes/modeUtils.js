@@ -130,7 +130,6 @@ var ModeUtils = (function() {
     };
     const activationCallbackId = whole.connect('clicked', activationCallback);
     if (!oldBox.whole) whole.set_child(box);
-    whole.set_fill(true, true);
     whole.set_track_hover(true);
 
     return {

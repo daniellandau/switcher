@@ -21,7 +21,7 @@ const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
 const Gettext = imports.gettext;
-const Tweener = imports.ui.tweener;
+const Tweener = imports.tweener.tweener;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -151,6 +151,12 @@ function _showUI(mode, entryText, previousWidth, switching) {
   let useActiveMonitor = Convenience.getSettings().get_boolean('on-active-display')
   let selectedMonitor = useActiveMonitor ? Main.layoutManager.currentMonitor : Main.layoutManager.primaryMonitor;
   let allMonitors = Main.layoutManager.monitors;
+  let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+  const width =
+        selectedMonitor.width *
+        0.01 *
+        Convenience.getSettings().get_uint('max-width-percentage') *
+        scaleFactor;
 
   if (!switching) {
     containers = allMonitors
@@ -180,27 +186,14 @@ function _showUI(mode, entryText, previousWidth, switching) {
         transition: 'easeOutQuad'
       });
     }
-    const boxContainer = new St.BoxLayout();
-    boxContainer.add(boxLayout, {
-      expand: true,
-      x_fill: false,
-      x_align: St.Align.MIDDLE,
-      y_fill: false,
-      y_align: St.Align.TOP
-    });
-    container.add_actor(boxContainer);
+    Main.layoutManager.addTopChrome(boxLayout)
+    boxLayout.x = (container.width - width) / 2;
     timeit('added actor');
   }
 
   let shortcutWidth = boxes
     .map(box => (box.shortcutBox ? box.shortcutBox.width : 0))
     .reduce((a, b) => Math.max(a, b), 0);
-  let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-  const width =
-    selectedMonitor.width *
-    0.01 *
-    Convenience.getSettings().get_uint('max-width-percentage') *
-    scaleFactor;
 
   boxes.forEach(box => util.fixWidths(box, width, shortcutWidth));
   entry.set_width(width);
