@@ -187,7 +187,7 @@ function _showUI(mode, entryText, previousWidth, switching) {
       });
     }
     Main.layoutManager.addTopChrome(boxLayout)
-    boxLayout.x = (container.width - width) / 2;
+    boxLayout.x = selectedMonitor.x + (container.width - width) / 2;
     timeit('added actor');
   }
 
