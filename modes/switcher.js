@@ -34,6 +34,10 @@ var Switcher = (function() {
     );
   };
 
+  let activate = function(app) {
+    Main.activateWindow(app);
+  };
+
   let apps = function() {
     // Get all windows in activation order
     let tabList = global.display.get_tab_list(Meta.TabList.NORMAL, null);
@@ -45,12 +49,9 @@ var Switcher = (function() {
       tabList[1] = tmp;
     }
 
-    return tabList;
+    return tabList.map(tab => ({ app: tab, mode: Switcher, activate }));
   };
 
-  let activate = function(app) {
-    Main.activateWindow(app);
-  };
 
   let description = function(app) {
     let workspace = '';
@@ -70,10 +71,12 @@ var Switcher = (function() {
     return workspace + appName + ' → ' + app.get_title();
   };
 
-  let makeBox = function(app, index, onActivate, oldBox) {
+  let makeBox = function(appObj, index, onActivate, oldBox) {
+    const app = appObj.app;
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
     if (!appRef) return null;
     return modeUtils.makeBox(
+      appObj,
       app,
       appRef,
       description(app),

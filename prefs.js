@@ -61,7 +61,7 @@ function buildWidgets() {
   addIconSize(iconSizeWidget, settings);
   appearanceWidget.add(iconSizeWidget);
 
-  const widthWidgets = buildWidth(settings);
+  const widthWidgets = buildMaxWidth(settings);
 
   let workspaceIndicatorWidget = new Gtk.HBox();
   addWorkspaceIndicator(workspaceIndicatorWidget, settings);
@@ -222,7 +222,7 @@ function addFontSize(widget, settings) {
   widget.add(input);
 }
 
-function buildWidth(settings) {
+function buildMaxWidth(settings) {
   const title = makeTitle(_("Width (%)"));
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
