@@ -16,15 +16,15 @@ var setTimeout = (f, ms) => {
   });
 };
 
-var clearTimeout = id => MainLoop.source_remove(id);
+var clearTimeout = (id) => MainLoop.source_remove(id);
 
 function debounce(f, ms) {
   let timeoutId = null;
-  const debounced = function() {
+  const debounced = function () {
     if (timeoutId) clearTimeout(timeoutId);
     timeoutId = setTimeout(f, ms);
   };
-  debounced.cancel = function() {
+  debounced.cancel = function () {
     if (timeoutId) clearTimeout(timeoutId);
   };
   return debounced;
@@ -34,13 +34,15 @@ function escapeChars(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&');
 }
 
-function makeFilter(mode, text) {
-  return function(app) {
+function makeFilter(text) {
+  return function (app) {
     // start from zero, filters can change this up or down
     // and the scores are summed
-    app.score = 0;
-    app.cachedDescription = escapeChars(mode.description(app).toLowerCase());
-    return text.split(' ').every(fragment => runFilter(mode, app, fragment));
+    app.app.score = 0;
+    app.app.cachedDescription = escapeChars(
+      app.mode.description(app.app).toLowerCase()
+    );
+    return text.split(' ').every((fragment) => runFilter(app.app, fragment));
   };
 }
 
@@ -53,7 +55,7 @@ function getCurrentWorkspace() {
   }
 }
 
-function runFilter(mode, app, fragment) {
+function runFilter(app, fragment) {
   if (fragment == '') return true;
 
   fragment = escapeChars(fragment);
@@ -62,7 +64,7 @@ function runFilter(mode, app, fragment) {
   const splitChar = matching == matchFuzzy ? '' : ' ';
   const specialexp = new RegExp(/[-[\]{}()*+?.,\\^$|#]/);
   const regexp = new RegExp(
-    fragment.split(splitChar).reduce(function(a, b) {
+    fragment.split(splitChar).reduce(function (a, b) {
       // In order to treat special charactes as a whole,
       // we manually identify and concatenate them
       if (b == '\\') return a + b;
@@ -112,7 +114,7 @@ function runFilter(mode, app, fragment) {
 
 function fixWidths(box, width, shortcutWidth) {
   box.whole.set_width(width);
-  box.shortcutBox && box.shortcutBox.set_width(shortcutWidth);
+  if (box.shortcutBox) box.shortcutBox.set_width(shortcutWidth);
 }
 
 let latestHighLightedText = null;
@@ -122,7 +124,7 @@ function reinit() {
 }
 
 function updateHighlight(boxes, query, cursor) {
-  boxes.forEach(box => {
+  boxes.forEach((box) => {
     box.whole.remove_style_class_name('switcher-highlight');
     box.label.remove_style_pseudo_class('selected');
 
@@ -186,15 +188,15 @@ function detachParent(child) {
 }
 
 const launcherFilterCache = {};
-function filterByText(mode, apps, text) {
+function filterByText(apps, text) {
   const cacheKey = text + apps.length;
   const get = () => {
-    let filteredApps = apps.filter(makeFilter(mode, text));
+    let filteredApps = apps.filter(makeFilter(text));
 
     // Always preserve focus order before typing
     const ordering = Convenience.getSettings().get_uint('ordering');
     if (ordering == orderByRelevancy && text != '') {
-      filteredApps = filteredApps.sort(function(a, b) {
+      filteredApps = filteredApps.sort(function (a, b) {
         if (a.score > b.score) return -1;
         if (a.score < b.score) return 1;
         return 0;
@@ -204,7 +206,8 @@ function filterByText(mode, apps, text) {
     return filteredApps;
   };
 
-  if (mode.name() === 'Switcher') return get();
+  // if (mode.name() === 'Switcher') return get();
+  return get();
 
   const update = () => {
     launcherFilterCache[cacheKey] = get();

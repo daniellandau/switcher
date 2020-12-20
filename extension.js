@@ -73,7 +73,7 @@ function timeit(msg) {
   previous = now;
 }
 
-function _showUI(mode) {
+function _showUI() {
   'use strict';
   if (container) return;
   setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
@@ -85,18 +85,18 @@ function _showUI(mode) {
   cursor = 0;
   util.reinit();
   boxes = [];
-  const makeBoxes = function (apps, mode) {
-    mode.cleanIDs();
-    const newBoxes = apps
-      .slice(0, mode.MAX_NUM_ITEMS)
+  const updateBoxes = function (filteredApps) {
+    modeUtils.cleanIDs();
+    const newBoxes = filteredApps
+      .slice(0, launcher.MAX_NUM_ITEMS)
       .map((a, i) =>
-        mode.makeBox(
+        a.mode.makeBox(
           a,
           i,
           (app, modifiers) => {
-            if (!(mode.name() === 'Launcher' && modifiers.control))
+            if (!(app.mode.name() === 'Launcher' && modifiers.control))
               cleanUIWithFade();
-            mode.activate(app);
+            app.mode.activate(app.app);
           },
           boxes.length > i ? boxes[i] : {}
         )
@@ -178,14 +178,14 @@ function _showUI(mode) {
   });
   global.stage.set_key_focus(entry);
 
-  const apps = mode.apps();
+  const apps = [].concat.apply([], [switcher.apps(), launcher.apps()]);
   let filteredApps = apps;
-  boxes = makeBoxes(filteredApps, mode);
+  boxes = updateBoxes(filteredApps);
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
       cleanUIWithFade();
-      mode.activate(filteredApps[cursor]);
+      filteredApps[cursor].activate(filteredApps[cursor].app);
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
 
@@ -260,22 +260,23 @@ function _showUI(mode) {
         (symbol === Clutter.j && control)) &&
       o.text === previousEntryContent
     ) {
-      if (!(mode.name() === 'Launcher' && control && symbol !== Clutter.j))
-        cleanUIWithFade();
+      // if (!(mode.name() === 'Launcher' && control && symbol !== Clutter.j))
+      cleanUIWithFade();
       if (filteredApps.length > 0) {
+        const selected = filteredApps[cursor];
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
-        if (mode.name() === 'Switcher' && shift)
-          filteredApps[cursor].change_workspace_by_index(
+        if (selected.mode.name() === 'Switcher' && shift)
+          selected.app.change_workspace_by_index(
             util.getCurrentWorkspace(),
             true
           );
-        mode.activate(filteredApps[cursor]);
+        selected.activate(selected.app);
       }
-    }
-    // Activate entry by shortcut
-    else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
-      cleanUIWithFade();
-      mode.activate(filteredApps[fkeyIndex]);
+    // }
+    // // Activate entry by shortcut
+    // else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
+    //   cleanUIWithFade();
+    //   mode.activate(filteredApps[fkeyIndex]);
     } else if (entryContent === previousEntryContent) {
       // nothing
     }
@@ -289,23 +290,24 @@ function _showUI(mode) {
         entryText.delete_text(textCursor - 1, textCursor);
       }
 
-      filteredApps = mode.filter(util.filterByText(mode, apps, o.text));
-      if (
-        Convenience.getSettings().get_boolean('activate-immediately') &&
-        filteredApps.length === 1 &&
-        symbol !== Clutter.Control_L &&
-        symbol !== Clutter.Control_R &&
-        // Don't activate the unique result if it's also the only result
-        // https://github.com/daniellandau/switcher/issues/77
-        // Don't do this logic in Launcher mode as it's somewhat expensive
-        // and we expect to always have more than one app installed anyways
-        (mode.name() !== 'Switcher' ||
-          mode.filter(util.filterByText(mode, apps, '')).length > 1)
-      ) {
-        debouncedActivateUnique();
-      }
+      // filteredApps = mode.filter(util.filterByText(apps, o.text));
+      filteredApps = util.filterByText(apps, o.text);
+      // if (
+      //   Convenience.getSettings().get_boolean('activate-immediately') &&
+      //   filteredApps.length === 1 &&
+      //   symbol !== Clutter.Control_L &&
+      //   symbol !== Clutter.Control_R &&
+      //   // Don't activate the unique result if it's also the only result
+      //   // https://github.com/daniellandau/switcher/issues/77
+      //   // Don't do this logic in Launcher mode as it's somewhat expensive
+      //   // and we expect to always have more than one app installed anyways
+      //   (mode.name() !== 'Switcher' ||
+      //     mode.filter(util.filterByText(apps, '')).length > 1)
+      // ) {
+      //   debouncedActivateUnique();
+      // }
 
-      boxes = makeBoxes(filteredApps, mode);
+      boxes = updateBoxes(filteredApps);
       // If there's less boxes then in previous cursor position,
       // set cursor to the last box
       if (cursor + 1 > boxes.length) cursor = Math.max(boxes.length - 1, 0);
@@ -412,7 +414,7 @@ function enable() {
       Convenience.getSettings(),
       Meta.KeyBindingFlags.NONE,
       Shell.ActionMode.NORMAL,
-      () => _showUI(switcher)
+      () => _showUI()
     )
   );
   keybindings.push(
@@ -421,7 +423,7 @@ function enable() {
       Convenience.getSettings(),
       Meta.KeyBindingFlags.NONE,
       Shell.ActionMode.NORMAL,
-      () => _showUI(launcher)
+      () => _showUI()
     )
   );
 
