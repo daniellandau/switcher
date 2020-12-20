@@ -139,12 +139,10 @@ function _showUI() {
     ? Main.layoutManager.currentMonitor
     : Main.layoutManager.primaryMonitor;
   let allMonitors = Main.layoutManager.monitors;
-  let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
   const width =
     selectedMonitor.width *
     0.01 *
-    Convenience.getSettings().get_uint('max-width-percentage') *
-    scaleFactor;
+    Convenience.getSettings().get_uint('max-width-percentage');
   entry.set_width(width);
 
   containers = allMonitors.map((monitor) => {
