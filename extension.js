@@ -160,7 +160,8 @@ function _showUI() {
     return tmpContainer;
   });
   Main.layoutManager.addTopChrome(boxLayout);
-  boxLayout.x = (container.width - width) / 2;
+  boxLayout.x = selectedMonitor.x + (container.width - width) / 2;
+  boxLayout.y = selectedMonitor.y;
   timeit('added actor');
 
   const windows = switcher.apps()
