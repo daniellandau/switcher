@@ -252,11 +252,12 @@ function _showUI() {
           );
         selected.activate(selected.app);
       }
-      // }
-      // // Activate entry by shortcut
-      // else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
-      //   cleanUIWithFade();
-      //   mode.activate(filteredApps[fkeyIndex]);
+    }
+    // Activate entry by shortcut
+    else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
+      cleanUIWithFade();
+      const selected = filteredApps[fkeyIndex];
+      selected.activate(selected.app);
     } else if (entryContent === previousEntryContent) {
       // nothing
     }
@@ -270,7 +271,6 @@ function _showUI() {
         entryText.delete_text(textCursor - 1, textCursor);
       }
 
-      // filteredApps = mode.filter(util.filterByText(apps, o.text));
       filteredApps = util.filterByText(apps, o.text);
       if (
         Convenience.getSettings().get_boolean('activate-immediately') &&
@@ -352,9 +352,7 @@ function _showUI() {
     }
   }
   let i = 0;
-  let shortcutWidth = boxes
-    .map((box) => (box.shortcutBox ? box.shortcutBox.width : 0))
-    .reduce((a, b) => Math.max(a, b), 0);
+  let shortcutWidth = keyActivation.shortcutBoxWidth();
 
   function showSingleBox() {
     if (i < boxes.length) {

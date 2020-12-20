@@ -65,7 +65,7 @@ var KeyActivation = (function () {
     case keyActivationFunctionKeys:
       return index > 12 ? '' : 'F' + index;
     case keyActivationNumbers:
-      return index > 10 ? '' : index.toString();
+      return index > 10 ? '' : (index % 10).toString();
     default:
       print("getKeyDesc error: " + index);
       return '';
@@ -83,8 +83,21 @@ var KeyActivation = (function () {
     }
   };
 
+  var shortcutBoxWidth = function() {
+    const fontSize = Convenience.getSettings().get_uint('font-size');
+    switch (getActivateByKey()) {
+      case keyActivationFunctionKeys:
+        return fontSize * 4;
+      case keyActivationNumbers:
+        return fontSize * 3;
+      default:
+        return 0;
+    }
+  }
+
   return {
     getKeyDesc: getKeyDesc,
-    getActionKeyTable: getActionKeyTable
+    getActionKeyTable: getActionKeyTable,
+    shortcutBoxWidth: shortcutBoxWidth
   };
 }());
