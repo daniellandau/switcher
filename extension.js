@@ -151,7 +151,14 @@ function _showUI() {
   boxLayout.x = (container.width - width) / 2;
   timeit('added actor');
 
-  const apps = [].concat.apply([], [switcher.apps(), launcher.apps()]);
+  const windows = switcher.apps()
+  const windowApps = new Set();
+  windows.forEach(window => {
+    const app = Shell.WindowTracker.get_default().get_window_app(window.app)
+    windowApps.add(app.get_id());
+  })
+  const launcherApps = launcher.apps().filter(app => !windowApps.has(app.app.get_id()));
+  const apps = [].concat.apply([], [windows, launcherApps]);
   let filteredApps = apps;
   boxes = updateBoxes(filteredApps);
 
@@ -265,20 +272,12 @@ function _showUI() {
 
       // filteredApps = mode.filter(util.filterByText(apps, o.text));
       filteredApps = util.filterByText(apps, o.text);
-      // if (
-      //   Convenience.getSettings().get_boolean('activate-immediately') &&
-      //   filteredApps.length === 1 &&
-      //   symbol !== Clutter.Control_L &&
-      //   symbol !== Clutter.Control_R &&
-      //   // Don't activate the unique result if it's also the only result
-      //   // https://github.com/daniellandau/switcher/issues/77
-      //   // Don't do this logic in Launcher mode as it's somewhat expensive
-      //   // and we expect to always have more than one app installed anyways
-      //   (mode.name() !== 'Switcher' ||
-      //     mode.filter(util.filterByText(apps, '')).length > 1)
-      // ) {
-      //   debouncedActivateUnique();
-      // }
+      if (
+        Convenience.getSettings().get_boolean('activate-immediately') &&
+        filteredApps.length === 1
+      ) {
+        debouncedActivateUnique();
+      }
 
       boxes = updateBoxes(filteredApps);
       // If there's less boxes then in previous cursor position,
