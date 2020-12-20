@@ -47,7 +47,8 @@ let container,
   keyRelease,
   previousEntryContent,
   keybindings = [],
-  initialHotkeyConsumed;
+  initialHotkeyConsumed,
+  currentlyShowingCount;
 
 let onboardingShownThisSession = false;
 
@@ -85,6 +86,7 @@ function _showUI() {
   cursor = 0;
   util.reinit();
   boxes = [];
+  currentlyShowingCount = 0;
   const updateBoxes = function (filteredApps) {
     modeUtils.cleanIDs();
     const newBoxes = filteredApps
@@ -102,12 +104,23 @@ function _showUI() {
         )
       )
       .filter((x) => x);
-    if (newBoxes.length < boxes.length) {
-      for (let i = newBoxes.length; i < boxes.length; ++i) {
-        destroyBox(boxes[i]);
+    if (newBoxes.length > boxes.length) {
+      boxes = newBoxes;
+    }
+    if (newBoxes.length > currentlyShowingCount) {
+      for (let i = currentlyShowingCount; i < newBoxes.length; ++i) {
+        newBoxes[i].whole.show();
       }
     }
-    return newBoxes;
+    if (newBoxes.length < boxes.length) {
+      for (let i = newBoxes.length; i < boxes.length; ++i) {
+        boxes[i].whole.hide();
+      }
+    }
+    for (let i = 0; i < newBoxes.length; ++i) {
+      boxes[i] = newBoxes[i];
+    }
+    currentlyShowingCount = newBoxes.length;
   };
 
   const fontSize = Convenience.getSettings().get_uint('font-size');
@@ -132,6 +145,7 @@ function _showUI() {
     0.01 *
     Convenience.getSettings().get_uint('max-width-percentage') *
     scaleFactor;
+  entry.set_width(width);
 
   containers = allMonitors.map((monitor) => {
     let tmpContainer = new St.Bin({
@@ -159,8 +173,8 @@ function _showUI() {
   })
   const launcherApps = launcher.apps().filter(app => !windowApps.has(app.app.get_id()));
   const apps = [].concat.apply([], [windows, launcherApps]);
-  let filteredApps = apps;
-  boxes = updateBoxes(filteredApps);
+  let filteredApps = util.filterByText(apps, '');
+  updateBoxes(filteredApps);
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
@@ -168,6 +182,22 @@ function _showUI() {
       filteredApps[cursor].activate(filteredApps[cursor].app);
     }
   }, Convenience.getSettings().get_uint('activate-after-ms'));
+
+  const rerunFiltersAndUpdate = (o) => {
+    filteredApps = util.filterByText(apps, o.text);
+    if (
+      Convenience.getSettings().get_boolean('activate-immediately') &&
+        filteredApps.length === 1
+    ) {
+      debouncedActivateUnique();
+    }
+
+    updateBoxes(filteredApps);
+    // If there's less boxes then in previous cursor position,
+    // set cursor to the last box
+    if (cursor + 1 > currentlyShowingCount) cursor = Math.max(currentlyShowingCount - 1, 0);
+    util.updateHighlight(boxes, o.text, cursor);
+  }
 
   // handle what we can on key press and the rest on key release
   keyPress = entry.connect('key-press-event', (o, e) => {
@@ -183,22 +213,30 @@ function _showUI() {
     else if (
       symbol === Clutter.KEY_Down ||
       symbol === Clutter.KEY_Tab ||
-      (symbol === Clutter.n && control)
+      (symbol === Clutter.KEY_n && control)
     ) {
-      cursor = cursor + 1 < boxes.length ? cursor + 1 : 0;
+      cursor = cursor + 1 < currentlyShowingCount ? cursor + 1 : 0;
       util.updateHighlight(boxes, o.text, cursor);
     }
     // Previous entry
     else if (
       symbol === Clutter.KEY_Up ||
-      (symbol === Clutter.ISO_Left_Tab && shift) ||
+      (symbol === Clutter.KEY_ISO_Left_Tab && shift) ||
       (symbol === Clutter.KEY_Tab && shift) ||
-      (symbol === Clutter.p && control)
+      (symbol === Clutter.KEY_p && control)
     ) {
-      cursor = cursor > 0 ? cursor - 1 : boxes.length - 1;
+      cursor = cursor > 0 ? cursor - 1 : currentlyShowingCount - 1;
       util.updateHighlight(boxes, o.text, cursor);
-    } else if (symbol === Clutter.w && control) {
+    } else if (symbol === Clutter.KEY_w && control) {
       switcherModule.onlyCurrentWorkspaceToggled = !switcherModule.onlyCurrentWorkspaceToggled;
+      rerunFiltersAndUpdate(o);
+    } else if (symbol === Clutter.KEY_h && control) {
+      // Delete last character
+      const entryText = entry.get_clutter_text();
+      let textCursor = entryText.get_cursor_position();
+      if (textCursor == -1) textCursor = o.text.length;
+      entryText.delete_text(textCursor - 1, textCursor);
+      rerunFiltersAndUpdate(o);
     }
   });
 
@@ -211,16 +249,16 @@ function _showUI() {
 
     if (
       symbol === Clutter.KEY_Escape ||
-      (symbol === Clutter.m && control) ||
+      (symbol === Clutter.KEY_m && control) ||
       (symbol === Clutter.KEY_Tab && control) ||
       (symbol === Clutter.KEY_space && control) ||
       symbol === Clutter.KEY_Down ||
       symbol === Clutter.KEY_Tab ||
-      (symbol === Clutter.n && control) ||
+      (symbol === Clutter.KEY_n && control) ||
       symbol === Clutter.KEY_Up ||
-      (symbol === Clutter.ISO_Left_Tab && shift) ||
+      (symbol === Clutter.KEY_ISO_Left_Tab && shift) ||
       (symbol === Clutter.KEY_Tab && shift) ||
-      (symbol === Clutter.p && control)
+      (symbol === Clutter.KEY_p && control)
     ) {
       // pass, these where handled already in keypress
     }
@@ -237,7 +275,7 @@ function _showUI() {
     else if (
       (symbol === Clutter.KEY_Return ||
         symbol === Clutter.KEY_KP_Enter ||
-        (symbol === Clutter.j && control)) &&
+        (symbol === Clutter.KEY_j && control)) &&
       o.text === previousEntryContent
     ) {
       // if (!(mode.name() === 'Launcher' && control && symbol !== Clutter.j))
@@ -263,26 +301,7 @@ function _showUI() {
     }
     // Filter text
     else {
-      // Delete last character
-      if (symbol === Clutter.h && control) {
-        const entryText = entry.get_clutter_text();
-        let textCursor = entryText.get_cursor_position();
-        if (textCursor == -1) textCursor = o.text.length;
-        entryText.delete_text(textCursor - 1, textCursor);
-      }
-
-      filteredApps = util.filterByText(apps, o.text);
-      if (
-        Convenience.getSettings().get_boolean('activate-immediately') &&
-        filteredApps.length === 1
-      ) {
-        debouncedActivateUnique();
-      }
-
-      boxes = updateBoxes(filteredApps);
-      // If there's less boxes then in previous cursor position,
-      // set cursor to the last box
-      if (cursor + 1 > boxes.length) cursor = Math.max(boxes.length - 1, 0);
+      rerunFiltersAndUpdate(o);
     }
 
     previousEntryContent = entryContent;
@@ -355,7 +374,7 @@ function _showUI() {
   let shortcutWidth = keyActivation.shortcutBoxWidth();
 
   function showSingleBox() {
-    if (i < boxes.length) {
+    if (i < currentlyShowingCount) {
       const box = boxes[i];
       boxLayout.insert_child_at_index(box.whole, -1);
       util.fixWidths(box, width, shortcutWidth);

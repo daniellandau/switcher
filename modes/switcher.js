@@ -21,13 +21,12 @@ var Switcher = (function() {
     return 'Switcher';
   };
 
-  let filter = function(apps) {
+  let filter = function(app) {
     let onlyCurrentWorkspace = Convenience.getSettings().get_boolean(
       'only-current-workspace'
     );
     let currentWorkspace = util.getCurrentWorkspace();
-    return apps.filter(
-      app =>
+    return (
         (!onlyCurrentWorkspace && !onlyCurrentWorkspaceToggled) ||
         (onlyCurrentWorkspace && onlyCurrentWorkspaceToggled) ||
         app.get_workspace().index() === currentWorkspace

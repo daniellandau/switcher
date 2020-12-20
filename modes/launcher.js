@@ -66,7 +66,7 @@ var Launcher = (function () {
     MAX_NUM_ITEMS,
     name,
     apps,
-    filter: (x) => x,
+    filter: (x) => true,
     activate,
     description,
     makeBox,

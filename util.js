@@ -191,7 +191,7 @@ const launcherFilterCache = {};
 function filterByText(apps, text) {
   const cacheKey = text + apps.length;
   const get = () => {
-    let filteredApps = apps.filter(makeFilter(text));
+    let filteredApps = apps.filter(app => app.mode.filter(app.app)).filter(makeFilter(text));
 
     // Always preserve focus order before typing
     const ordering = Convenience.getSettings().get_uint('ordering');
