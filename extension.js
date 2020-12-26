@@ -164,13 +164,15 @@ function _showUI() {
   boxLayout.y = selectedMonitor.y;
   timeit('added actor');
 
-  const windows = switcher.apps()
+  const windows = switcher.apps();
   const windowApps = new Set();
-  windows.forEach(window => {
-    const app = Shell.WindowTracker.get_default().get_window_app(window.app)
+  windows.forEach((window) => {
+    const app = Shell.WindowTracker.get_default().get_window_app(window.app);
     windowApps.add(app.get_id());
-  })
-  const launcherApps = launcher.apps().filter(app => !windowApps.has(app.app.get_id()));
+  });
+  const launcherApps = launcher
+    .apps()
+    .filter((app) => !windowApps.has(app.app.get_id()));
   const apps = [].concat.apply([], [windows, launcherApps]);
   let filteredApps = util.filterByText(apps, '');
   updateBoxes(filteredApps);
@@ -186,7 +188,7 @@ function _showUI() {
     filteredApps = util.filterByText(apps, o.text);
     if (
       Convenience.getSettings().get_boolean('activate-immediately') &&
-        filteredApps.length === 1
+      filteredApps.length === 1
     ) {
       debouncedActivateUnique();
     }
@@ -194,9 +196,10 @@ function _showUI() {
     updateBoxes(filteredApps);
     // If there's less boxes then in previous cursor position,
     // set cursor to the last box
-    if (cursor + 1 > currentlyShowingCount) cursor = Math.max(currentlyShowingCount - 1, 0);
+    if (cursor + 1 > currentlyShowingCount)
+      cursor = Math.max(currentlyShowingCount - 1, 0);
     util.updateHighlight(boxes, o.text, cursor);
-  }
+  };
 
   // handle what we can on key press and the rest on key release
   keyPress = entry.connect('key-press-event', (o, e) => {
