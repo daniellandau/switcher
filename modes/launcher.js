@@ -29,15 +29,21 @@ var Launcher = (function () {
   };
 
   let apps = function () {
-    return modeUtils
-      .shellApps()
-      .sort((a, b) => {
-        if (a.get_id() in stats && !(b.get_id() in stats)) return -1;
-        if (b.get_id() in stats && !(a.get_id() in stats)) return 1;
-        if (!(a.get_id() in stats) && !(b.get_id() in stats)) return 0;
-        return stats[a.get_id()] < stats[b.get_id()] ? 1 : -1;
-      })
-      .map((app) => ({ app, mode: Launcher, activate }));
+    try {
+      return modeUtils
+        .shellApps()
+        .sort((a, b) => {
+          if (a.get_id() in stats && !(b.get_id() in stats)) return -1;
+          if (b.get_id() in stats && !(a.get_id() in stats)) return 1;
+          if (!(a.get_id() in stats) && !(b.get_id() in stats)) return 0;
+          return stats[a.get_id()] < stats[b.get_id()] ? 1 : -1;
+        })
+        .map((app) => ({ app, mode: Launcher, activate }));
+    } catch (e) {
+      print(e)
+      return [];
+    }
+
   };
 
   let description = function (app) {
