@@ -277,8 +277,7 @@ function _showUI() {
         (symbol === Clutter.KEY_j && control)) &&
       o.text === previousEntryContent
     ) {
-      // if (!(mode.name() === 'Launcher' && control && symbol !== Clutter.j))
-      cleanUIWithFade();
+      let needCleanUI = true;
       if (filteredApps.length > 0) {
         const selected = filteredApps[cursor];
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
@@ -288,7 +287,14 @@ function _showUI() {
             true
           );
         selected.activate(selected.app);
+        if (
+          selected.mode.name() === 'Launcher' &&
+          control &&
+          symbol !== Clutter.j
+        )
+          needCleanUI = false;
       }
+      if (needCleanUI) cleanUIWithFade();
     }
     // Activate entry by shortcut
     else if (fkeyIndex >= 0 && fkeyIndex < filteredApps.length) {
