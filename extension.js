@@ -293,7 +293,7 @@ function _showUI() {
         if (
           selected.mode.name() === 'Launcher' &&
           control &&
-          symbol !== Clutter.j
+          symbol !== Clutter.KEY_j
         )
           needCleanUI = false;
       }
