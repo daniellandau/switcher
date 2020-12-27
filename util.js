@@ -197,8 +197,8 @@ function filterByText(apps, text) {
     const ordering = Convenience.getSettings().get_uint('ordering');
     if (ordering == orderByRelevancy && text != '') {
       filteredApps = filteredApps.sort(function (a, b) {
-        if (a.score > b.score) return -1;
-        if (a.score < b.score) return 1;
+        if (a.app.score > b.app.score) return -1;
+        if (a.app.score < b.app.score) return 1;
         return 0;
       });
     }
