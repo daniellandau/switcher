@@ -187,36 +187,20 @@ function detachParent(child) {
   }
 }
 
-const launcherFilterCache = {};
 function filterByText(apps, text) {
-  const cacheKey = text + apps.length;
-  const get = () => {
-    let filteredApps = apps.filter(app => app.mode.filter(app.app)).filter(makeFilter(text));
+  let filteredApps = apps
+    .filter((app) => app.mode.filter(app.app))
+    .filter(makeFilter(text));
 
-    // Always preserve focus order before typing
-    const ordering = Convenience.getSettings().get_uint('ordering');
-    if (ordering == orderByRelevancy && text != '') {
-      filteredApps = filteredApps.sort(function (a, b) {
-        if (a.app.score > b.app.score) return -1;
-        if (a.app.score < b.app.score) return 1;
-        return 0;
-      });
-    }
-
-    return filteredApps;
-  };
-
-  // if (mode.name() === 'Switcher') return get();
-  return get();
-
-  const update = () => {
-    launcherFilterCache[cacheKey] = get();
-  };
-  const cachedFiltered = launcherFilterCache[cacheKey];
-  if (!!cachedFiltered) {
-    setTimeout(update, 500);
-    return cachedFiltered;
+  // Always preserve focus order before typing
+  const ordering = Convenience.getSettings().get_uint('ordering');
+  if (ordering == orderByRelevancy && text != '') {
+    filteredApps = filteredApps.sort(function (a, b) {
+      if (a.app.score > b.app.score) return -1;
+      if (a.app.score < b.app.score) return 1;
+      return 0;
+    });
   }
-  update();
-  return launcherFilterCache[cacheKey];
+
+  return filteredApps;
 }
