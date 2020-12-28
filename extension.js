@@ -81,6 +81,7 @@ function _showUI() {
 
   const modes = [switcher, launcher];
 
+  Convenience.initSettings();
   previousEntryContent = '';
   initialHotkeyConsumed = false;
   cursor = 0;
@@ -401,6 +402,7 @@ function init() {
 }
 
 function enable() {
+  Convenience.initSettings();
   keybindings.push(
     Main.wm.addKeybinding(
       'show-switcher',

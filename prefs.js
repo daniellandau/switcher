@@ -28,6 +28,7 @@ function buildPrefsWidget() {
 }
 
 function buildWidgets() {
+  Convenience.initSettings()
   let settings = Convenience.getSettings();
 
   let shortcutsWidget = new Gtk.HBox({spacing: 20, homogeneous: true});
