@@ -10,28 +10,17 @@ const Convenience = Me.imports.convenience;
 
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 
-let stats = Convenience.getJson(
-  'launcher-stats'
-);
+let stats = Convenience.getJson('launcher-stats');
 
-var Launcher = (function() {
+var Launcher = (function () {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 10;
 
-  let name = function() {
+  let name = function () {
     return 'Launcher';
   };
 
-  let apps = function() {
-    return modeUtils.shellApps().sort((a, b) => {
-      if (a.get_id() in stats && !(b.get_id() in stats)) return -1
-      if (b.get_id() in stats && !(a.get_id() in stats)) return 1
-      if (!(a.get_id() in stats) && !(b.get_id() in stats)) return 0
-      return stats[a.get_id()] < stats[b.get_id()] ? 1 : -1;
-    })
-  };
-
-  let activate = function(app) {
+  let activate = function (app) {
     app.open_new_window(-1);
     const key = app.get_id();
     if (key in stats) stats[key] += 1;
@@ -39,7 +28,25 @@ var Launcher = (function() {
     Convenience.setJson('launcher-stats', stats);
   };
 
-  let description = function(app) {
+  let apps = function () {
+    try {
+      return modeUtils
+        .shellApps()
+        .sort((a, b) => {
+          if (a.get_id() in stats && !(b.get_id() in stats)) return -1;
+          if (b.get_id() in stats && !(a.get_id() in stats)) return 1;
+          if (!(a.get_id() in stats) && !(b.get_id() in stats)) return 0;
+          return stats[a.get_id()] < stats[b.get_id()] ? 1 : -1;
+        })
+        .map((app) => ({ app, mode: Launcher, activate }));
+    } catch (e) {
+      print(e)
+      return [];
+    }
+
+  };
+
+  let description = function (app) {
     try {
       return app.get_name();
     } catch (e) {
@@ -48,8 +55,10 @@ var Launcher = (function() {
     }
   };
 
-  let makeBox = function(app, index, onActivate, oldBox) {
+  let makeBox = function (appObj, index, onActivate, oldBox) {
+    const app = appObj.app;
     return modeUtils.makeBox(
+      appObj,
       app,
       app,
       description(app),
@@ -63,7 +72,7 @@ var Launcher = (function() {
     MAX_NUM_ITEMS,
     name,
     apps,
-    filter: x => x,
+    filter: (x) => true,
     activate,
     description,
     makeBox,

@@ -35,7 +35,7 @@ function buildWidgets() {
   addShortcut(switcherWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
   shortcutsWidget.pack_start(switcherWidget, true, true, 0);
   let launcherWidget = new Gtk.VBox();
-  addShortcut(launcherWidget, settings, 'show-launcher', _("Hotkey to activate launcher"));
+  addShortcut(launcherWidget, settings, 'show-launcher', _("Hotkey to activate launcher (deprecated)"));
   shortcutsWidget.pack_start(launcherWidget, true, true, 0);
 
   let changeExplanation = new Gtk.Label({margin_top: 5});
@@ -61,7 +61,7 @@ function buildWidgets() {
   addIconSize(iconSizeWidget, settings);
   appearanceWidget.add(iconSizeWidget);
 
-  const widthWidgets = buildWidth(settings);
+  const widthWidgets = buildMaxWidth(settings);
 
   let workspaceIndicatorWidget = new Gtk.HBox();
   addWorkspaceIndicator(workspaceIndicatorWidget, settings);
@@ -222,7 +222,7 @@ function addFontSize(widget, settings) {
   widget.add(input);
 }
 
-function buildWidth(settings) {
+function buildMaxWidth(settings) {
   const title = makeTitle(_("Width (%)"));
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({

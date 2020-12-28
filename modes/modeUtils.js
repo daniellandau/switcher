@@ -71,7 +71,7 @@ var ModeUtils = (function() {
 
   let seenIDs = {};
   let cleanIDs = () => (seenIDs = {});
-  let makeBox = function(app, appRef, description, index, onActivate, oldBox) {
+  let makeBox = function(appObj, app, appRef, description, index, onActivate, oldBox) {
     if (oldBox.whole) oldBox.whole.disconnect(oldBox.activationCallbackId);
     const whole =
       oldBox.whole || new St.Button({ style_class: 'switcher-box' });
@@ -126,7 +126,7 @@ var ModeUtils = (function() {
       const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
       const alt = (e.get_state() & Clutter.ModifierType.META_MASK) !== 0;
       const super_ = (e.get_state() & Clutter.ModifierType.SUPER_MASK) !== 0;
-      onActivate(app, { control, shift, alt, super_ });
+      onActivate(appObj, { control, shift, alt, super_ });
     };
     const activationCallbackId = whole.connect('clicked', activationCallback);
     if (!oldBox.whole) whole.set_child(box);

@@ -21,17 +21,22 @@ var Switcher = (function() {
     return 'Switcher';
   };
 
-  let filter = function(apps) {
+  let filter = function(app) {
     let onlyCurrentWorkspace = Convenience.getSettings().get_boolean(
       'only-current-workspace'
     );
     let currentWorkspace = util.getCurrentWorkspace();
-    return apps.filter(
-      app =>
+    const workspace = app.get_workspace();
+    const workspaceIndex = workspace ? workspace.index() : null;
+    return (
         (!onlyCurrentWorkspace && !onlyCurrentWorkspaceToggled) ||
         (onlyCurrentWorkspace && onlyCurrentWorkspaceToggled) ||
-        app.get_workspace().index() === currentWorkspace
+        workspaceIndex === currentWorkspace
     );
+  };
+
+  let activate = function(app) {
+    Main.activateWindow(app);
   };
 
   let apps = function() {
@@ -45,17 +50,18 @@ var Switcher = (function() {
       tabList[1] = tmp;
     }
 
-    return tabList;
+    return tabList.map(tab => ({ app: tab, mode: Switcher, activate }));
   };
 
-  let activate = function(app) {
-    Main.activateWindow(app);
-  };
 
   let description = function(app) {
     let workspace = '';
     if (Convenience.getSettings().get_boolean('workspace-indicator')) {
-      workspace = app.get_workspace().index() + 1 + ': ';
+      try {
+        workspace = app.get_workspace().index() + 1 + ': ';
+      } catch (e) {
+        print(e);
+      }
     }
 
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
@@ -70,10 +76,12 @@ var Switcher = (function() {
     return workspace + appName + ' → ' + app.get_title();
   };
 
-  let makeBox = function(app, index, onActivate, oldBox) {
+  let makeBox = function(appObj, index, onActivate, oldBox) {
+    const app = appObj.app;
     const appRef = Shell.WindowTracker.get_default().get_window_app(app);
     if (!appRef) return null;
     return modeUtils.makeBox(
+      appObj,
       app,
       appRef,
       description(app),
