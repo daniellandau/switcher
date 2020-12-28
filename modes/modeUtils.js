@@ -10,13 +10,31 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 const util = Me.imports.util;
+const controlCenter = Me.imports.controlCenter;
+const switcherApplication = Me.imports.switcherApplication;
 
 const keyActivation = Me.imports.keyActivation.KeyActivation;
 
 var ModeUtils = (function () {
+  let gnomeControlCenter;
+  let mainApplicationName;
+
+  // get gnome control center instance
+  gnomeControlCenter = new controlCenter.GnomeControlCenter();
+  if (gnomeControlCenter.mainApplicationId != '') {
+    try {
+      mainApplicationName = Shell.AppSystem.get_default()
+        .lookup_app(gnomeControlCenter.mainApplicationId)
+        .get_name();
+    } catch (error) {
+      mainApplicationName = '';
+    }
+  }
+
   // From _loadApps() in GNOME Shell's appDisplay.js
-  let appInfos = () =>
-    Gio.AppInfo.get_all()
+  let appInfos = () => {
+    // get app ids for regular applications
+    let regularAppIDs = Gio.AppInfo.get_all()
       .filter(function (appInfo) {
         try {
           let id = appInfo.get_id(); // catch invalid file encodings
@@ -26,14 +44,35 @@ var ModeUtils = (function () {
         return appInfo.should_show();
       })
       .map(function (app) {
-        return app.get_id();
+        return new switcherApplication.RegularApplication(app.get_id());
       });
+
+    // get gnome control center panel app ids
+    let gnomeControlCenterAppIDs = gnomeControlCenter
+      .getPanelAppIDs()
+      .map(function (appId) {
+        return new switcherApplication.GnomeControlApplication(
+          appId,
+          mainApplicationName
+        );
+      });
+    // combine Regular Apps ans and Gnome Control Apps ids
+    let allApps = regularAppIDs.concat(gnomeControlCenterAppIDs);
+
+    return allApps;
+  };
 
   let shellAppCache = { lastIndexed: null, apps: [] };
   let shellApps = (force) => {
     const get = () =>
-      appInfos().map(function (appID) {
-        return Shell.AppSystem.get_default().lookup_app(appID);
+      appInfos().map(function (switcherApp) {
+        let shellApp = Shell.AppSystem.get_default().lookup_app(
+          switcherApp.appId
+        );
+        // TODO: should this really be done during appInfos creation?
+        //       seems disjointed here
+        switcherApp.setShellApp(shellApp);
+        return switcherApp;
       });
     const update = () => {
       shellAppCache.lastIndexed = new Date();
