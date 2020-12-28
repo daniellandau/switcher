@@ -15,7 +15,11 @@ const switcherApplication = Me.imports.switcherApplication;
 
 const keyActivation = Me.imports.keyActivation.KeyActivation;
 
-var ModeUtils = (function () {
+let gnomeControlCenterAppIDs = null;
+
+function getGnomeControlCenterAppIDs() {
+  if (gnomeControlCenterAppIDs) return gnomeControlCenterAppIDs;
+
   let gnomeControlCenter;
   let mainApplicationName;
 
@@ -31,6 +35,18 @@ var ModeUtils = (function () {
     }
   }
 
+  gnomeControlCenterAppIDs = gnomeControlCenter
+    .getPanelAppIDs()
+    .map(function (appId) {
+      return new switcherApplication.GnomeControlApplication(
+        appId,
+        mainApplicationName
+      );
+    });
+  return gnomeControlCenterAppIDs;
+}
+
+var ModeUtils = (function () {
   // From _loadApps() in GNOME Shell's appDisplay.js
   let appInfos = () => {
     // get app ids for regular applications
@@ -48,14 +64,7 @@ var ModeUtils = (function () {
       });
 
     // get gnome control center panel app ids
-    let gnomeControlCenterAppIDs = gnomeControlCenter
-      .getPanelAppIDs()
-      .map(function (appId) {
-        return new switcherApplication.GnomeControlApplication(
-          appId,
-          mainApplicationName
-        );
-      });
+    let gnomeControlCenterAppIDs = getGnomeControlCenterAppIDs();
     // combine Regular Apps ans and Gnome Control Apps ids
     let allApps = regularAppIDs.concat(gnomeControlCenterAppIDs);
 
