@@ -39,6 +39,11 @@ class SwitcherApplication {
   }
 
   /* ....................................................................... */
+  get_app_info() {
+    throw Error("'get_app_info' is not implemented");
+  }
+
+  /* ....................................................................... */
   get_title() {
     throw Error("'get_title' is not implemented");
   }
@@ -69,6 +74,10 @@ var RegularApplication = class RegularApplication extends SwitcherApplication {
     return this._shellApp.get_title();
   }
 
+  /* ....................................................................... */
+  get_app_info() {
+    return this._shellApp.get_app_info();
+  }
 }
 
 
@@ -101,4 +110,8 @@ var GnomeControlApplication = class GnomeControlApplication
     return this._shellApp.get_title();
   }
 
+  /* ....................................................................... */
+  get_app_info() {
+    return null;
+  }
 }

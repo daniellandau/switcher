@@ -210,6 +210,7 @@ var ModeUtils = (function () {
     if (!showOriginal && !showExec) return '';
     try {
       let appInfo = appRef.get_app_info();
+      if (!appInfo) return ''; // e.g. settings panel
       const original = showOriginal ? getOriginal(appInfo) : '';
       const executable = showExec ? getExecutable(appInfo) : '';
       return `${original} ${executable}`;
