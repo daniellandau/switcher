@@ -76,6 +76,11 @@ function buildWidgets() {
   let activeDisplayWidget = new Gtk.HBox();
   addActiveDisplay(activeDisplayWidget, settings);
 
+  let showOriginalsWidget = new Gtk.HBox();
+  addBoolean(showOriginalsWidget, settings, _("Show original language names"), 'show-original-names');
+  let showExecutablesWidget = new Gtk.HBox();
+  addBoolean(showExecutablesWidget, settings, _("Show executable names"), 'show-executables');
+
   const onboardingWidgets = buildOnboarding(settings);
 
   return []
@@ -90,6 +95,8 @@ function buildWidgets() {
             onlyOneWorkSpaceWidget,
             fadeEffectWidget,
             activeDisplayWidget,
+            showOriginalsWidget,
+            showExecutablesWidget,
             onboardingWidgets
            )
 }
@@ -251,60 +258,34 @@ function buildActivateByKey(settings) {
   return [title, input];
 }
 
-function addWorkspaceIndicator(widget, settings) {
-  widget.add(makeTitle(_("Show workspace indicators")));
+function addBoolean(widget, settings, title, key) {
+  widget.add(makeTitle(title));
 
   let _switch = new Gtk.Switch({
-    active: settings.get_boolean('workspace-indicator'),
+    active: settings.get_boolean(key),
     margin_top: 15,
     halign: Gtk.Align.END
   });
   _switch.connect('notify::active', function (o) {
-    settings.set_boolean('workspace-indicator', o.active);
+    settings.set_boolean(key, o.active);
   });
   widget.add(_switch);
+}
+
+function addWorkspaceIndicator(widget, settings) {
+  addBoolean(widget, settings, _("Show workspace indicators"), 'workspace-indicator');
 }
 
 function addOnlyOneWorkspace(widget, settings) {
-  widget.add(makeTitle(_("Show only apps in the current workspace")));
-
-  let _switch = new Gtk.Switch({
-    active: settings.get_boolean('only-current-workspace'),
-    margin_top: 15,
-    halign: Gtk.Align.END
-  });
-  _switch.connect('notify::active', function (o) {
-    settings.set_boolean('only-current-workspace', o.active);
-  });
-  widget.add(_switch);
+  addBoolean(widget, settings, _("Show only apps in the current workspace"), 'only-current-workspace');
 }
 
 function addFadeEffect(widget, settings) {
-  widget.add(makeTitle(_("Fade Effect")));
-
-  let _switch = new Gtk.Switch({
-    active: settings.get_boolean('fade-enable'),
-    margin_top: 15,
-    halign: Gtk.Align.END
-  });
-  _switch.connect('notify::active', function (o) {
-    settings.set_boolean('fade-enable', o.active);
-  });
-  widget.add(_switch);
+  addBoolean(widget, settings, _("Fade Effect"), 'fade-enable');
 }
 
 function addActiveDisplay(widget, settings) {
-  widget.add(makeTitle(_("Show Switcher on active display")));
-
-  let _switch = new Gtk.Switch({
-    active: settings.get_boolean('on-active-display'),
-    margin_top: 15,
-    halign: Gtk.Align.END
-  });
-  _switch.connect('notify::active', function (o) {
-    settings.set_boolean('on-active-display', o.active);
-  });
-  widget.add(_switch);
+  addBoolean(widget, settings, _("Show Switcher on active display"), 'on-active-display');
 }
 
 function buildOnboarding(settings) {

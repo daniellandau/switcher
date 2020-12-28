@@ -89,7 +89,8 @@ function runFilter(app, fragment) {
     // matches at beginning word boundaries are better than in the middle of words
     const wordPrefixFactor =
       match.index == 0 ||
-      (match.index != 0 && filteredDescription.charAt(match.index - 1) == ' ')
+      (match.index != 0 &&
+        [' ', '[', '('].includes(filteredDescription.charAt(match.index - 1)))
         ? 1.2
         : 0.0;
 

@@ -89,5 +89,13 @@
           <default>"{}"</default>
           <summary>Launcher stats stored as json.</summary>
         </key>
+        <key type="b" name="show-original-names">
+          <default>false</default>
+          <summary>Should original language names be shown?</summary>
+        </key>
+        <key type="b" name="show-executables">
+          <default>false</default>
+          <summary>Should names of executables be shown?</summary>
+        </key>
     </schema>
 </schemalist>

@@ -48,7 +48,7 @@ var Launcher = (function () {
 
   let description = function (app) {
     try {
-      return app.get_name();
+      return `${app.get_name()} ${modeUtils.getExtras(app)}`;
     } catch (e) {
       print(e);
       return 'Could not get name';

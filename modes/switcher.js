@@ -73,7 +73,7 @@ var Switcher = (function() {
       appName = 'Could not get name';
     }
 
-    return workspace + appName + ' → ' + app.get_title();
+    return workspace + appName + ' → ' + app.get_title() + ` ${modeUtils.getExtras(appRef)}`;
   };
 
   let makeBox = function(appObj, index, onActivate, oldBox) {

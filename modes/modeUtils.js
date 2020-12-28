@@ -4,6 +4,7 @@ const Main = imports.ui.main;
 const Shell = imports.gi.Shell;
 const Meta = imports.gi.Meta;
 const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -150,9 +151,39 @@ var ModeUtils = (function () {
     };
   };
 
+  let getExecutable = function (appInfo) {
+    let executable = appInfo.get_executable();
+    executable = GLib.basename(executable);
+    executable = executable.replace(/%[a-zA-Z]/g, '').trim();
+    return `(${executable})`;
+  };
+
+  let getOriginal = function (appInfo) {
+    let original = appInfo.get_string('Name');
+    return `[${original}]`;
+  };
+
+  let getExtras = function (appRef) {
+    const showOriginal = Convenience.getSettings().get_boolean(
+      'show-original-names'
+    );
+    const showExec = Convenience.getSettings().get_boolean('show-executables');
+    if (!showOriginal && !showExec) return '';
+    try {
+      let appInfo = appRef.get_app_info();
+      const original = showOriginal ? getOriginal(appInfo) : '';
+      const executable = showExec ? getExecutable(appInfo) : '';
+      return `${original} ${executable}`;
+    } catch (e) {
+      log(e);
+      return '';
+    }
+  };
+
   return {
     cleanIDs: cleanIDs,
     makeBox: makeBox,
-    shellApps: shellApps
+    shellApps: shellApps,
+    getExtras: getExtras
   };
 })();
