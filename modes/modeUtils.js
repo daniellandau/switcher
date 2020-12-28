@@ -12,11 +12,11 @@ const util = Me.imports.util;
 
 const keyActivation = Me.imports.keyActivation.KeyActivation;
 
-var ModeUtils = (function() {
+var ModeUtils = (function () {
   // From _loadApps() in GNOME Shell's appDisplay.js
   let appInfos = () =>
     Gio.AppInfo.get_all()
-      .filter(function(appInfo) {
+      .filter(function (appInfo) {
         try {
           let id = appInfo.get_id(); // catch invalid file encodings
         } catch (e) {
@@ -24,14 +24,14 @@ var ModeUtils = (function() {
         }
         return appInfo.should_show();
       })
-      .map(function(app) {
+      .map(function (app) {
         return app.get_id();
       });
 
   let shellAppCache = { lastIndexed: null, apps: [] };
-  let shellApps = force => {
+  let shellApps = (force) => {
     const get = () =>
-      appInfos().map(function(appID) {
+      appInfos().map(function (appID) {
         return Shell.AppSystem.get_default().lookup_app(appID);
       });
     const update = () => {
@@ -49,14 +49,14 @@ var ModeUtils = (function() {
   let appIcons = {};
   let iconSize = null;
 
-  let getAppIcon = app => {
+  let getAppIcon = (app) => {
     const configuredIconSize = Convenience.getSettings().get_uint('icon-size');
 
     // if icon size changes, redo the whole cache
     if (configuredIconSize !== iconSize) {
       appIcons = {};
       iconSize = configuredIconSize;
-      shellApps().forEach(function(app) {
+      shellApps().forEach(function (app) {
         appIcons[app.get_id()] = app.create_icon_texture(iconSize);
       });
     }
@@ -71,7 +71,15 @@ var ModeUtils = (function() {
 
   let seenIDs = {};
   let cleanIDs = () => (seenIDs = {});
-  let makeBox = function(appObj, app, appRef, description, index, onActivate, oldBox) {
+  let makeBox = function (
+    appObj,
+    app,
+    appRef,
+    description,
+    index,
+    onActivate,
+    oldBox
+  ) {
     if (oldBox.whole) oldBox.whole.disconnect(oldBox.activationCallbackId);
     const whole =
       oldBox.whole || new St.Button({ style_class: 'switcher-box' });
