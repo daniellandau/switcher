@@ -194,10 +194,13 @@ function _showUI() {
 
   rerunFiltersAndUpdate(entry);
 
+  let allLauncherApps = [];
+  let launcherApps = [];
   setTimeout(function () {
-    const launcherApps = launcher
-      .apps()
-      .filter((app) => !windowApps.has(app.app.get_id()));
+    allLauncherApps = launcher.apps();
+    launcherApps = allLauncherApps.filter(
+      (app) => !windowApps.has(app.app.get_id())
+    );
     apps = [].concat.apply([], [windows, launcherApps]);
     rerunFiltersAndUpdate(entry);
   }, 10);
@@ -297,7 +300,25 @@ function _showUI() {
             util.getCurrentWorkspace(),
             true
           );
-        selected.activate(selected.app);
+        if (
+          selected.mode.name() === 'Switcher' &&
+          control &&
+          symbol !== Clutter.KEY_j
+        ) {
+          const app = Shell.WindowTracker.get_default().get_window_app(
+            selected.app
+          );
+          const launcherAppForWindow = allLauncherApps.find(
+            (x) => x.app.get_id() === app.get_id()
+          );
+          if (launcherAppForWindow)
+            launcherAppForWindow.activate(launcherAppForWindow.app);
+          else {
+            selected.activate(selected.app);
+          }
+        } else {
+          selected.activate(selected.app);
+        }
         if (
           selected.mode.name() === 'Launcher' &&
           control &&
