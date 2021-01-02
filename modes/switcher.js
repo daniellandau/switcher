@@ -43,13 +43,6 @@ var Switcher = (function() {
     // Get all windows in activation order
     let tabList = global.display.get_tab_list(Meta.TabList.NORMAL, null);
 
-    // swap the first two, so we can switch quickly back and forth
-    if (tabList.length >= 2) {
-      const tmp = tabList[0];
-      tabList[0] = tabList[1];
-      tabList[1] = tmp;
-    }
-
     return tabList.map(tab => ({ app: tab, mode: Switcher, activate }));
   };
 

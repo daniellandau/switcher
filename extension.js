@@ -166,7 +166,8 @@ function _showUI() {
   boxLayout.y = selectedMonitor.y;
   timeit('added actor');
 
-  const windows = switcher.apps();
+  let windows = switcher.apps();
+  if (windows.length >= 2) cursor = 1;
   const windowApps = new Set();
   windows.forEach((window) => {
     const app = Shell.WindowTracker.get_default().get_window_app(window.app);
@@ -311,9 +312,23 @@ function _showUI() {
           const launcherAppForWindow = allLauncherApps.find(
             (x) => x.app.get_id() === app.get_id()
           );
-          if (launcherAppForWindow)
+          if (launcherAppForWindow) {
+            needCleanUI = false;
             launcherAppForWindow.activate(launcherAppForWindow.app);
-          else {
+            // Check windowlist periodically until a new window appears
+            function checkNewWindows() {
+              const oldLength = windows.length;
+              windows = switcher.apps();
+              if (oldLength < windows.length) {
+                apps = [].concat.apply([], [windows, launcherApps]);
+                cursor += 1;
+                rerunFiltersAndUpdate(entry);
+              } else {
+                setTimeout(checkNewWindows, 50);
+              }
+            }
+            setTimeout(checkNewWindows, 50);
+          } else {
             selected.activate(selected.app);
           }
         } else {
