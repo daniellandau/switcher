@@ -43,6 +43,11 @@ function getGnomeControlCenterAppIDs() {
         mainApplicationName
       );
     });
+  // Tried to get before initialization was complete
+  if (gnomeControlCenterAppIDs.length === 0) {
+    gnomeControlCenterAppIDs = null
+    return []
+  }
   return gnomeControlCenterAppIDs;
 }
 

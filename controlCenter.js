@@ -26,6 +26,7 @@ class SearchProviderConfiguration {
   }
 }
 
+let panelAppIDs = [];
 
 /* ------------------------------------------------------------------------- */
 var GnomeControlCenter = class GnomeControlCenter {
@@ -65,46 +66,34 @@ var GnomeControlCenter = class GnomeControlCenter {
     }
   }
 
-  /* ....................................................................... */
-  getPanelAppIDs() {
-
-    let panelIDs;
-    let panelMetas;
-    let panelAppIDs;
-
-    try {
-      // find all panel ids from the gnome control center dbus proxy using a
-      // syncronous call (will timeout in DBUS_PROXY_TIMEOUT)
-      panelIDs = this._makeDBusSyncCall(
-        this._proxy.GetInitialResultSetSync,
-        [
-          []
-        ],
-        'GetInitialResultSetSync'
-      )
-
+  initPanelAppIDs() {
+    this._proxy.GetInitialResultSetRemote([], (results, error) => {
+      if (error) {
+        log('Switcher got an error getting settings panels', String(error));
+        return;
+      }
+      const panelIDs = results[0];
       // get the panel metas with information about panels
-      panelMetas = this._makeDBusSyncCall(
-        this._proxy.GetResultMetasSync,
-        [
-          panelIDs
-        ],
-        'GetResultMetasSync'
+      this._proxy.GetResultMetasRemote(panelIDs, combine);
+    });
+
+    function combine(results, error) {
+      if (error) {
+        log(
+          'Switcher got an error getting settings panels details',
+          String(error)
+        );
+        return;
+      }
+      const panelMetas = results[0];
+      // get app id names from panel meta information
+      panelAppIDs = panelMetas.map((panelMeta) =>
+        panelMeta['id'].deep_unpack()
       );
     }
-    catch (error) {
-      log(error.toString());
-      return [];
-    }
-
-    // get app id names from panel meta information
-    panelAppIDs = [];
-    for (let i = 0; i < panelMetas.length; i++) {
-      // TODO: catch unpack error?
-      let appID = panelMetas[i]['id'].deep_unpack();
-      panelAppIDs.push(appID);
-    }
-
+  }
+  /* ....................................................................... */
+  getPanelAppIDs() {
     return panelAppIDs;
   }
 
@@ -269,8 +258,7 @@ var GnomeControlCenter = class GnomeControlCenter {
         g_object_path: this._providerConfiguration.dbusPath,
         g_interface_info: proxyInfo,
         g_interface_name: proxyInfo.name,
-        g_flags: g_flags,
-        g_default_timeout: this.DBUS_PROXY_TIMEOUT
+        g_flags: g_flags
       });
 
       // initialize the proxy synchronously (basically blocking). this
@@ -292,61 +280,4 @@ var GnomeControlCenter = class GnomeControlCenter {
 
     return proxy;
   }
-
-  /* ....................................................................... */
-  _makeDBusSyncCall(func, args, func_name) {
-
-    let dbusReturn;
-    let errorMessage;
-
-    // check if proxy has been loaded before making the call.
-    // technically since we initialize proxy synchronously it should not be
-    // a problem in the first place. See _createProxy for more infromation
-    if (this._proxy !== null ) {
-
-      try {
-        // call passed in function with args and proxy as 'this' context
-        dbusReturn = func.apply(this._proxy, args);
-      }
-      catch (error) {
-        if (error instanceof Gio.IOErrorEnum) {
-          errorMessage = ""
-            + "Time out calling '%s' method of Gnome ".format(func_name)
-            + "Control Center DBus search provider, current "
-            +"timout is %d, ".format(this.DBUS_PROXY_TIMEOUT)
-            + "consider increasing it, error: %s".format(error.toString())
-          throw(GnomeControlCenterError(errorMessage));
-        }
-        else {
-          errorMessage = ""
-            + "Error calling '%s' method of Gnome ".format(func_name)
-            + "Control Center DBus search provider: "
-            + error.toString();
-          throw(GnomeControlCenterError(errorMessage));
-
-        }
-      }
-
-      // currently dbus methods we use return only 1 result, so check for
-      // if we got 1 result item only
-      if (dbusReturn.length == 1) {
-        return dbusReturn[0];
-      }
-      else {
-          errorMessage = ""
-            + "Failed to get result from '%s' method of ".format(func_name)
-            + "Gnome Control Center DBus search provider: "
-            + error.toString();
-          throw(GnomeControlCenterError(errorMessage));
-      }
-    }
-    else {
-      errorMessage = ""
-        + "Error calling '%s' method of Gnome ".format(func_name)
-        + "Control Center DBus search provider because DBus Proxy has not "
-        + "been loaded: " + this._proxy;
-      throw(GnomeControlCenterError(errorMessage));
-    }
-  }
-
-}
+};

@@ -33,6 +33,7 @@ const switcher = switcherModule.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 const util = Me.imports.util;
+const controlCenter = Me.imports.controlCenter;
 const onboarding = Me.imports.onboarding;
 window.setTimeout = util.setTimeout;
 const promiseModule = Me.imports.promise;
@@ -467,6 +468,8 @@ function enable() {
     )
   );
 
+  const gnomeControlCenter = new controlCenter.GnomeControlCenter();
+  gnomeControlCenter.initPanelAppIDs();
   setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
 
   if (!onboardingShownThisSession) {
