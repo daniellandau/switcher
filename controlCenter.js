@@ -1,47 +1,34 @@
 // -*- mode: js; js-indent-level: 2; indent-tabs-mode: nil -*-
 
 /* ------------------------------------------------------------------------- */
-"use strict";
-
+'use strict';
 
 /* ------------------------------------------------------------------------- */
 const Gio = imports.gi.Gio;
 const GLib = imports.gi.GLib;
 
-
 /* ------------------------------------------------------------------------- */
 // use RemoteSearch dbus setup and keyfile constants
 const RemoteSearch = imports.ui.remoteSearch;
 
-
 /* ------------------------------------------------------------------------- */
-class GnomeControlCenterError extends Error { }
-
+class GnomeControlCenterError extends Error {}
 
 /* ------------------------------------------------------------------------- */
 class SearchProviderConfiguration {
-
   /* ....................................................................... */
-  constructor(
-    desktopId,
-    dbusName,
-    dbusPath,
-    providerApiVersion,
-    autoStart
-  ) {
-
-  this.desktopId = desktopId;
-  this.dbusName = dbusName;
-  this.dbusPath = dbusPath;
-  this.providerApiVersion = providerApiVersion;
-  this.autoStart = autoStart;
+  constructor(desktopId, dbusName, dbusPath, providerApiVersion, autoStart) {
+    this.desktopId = desktopId;
+    this.dbusName = dbusName;
+    this.dbusPath = dbusPath;
+    this.providerApiVersion = providerApiVersion;
+    this.autoStart = autoStart;
   }
 }
 
 
 /* ------------------------------------------------------------------------- */
 var GnomeControlCenter = class GnomeControlCenter {
-
   /* ....................................................................... */
   // class constant for dbus time in milliseconds
   /// (it's 2019 and ES does not support basic 'const', terrible)
@@ -51,24 +38,20 @@ var GnomeControlCenter = class GnomeControlCenter {
 
   /* ....................................................................... */
   constructor() {
-
     // "declare" instance variables ... so we know we what we use
     this._providerConfiguration = null;
     this._proxy = null;
-
 
     // if successfull loaded search provider configuration then create proxy
     try {
       this._providerConfiguration = this._loadSearchProvider();
       try {
         this._proxy = this._createProxy();
-      }
-      catch (error) {
+      } catch (error) {
         this._proxy = null;
         log(error.toString());
       }
-    }
-    catch (error) {
+    } catch (error) {
       log(error.toString());
     }
   }
@@ -77,8 +60,7 @@ var GnomeControlCenter = class GnomeControlCenter {
   get mainApplicationId() {
     if (this._providerConfiguration !== null) {
       return this._providerConfiguration.desktopId;
-    }
-    else {
+    } else {
       return '';
     }
   }
@@ -128,7 +110,6 @@ var GnomeControlCenter = class GnomeControlCenter {
 
   /* ....................................................................... */
   _getSearchProviderConigurationFilePath() {
-
     let filePath;
     let dataDirs;
     let errorMessage;
@@ -147,9 +128,9 @@ var GnomeControlCenter = class GnomeControlCenter {
       // build file path for gnome-control search provider
       let possibleFilePath = GLib.build_filenamev([
         dataDirs[i],
-        "gnome-shell",
-        "search-providers",
-        "gnome-control-center-search-provider.ini"
+        'gnome-shell',
+        'search-providers',
+        'gnome-control-center-search-provider.ini'
       ]);
       // check if the file exists and if so stop the search
       if (GLib.file_test(possibleFilePath, GLib.FileTest.EXISTS) === true) {
@@ -158,10 +139,11 @@ var GnomeControlCenter = class GnomeControlCenter {
       }
     }
     if (filePath === null) {
-        errorMessage = ""
-          + "Could not find Gnome Control center search provider configuration"
-          +" file in any system or user data directories: "
-          + dataDirs.join(" ");
+      errorMessage =
+        '' +
+        'Could not find Gnome Control center search provider configuration' +
+        ' file in any system or user data directories: ' +
+        dataDirs.join(' ');
       throw GnomeControlCenterError(errorMessage);
     }
 
@@ -170,7 +152,6 @@ var GnomeControlCenter = class GnomeControlCenter {
 
   /* ....................................................................... */
   _loadSearchProvider() {
-
     let configFilePath;
     let keyFile;
     let group;
@@ -192,61 +173,56 @@ var GnomeControlCenter = class GnomeControlCenter {
         keyFile.load_from_file(configFilePath, 0);
 
         //  if keyfile has the search providers group section
-        group = "Shell Search Provider";
+        group = 'Shell Search Provider';
         if (keyFile.has_group(group) === true) {
           try {
             // get the desktop id for the gnome search provider
-            desktopId = keyFile.get_string(group, "DesktopId");
+            desktopId = keyFile.get_string(group, 'DesktopId');
 
             // get search provider dbus bus name
-            dbusName = keyFile.get_string(group, "BusName");
+            dbusName = keyFile.get_string(group, 'BusName');
 
             // get search provider dbus object path
-            dbusPath = keyFile.get_string(group, "ObjectPath");
+            dbusPath = keyFile.get_string(group, 'ObjectPath');
 
             // get the version for the dbus interface used for search provider
-            providerApiVersion = keyFile.get_integer(group, "Version");
+            providerApiVersion = keyFile.get_integer(group, 'Version');
 
             // get the autostart setting for the dbus services
             // it's possible gnome control center does not have it specified
             // though so we fallback to autoStart set to true
             try {
-              autoStart = keyFile.get_boolean(group, "AutoStart");
-            }
-            catch(error) {
+              autoStart = keyFile.get_boolean(group, 'AutoStart');
+            } catch (error) {
               autoStart = true;
             }
-          }
-          catch(error) {
-            errorMessage = ""
-              + "Failed to retrive desktop id and DBus configuration from "
-              + "search provider configuation file '%s': %s".format(
-                   configFilePath,
-                   error.toString()
-                )
-              throw(GnomeControlCenterError(errorMessage));
-          }
-        }
-        else {
-          errorMessage = ""
-            + "Loaded search provider configuration file '%s' does not "
-            + "contain '%s' configuration group".format(
+          } catch (error) {
+            errorMessage =
+              '' +
+              'Failed to retrive desktop id and DBus configuration from ' +
+              "search provider configuation file '%s': %s".format(
                 configFilePath,
-                group
-              )
-          throw(GnomeControlCenterError(errorMessage));
+                error.toString()
+              );
+            throw GnomeControlCenterError(errorMessage);
+          }
+        } else {
+          errorMessage =
+            '' +
+            "Loaded search provider configuration file '%s' does not " +
+            "contain '%s' configuration group".format(configFilePath, group);
+          throw GnomeControlCenterError(errorMessage);
         }
-      }
-      catch(error) {
-        errorMessage = ""
-          + "Failed to load search provider configuration file '%s':"
-          + " %s".format(configFilePath)
+      } catch (error) {
+        errorMessage =
+          '' +
+          "Failed to load search provider configuration file '%s':" +
+          ' %s'.format(configFilePath);
         throw GnomeControlCenterError(error);
       }
-    }
-    catch (error) {
+    } catch (error) {
       // re-throw error from _getSearchProviderConigurationFilePath
-      throw(error)
+      throw error;
     }
 
     return new SearchProviderConfiguration(
@@ -260,7 +236,6 @@ var GnomeControlCenter = class GnomeControlCenter {
 
   /* ...................................................................... */
   _createProxy() {
-
     // TODO: need a lot more arror handling
 
     let proxy;
@@ -273,8 +248,7 @@ var GnomeControlCenter = class GnomeControlCenter {
     g_flags = Gio.DBusProxyFlags.DO_NOT_LOAD_PROPERTIES;
     if (this._providerConfiguration.autoStart === true) {
       g_flags |= Gio.DBusProxyFlags.DO_NOT_AUTO_START_AT_CONSTRUCTION;
-    }
-    else {
+    } else {
       g_flags |= Gio.DBusProxyFlags.DO_NOT_AUTO_START;
     }
 
@@ -283,8 +257,7 @@ var GnomeControlCenter = class GnomeControlCenter {
     // version 1 is still distributed, so many support it for now
     if (this._providerConfiguration.providerApiVersion >= 2) {
       proxyInfo = RemoteSearch.SearchProvider2ProxyInfo;
-    }
-    else {
+    } else {
       proxyInfo = RemoteSearch.SearchProviderProxyInfo;
     }
 
@@ -309,12 +282,12 @@ var GnomeControlCenter = class GnomeControlCenter {
       // cancel it right now which should be fine since we do non-async calls
       // to the dbus with timeout
       proxy.init(null);
-    }
-    catch (error) {
-      errorMessage = ""
-        + "Failed to connect to Gnome Control Search Provider Dbus "
-        + "service: %s".format(error.toString());
-      throw(GnomeControlCenterError(errorMessage));
+    } catch (error) {
+      errorMessage =
+        '' +
+        'Failed to connect to Gnome Control Search Provider Dbus ' +
+        'service: %s'.format(error.toString());
+      throw GnomeControlCenterError(errorMessage);
     }
 
     return proxy;
