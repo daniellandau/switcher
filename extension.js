@@ -354,7 +354,7 @@ function _showUI() {
     // Filter text
     else {
       // Cursor starts from 1 to allow quick switching, but should revert back to 0 when text changes
-      if (previousEntryContent !== entryContent) cursor = 0;
+      cursor = 0;
       rerunFiltersAndUpdate(o);
     }
 
