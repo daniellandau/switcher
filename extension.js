@@ -317,6 +317,7 @@ function _showUI() {
             launcherAppForWindow.activate(launcherAppForWindow.app);
             // Check windowlist periodically until a new window appears
             function checkNewWindows() {
+              if (!container) return;
               const oldLength = windows.length;
               windows = switcher.apps();
               if (oldLength < windows.length) {
