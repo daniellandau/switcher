@@ -33,6 +33,7 @@ const switcher = switcherModule.Switcher;
 const launcher = Me.imports.modes.launcher.Launcher;
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 const util = Me.imports.util;
+const controlCenter = Me.imports.controlCenter;
 const onboarding = Me.imports.onboarding;
 window.setTimeout = util.setTimeout;
 const promiseModule = Me.imports.promise;
@@ -112,6 +113,7 @@ function _showUI() {
       for (let i = currentlyShowingCount; i < newBoxes.length; ++i) {
         newBoxes[i].whole.show();
       }
+      setTimeout(showSingleBox, 0);
     }
     if (newBoxes.length < boxes.length) {
       for (let i = newBoxes.length; i < boxes.length; ++i) {
@@ -165,25 +167,15 @@ function _showUI() {
   boxLayout.y = selectedMonitor.y;
   timeit('added actor');
 
-  const windows = switcher.apps();
+  let windows = switcher.apps();
+  if (windows.length >= 2) cursor = 1;
   const windowApps = new Set();
   windows.forEach((window) => {
     const app = Shell.WindowTracker.get_default().get_window_app(window.app);
     windowApps.add(app.get_id());
   });
-  const launcherApps = launcher
-    .apps()
-    .filter((app) => !windowApps.has(app.app.get_id()));
-  const apps = [].concat.apply([], [windows, launcherApps]);
-  let filteredApps = util.filterByText(apps, '');
-  updateBoxes(filteredApps);
-
-  const debouncedActivateUnique = util.debounce(() => {
-    if (filteredApps.length === 1) {
-      cleanUIWithFade();
-      filteredApps[cursor].activate(filteredApps[cursor].app);
-    }
-  }, Convenience.getSettings().get_uint('activate-after-ms'));
+  let apps = windows;
+  let filteredApps = windows;
 
   const rerunFiltersAndUpdate = (o) => {
     filteredApps = util.filterByText(apps, o.text);
@@ -201,6 +193,26 @@ function _showUI() {
       cursor = Math.max(currentlyShowingCount - 1, 0);
     util.updateHighlight(boxes, o.text, cursor);
   };
+
+  rerunFiltersAndUpdate(entry);
+
+  let allLauncherApps = [];
+  let launcherApps = [];
+  setTimeout(function () {
+    allLauncherApps = launcher.apps();
+    launcherApps = allLauncherApps.filter(
+      (app) => !windowApps.has(app.app.get_id())
+    );
+    apps = [].concat.apply([], [windows, launcherApps]);
+    rerunFiltersAndUpdate(entry);
+  }, 10);
+
+  const debouncedActivateUnique = util.debounce(() => {
+    if (filteredApps.length === 1) {
+      cleanUIWithFade();
+      filteredApps[cursor].activate(filteredApps[cursor].app);
+    }
+  }, Convenience.getSettings().get_uint('activate-after-ms'));
 
   // handle what we can on key press and the rest on key release
   keyPress = entry.connect('key-press-event', (o, e) => {
@@ -290,7 +302,40 @@ function _showUI() {
             util.getCurrentWorkspace(),
             true
           );
-        selected.activate(selected.app);
+        if (
+          selected.mode.name() === 'Switcher' &&
+          control &&
+          symbol !== Clutter.KEY_j
+        ) {
+          const app = Shell.WindowTracker.get_default().get_window_app(
+            selected.app
+          );
+          const launcherAppForWindow = allLauncherApps.find(
+            (x) => x.app.get_id() === app.get_id()
+          );
+          if (launcherAppForWindow) {
+            needCleanUI = false;
+            launcherAppForWindow.activate(launcherAppForWindow.app);
+            // Check windowlist periodically until a new window appears
+            function checkNewWindows() {
+              if (!container) return;
+              const oldLength = windows.length;
+              windows = switcher.apps();
+              if (oldLength < windows.length) {
+                apps = [].concat.apply([], [windows, launcherApps]);
+                cursor += 1;
+                rerunFiltersAndUpdate(entry);
+              } else {
+                setTimeout(checkNewWindows, 50);
+              }
+            }
+            setTimeout(checkNewWindows, 50);
+          } else {
+            selected.activate(selected.app);
+          }
+        } else {
+          selected.activate(selected.app);
+        }
         if (
           selected.mode.name() === 'Launcher' &&
           control &&
@@ -310,6 +355,8 @@ function _showUI() {
     }
     // Filter text
     else {
+      // Cursor starts from 1 to allow quick switching, but should revert back to 0 when text changes
+      cursor = 0;
       rerunFiltersAndUpdate(o);
     }
 
@@ -390,7 +437,6 @@ function _showUI() {
       i += 1;
       setTimeout(showSingleBox, 0);
     } else {
-      util.updateHighlight(boxes, '', cursor);
     }
   }
   setTimeout(showSingleBox, 0);
@@ -421,6 +467,10 @@ function enable() {
       () => _showUI()
     )
   );
+
+  const gnomeControlCenter = new controlCenter.GnomeControlCenter();
+  gnomeControlCenter.initPanelAppIDs();
+  setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
 
   if (!onboardingShownThisSession) {
     onboardingShownThisSession = true;
