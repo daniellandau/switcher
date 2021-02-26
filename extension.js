@@ -36,6 +36,7 @@ const util = Me.imports.util;
 const controlCenter = Me.imports.controlCenter;
 const onboarding = Me.imports.onboarding;
 window.setTimeout = util.setTimeout;
+window.clearTimeout = util.clearTimeout;
 const promiseModule = Me.imports.promise;
 
 let container,
@@ -58,6 +59,10 @@ const enablePerfTracing = false;
 let previous = null,
   previousMessage = null;
 
+let apps = [], windows = [], allLauncherApps = [], launcherApps = [];
+let windowApps = new Set();
+let rerunFiltersAndUpdate = null;
+
 function leftpad(str, n) {
   return ('                          ' + str).slice(-n);
 }
@@ -75,10 +80,28 @@ function timeit(msg) {
   previous = now;
 }
 
+const APP_CACHE_TIMEOUT = 500;
+let forceUpdateAppCacheTimeoutId = null;
+function forceUpdateAppCacheCallback() {
+  forceUpdateAppCacheTimeoutId = null;
+  modeUtils.shellApps(true);
+  if (modeUtils.getHasNullAppInfos()) {
+    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
+  } else {
+    allLauncherApps = launcher.apps();
+    launcherApps = allLauncherApps.filter(
+      (app) => !windowApps.has(app.app.get_id())
+    );
+    apps = [].concat.apply([], [windows, launcherApps]);
+    if (rerunFiltersAndUpdate) rerunFiltersAndUpdate(entry);
+  }
+}
+
 function _showUI() {
   'use strict';
   if (container) return;
-  setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
+  timeit('init');
+  forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
 
   const modes = [switcher, launcher];
 
@@ -167,17 +190,17 @@ function _showUI() {
   boxLayout.y = selectedMonitor.y;
   timeit('added actor');
 
-  let windows = switcher.apps();
+  windows = switcher.apps();
   if (windows.length >= 2) cursor = 1;
-  const windowApps = new Set();
+  windowApps = new Set();
   windows.forEach((window) => {
     const app = Shell.WindowTracker.get_default().get_window_app(window.app);
     windowApps.add(app.get_id());
   });
-  let apps = windows;
+  apps = windows;
   let filteredApps = windows;
 
-  const rerunFiltersAndUpdate = (o) => {
+  rerunFiltersAndUpdate = (o) => {
     filteredApps = util.filterByText(apps, o.text);
     if (
       Convenience.getSettings().get_boolean('activate-immediately') &&
@@ -195,17 +218,10 @@ function _showUI() {
   };
 
   rerunFiltersAndUpdate(entry);
+  timeit('filters rerun');
 
-  let allLauncherApps = [];
-  let launcherApps = [];
-  setTimeout(function () {
-    allLauncherApps = launcher.apps();
-    launcherApps = allLauncherApps.filter(
-      (app) => !windowApps.has(app.app.get_id())
-    );
-    apps = [].concat.apply([], [windows, launcherApps]);
-    rerunFiltersAndUpdate(entry);
-  }, 10);
+  allLauncherApps = [];
+  launcherApps = [];
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
@@ -256,6 +272,9 @@ function _showUI() {
   });
 
   keyRelease = entry.connect('key-release-event', (o, e) => {
+    if (forceUpdateAppCacheTimeoutId)
+      clearTimeout(forceUpdateAppCacheTimeoutId);
+    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
     const entryContent = o.text;
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
@@ -384,6 +403,9 @@ function _showUI() {
 
   // this and the following function contain some of the same copy pasted code
   function cleanUI() {
+    rerunFiltersAndUpdate = null;
+    if (forceUpdateAppCacheTimeoutId)
+      clearTimeout(forceUpdateAppCacheTimeoutId);
     switcherModule.onlyCurrentWorkspaceToggled = false;
     cleanBoxes();
     containers.reverse().forEach((c) => {
@@ -396,6 +418,9 @@ function _showUI() {
   }
 
   function cleanUIWithFade() {
+    rerunFiltersAndUpdate = null;
+    if (forceUpdateAppCacheTimeoutId)
+      clearTimeout(forceUpdateAppCacheTimeoutId);
     switcherModule.onlyCurrentWorkspaceToggled = false;
     containers.reverse().forEach((c) => {
       try {
@@ -429,6 +454,8 @@ function _showUI() {
   let i = 0;
   let shortcutWidth = keyActivation.shortcutBoxWidth();
 
+  let allWindowsShown = false;
+
   function showSingleBox() {
     if (i < currentlyShowingCount) {
       const box = boxes[i];
@@ -436,7 +463,18 @@ function _showUI() {
       util.fixWidths(box, width, shortcutWidth);
       i += 1;
       setTimeout(showSingleBox, 0);
-    } else {
+    } else if (!allWindowsShown){
+      timeit('all windows now shown')
+      allWindowsShown = true;
+      setTimeout(function () {
+        timeit('this should be 10ms after the last one')
+        allLauncherApps = launcher.apps();
+        launcherApps = allLauncherApps.filter(
+          (app) => !windowApps.has(app.app.get_id())
+        );
+        apps = [].concat.apply([], [windows, launcherApps]);
+        rerunFiltersAndUpdate(entry);
+      }, 10);
     }
   }
   setTimeout(showSingleBox, 0);
