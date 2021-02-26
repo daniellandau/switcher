@@ -198,14 +198,6 @@ function _showUI() {
 
   let allLauncherApps = [];
   let launcherApps = [];
-  setTimeout(function () {
-    allLauncherApps = launcher.apps();
-    launcherApps = allLauncherApps.filter(
-      (app) => !windowApps.has(app.app.get_id())
-    );
-    apps = [].concat.apply([], [windows, launcherApps]);
-    rerunFiltersAndUpdate(entry);
-  }, 10);
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
@@ -429,6 +421,8 @@ function _showUI() {
   let i = 0;
   let shortcutWidth = keyActivation.shortcutBoxWidth();
 
+  let allWindowsShown = false;
+
   function showSingleBox() {
     if (i < currentlyShowingCount) {
       const box = boxes[i];
@@ -436,7 +430,16 @@ function _showUI() {
       util.fixWidths(box, width, shortcutWidth);
       i += 1;
       setTimeout(showSingleBox, 0);
-    } else {
+    } else if (!allWindowsShown){
+      allWindowsShown = true;
+      setTimeout(function () {
+        allLauncherApps = launcher.apps();
+        launcherApps = allLauncherApps.filter(
+          (app) => !windowApps.has(app.app.get_id())
+        );
+        apps = [].concat.apply([], [windows, launcherApps]);
+        rerunFiltersAndUpdate(entry);
+      }, 0);
     }
   }
   setTimeout(showSingleBox, 0);
