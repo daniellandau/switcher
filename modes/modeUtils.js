@@ -77,25 +77,31 @@ var ModeUtils = (function () {
   };
 
   let shellAppCache = { lastIndexed: null, apps: [] };
+  let nullAppInfosFound = false;
+  let getHasNullAppInfos = () => nullAppInfosFound;
   let shellApps = (force) => {
-    const get = () =>
-      appInfos().map(function (switcherApp) {
+    const get = () => {
+      nullAppInfosFound = false;
+      return appInfos().map(function (switcherApp) {
         let shellApp = Shell.AppSystem.get_default().lookup_app(
           switcherApp.appId
         );
+        if (shellApp == null) {
+          nullAppInfosFound = true;
+          return null
+        }
         // TODO: should this really be done during appInfos creation?
         //       seems disjointed here
         switcherApp.setShellApp(shellApp);
         return switcherApp;
-      });
+      }).filter(x => x);
+    }
     const update = () => {
       shellAppCache.lastIndexed = new Date();
       shellAppCache.apps = get();
     };
     if (!shellAppCache.lastIndexed || !!force) {
       update();
-    } else {
-      util.setTimeout(update, 500);
     }
     return shellAppCache.apps;
   };
@@ -235,9 +241,10 @@ var ModeUtils = (function () {
   };
 
   return {
-    cleanIDs: cleanIDs,
-    makeBox: makeBox,
-    shellApps: shellApps,
-    getExtras: getExtras
+    cleanIDs,
+    makeBox,
+    shellApps,
+    getExtras,
+    getHasNullAppInfos,
   };
 })();
