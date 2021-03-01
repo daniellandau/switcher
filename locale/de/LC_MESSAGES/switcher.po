@@ -7,64 +7,180 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-17 08:17+0100\n"
-"PO-Revision-Date: 2016-02-17 08:18+0100\n"
+"POT-Creation-Date: 2020-12-28 12:19+0200\n"
+"PO-Revision-Date: 2021-02-27 08:49+0100\n"
 "Last-Translator: Jonatan Zeidler <jonatan_zeidler@gmx.de>\n"
-"Language-Team: \n"
+"Language-Team: jonatan_zeidler@gmx.de\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.4\n"
+"X-Generator: Poedit 2.4.2\n"
 
-#: prefs.js:49
+#: onboarding.js:78
+msgid "Switcher"
+msgstr "Wechsler"
+
+#: onboarding.js:83
+msgid "Switcher usage tip"
+msgstr "Wechsler Nutzungstipp"
+
+#: onboarding.js:88 prefs.js:314
+msgid "Never show usage tips"
+msgstr "Nutzungstipps nicht mehr anzeigen"
+
+#: onboarding.js:93
+msgid "Ok"
+msgstr "Ok"
+
+#: onboardingmessages.js:3
+msgid ""
+"Use Super+w (or another shortcut you configured in settings) to start the "
+"switcher. Type space separated searches, use the arrow keys to navigate, and "
+"press Space to activate."
+msgstr ""
+"Super+w nutzen (oder in Einstellungen konfiguriertes Kürzel), um den "
+"Wechsler zu starten. Suchwörter durch Leerzeichen trennen, Pfeiltasten zum "
+"Navigieren und Leertaste zum aktivieren."
+
+#: onboardingmessages.js:4
+msgid ""
+"There is a launcher mode too. Use Ctrl+Tab, Ctrl+Space or Ctrl+m to switch "
+"modes. If you are looking for an app that is not running, the mode switches "
+"automatically."
+msgstr ""
+"Alternativ gibt es einen Startermodus. Strg+Tab, Strg+Leertaste oder Strg+m "
+"wechseln die Modi. By der Suche nach einer nicht laufenden Anwendung, "
+"wechselt der Modus automatisch."
+
+#: onboardingmessages.js:5
+msgid ""
+"There are a number of settings you can tweak to configure how the switcher "
+"looks and acts. Go to https://extensions.gnome.org/local/ to access settings."
+msgstr ""
+"Eine Reihe von Einstellungen können vorgenommen werden, um Aussehen und "
+"Verhalten des Wechslers anzupassen. Die Einstellungen sind unter https://"
+"extensions.gnome.org/local/ erreichbar."
+
+#: onboardingmessages.js:6
+msgid "You can also click an item with the mouse/touchpad to activate."
+msgstr "Suchergebnisse können auch per Maus oder Touchpad aktiviert werden."
+
+#: onboardingmessages.js:7
+msgid ""
+"You can use Shift+Enter to bring the activated window to the current "
+"workspace."
+msgstr ""
+"Shift+Enter bringt das aktivierte Fenster auf die aktuelle Arbeitsfläche."
+
+#: onboardingmessages.js:8
+msgid ""
+"If you want to toggle on the fly showing only windows in the current "
+"workspace or all windows, use Ctrl+w."
+msgstr ""
+"Mit Strg+w lässt sich umschalten, ob nur die aktuelle Arbeitsfläche oder "
+"alle Arbeitsflächen einbezogen werden."
+
+#: prefs.js:35
 msgid "Hotkey to activate switcher"
-msgstr "Tastenkürzel zum Aktivieren des Fensterwechslers"
+msgstr "Kürzel zum Aktivieren des Wechslers"
 
-#: prefs.js:73
+#: prefs.js:38
+msgid "Hotkey to activate launcher (deprecated)"
+msgstr "Kürzel zum Aktivieren des Starters (veraltet, wird demnächst entfernt)"
+
+#: prefs.js:42
+msgid "Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"
+msgstr "Strg+Tab oder Strg+Leertaste wechseln zwischen Wechsler und Starter"
+
+#: prefs.js:121
 msgid "Key"
-msgstr "Kürzel"
+msgstr "Taste"
 
-#: prefs.js:82
+#: prefs.js:130
+msgid "Pattern matching algorithm"
+msgstr "Mustererkennungsalgorithmus"
+
+#: prefs.js:131
+msgid "Strict"
+msgstr "Streng"
+
+#: prefs.js:131
+msgid "Fuzzy"
+msgstr "Unscharf"
+
+#: prefs.js:142
+msgid "Ordering criteria"
+msgstr "Sortierkriterien"
+
+#: prefs.js:143
+msgid "Last focused"
+msgstr "Letztes Fokussiertes"
+
+#: prefs.js:143
+msgid "Most relevant"
+msgstr "Passendstes"
+
+#: prefs.js:154
 msgid "Immediate activation"
 msgstr "Automatisches Wechseln"
 
-#: prefs.js:87
+#: prefs.js:159
 msgid "When there is just one result, activate immediately"
 msgstr "Automatisch wechseln, falls es nur ein Ergebnis gibt"
 
-#: prefs.js:101
+#: prefs.js:173
 msgid "Activate immediately this many milliseconds after last keystroke"
-msgstr "Automatisches Wechseln mit Verzögerung in Millisekunden von:"
+msgstr "So viele Millisekunden nach letztem Tastendruck automatisch wechseln"
 
-#: prefs.js:121
+#: prefs.js:192
 msgid "Icon size (px)"
 msgstr "Symbolgröße (px)"
 
-#: prefs.js:138
+#: prefs.js:209
 msgid "Font size (px)"
 msgstr "Schriftgröße (px)"
 
-#: prefs.js:155
+#: prefs.js:226
 msgid "Width (%)"
 msgstr "Breite (%)"
 
-#: prefs.js:171
+#: prefs.js:242
 msgid "Activate by pressing a key matching the index in the list"
 msgstr "Wechseln durch Tastendruck"
 
-#: prefs.js:172
+#: prefs.js:243
 msgid "Disable"
 msgstr "Deaktivieren"
 
-#: prefs.js:172
+#: prefs.js:243
 msgid "Function keys"
 msgstr "F-Tasten"
 
-#: prefs.js:172
+#: prefs.js:243
 msgid "Number keys"
 msgstr "Nummern-Tasten"
 
-#: prefs.js:183
+#: prefs.js:254
 msgid "Show workspace indicators"
 msgstr "Arbeitsflächenindikator anzeigen"
+
+#: prefs.js:268
+msgid "Show only apps in the current workspace"
+msgstr "Nur Anwendungen der aktuellen Arbeitsfläche anzeigen"
+
+#: prefs.js:282
+msgid "Fade Effect"
+msgstr "Überblendeffekt"
+
+#: prefs.js:296
+msgid "Show Switcher on active display"
+msgstr "Wechsler auf aktivem Bildschirm anzeigen"
+
+#: prefs.js:310
+msgid "Usage tips"
+msgstr "Nutzungstipps"
+
+#: prefs.js:327
+msgid "Read all tips"
+msgstr "Alle Tipps lesen"
