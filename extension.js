@@ -34,7 +34,6 @@ const launcher = Me.imports.modes.launcher.Launcher;
 const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 const util = Me.imports.util;
 const controlCenter = Me.imports.controlCenter;
-const onboarding = Me.imports.onboarding;
 window.setTimeout = util.setTimeout;
 window.clearTimeout = util.clearTimeout;
 const promiseModule = Me.imports.promise;
@@ -51,8 +50,6 @@ let container,
   keybindings = [],
   initialHotkeyConsumed,
   currentlyShowingCount;
-
-let onboardingShownThisSession = false;
 
 const enableDebugLog = false;
 const enablePerfTracing = false;
@@ -509,11 +506,6 @@ function enable() {
   const gnomeControlCenter = new controlCenter.GnomeControlCenter();
   gnomeControlCenter.initPanelAppIDs();
   setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
-
-  if (!onboardingShownThisSession) {
-    onboardingShownThisSession = true;
-    onboarding.showOne();
-  }
 }
 
 function disable() {
