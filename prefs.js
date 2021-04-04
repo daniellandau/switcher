@@ -10,7 +10,7 @@ const Gettext = imports.gettext.domain('switcher');
 const _ = Gettext.gettext;
 const getOnboardingMessages = Me.imports.onboardingmessages.messages;
 
-const { GLib } = imports.gi;
+const { GLib, Gdk } = imports.gi;
 
 
 let entry, settings;
@@ -22,16 +22,19 @@ function init() {
 
 function buildPrefsWidget() {
   let scrollableArea = new Gtk.ScrolledWindow();
+  let provider = new Gtk.CssProvider();
+  provider.load_from_path(Me.dir.get_path() + '/prefs.css');
+  Gtk.StyleContext.add_provider_for_display(
+    Gdk.Display.get_default(),
+    provider,
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
   GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
     let window = scrollableArea.get_root();
     window.default_width = 700;
     window.default_height = 900;
   });
-  let vWidget = new Gtk.Box();
+  let vWidget = new Gtk.Box({ 'css-classes': ['toplevel'] });
   vWidget.set_orientation(Gtk.Orientation.VERTICAL);
-
-  // TODO margin
-
   buildWidgets().forEach(w => vWidget.append(w));
   scrollableArea.set_child(vWidget);
   scrollableArea.set_size_request(800, -1);
@@ -43,13 +46,8 @@ function buildWidgets() {
   Convenience.initSettings()
   let settings = Convenience.getSettings();
 
-  let shortcutsWidget = new Gtk.Box({ spacing: 20, homogeneous: true });
-  let switcherWidget = new Gtk.Box();
-  addShortcut(switcherWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
-  shortcutsWidget.prepend(switcherWidget);
-  let launcherWidget = new Gtk.Box();
-  addShortcut(launcherWidget, settings, 'show-launcher', _("Hotkey to activate launcher (deprecated)"));
-  shortcutsWidget.prepend(launcherWidget);
+  let switcherShortcutWidget = new Gtk.Box();
+  addShortcut(switcherShortcutWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
 
   let changeExplanation = new Gtk.Label({ margin_top: 5 });
   changeExplanation.set_markup(_("Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"));
@@ -96,7 +94,7 @@ function buildWidgets() {
   const onboardingWidgets = buildOnboarding(settings);
 
   return []
-    .concat(shortcutsWidget,
+    .concat(switcherShortcutWidget,
       changeExplanation,
       immediatelyWidgets,
       activateByWidgets,
@@ -121,7 +119,6 @@ function addShortcut(widget, settings, shortcut, title) {
 
   const row = model.insert(0);
   let [ok, key, mods] = Gtk.accelerator_parse(settings.get_strv(shortcut)[0]);
-  log('mods' + mods + "key" + key);
   model.set(row, [0, 1], [mods, key]);
   const treeViewUi = `
   <?xml version="1.0" encoding="UTF-8"?>
@@ -129,6 +126,7 @@ function addShortcut(widget, settings, shortcut, title) {
   <requires lib="gtk" version="4.0"/>
 
   <object class="GtkTreeView" id="treeview">
+    <property name="height-request">100</property>
     <child>
       <object class="GtkTreeViewColumn" id="accelcolumn">
         <child>
@@ -142,20 +140,16 @@ function addShortcut(widget, settings, shortcut, title) {
   </object>
  </interface>
   `;
-  
+
   const builder = new Gtk.Builder();
   builder.add_from_string(treeViewUi, treeViewUi.length);
 
   let treeView = builder.get_object('treeview');
   treeView.set_model(model);
-  log('aoeuaoeu')
+  treeView.set_hexpand(true);
 
   let accelerator = builder.get_object('accelrenderer');
   accelerator.accel_mode = Gtk.CellRendererAccelMode.GTK;
-  //  new Gtk.CellRendererAccel({
-  //   'editable': true,
-  //   'accel-mode': Gtk.CellRendererAccelMode.GTK
-  // });
 
   accelerator.connect('accel-edited', function (r, iter, key, mods) {
     let value = Gtk.accelerator_name(key, mods);
@@ -168,11 +162,8 @@ function addShortcut(widget, settings, shortcut, title) {
 
   let column = builder.get_object('accelcolumn');
   column.set_title(_("Key"));
-  //new Gtk.TreeViewColumn({ title: _("Key") });
-  // column.set_widget(accelerator, false);
   column.add_attribute(accelerator, 'accel-mods', 0);
   column.add_attribute(accelerator, 'accel-key', 1);
-  treeView.append_column(column);
   widget.append(treeView);
 }
 
