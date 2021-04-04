@@ -50,8 +50,7 @@ function buildWidgets() {
   addShortcut(switcherShortcutWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
 
   let changeExplanation = new Gtk.Label({ margin_top: 5 });
-  changeExplanation.set_markup(_("Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"));
-  // changeExplanation.set_alignment(0, 0.5);
+  changeExplanation.set_markup(_("There used to be a separate launcher mode, but now launchable apps are shown in the same view"));
 
   const immediatelyWidgets = buildImmediately(settings);
   const activateByWidgets = buildActivateByKey(settings);
@@ -112,7 +111,9 @@ function buildWidgets() {
 }
 
 function addShortcut(widget, settings, shortcut, title) {
-  widget.append(makeTitle(title));
+  const vBox = new Gtk.Box();
+  vBox.set_orientation(Gtk.Orientation.VERTICAL);
+  vBox.append(makeTitle(title));
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
@@ -126,7 +127,7 @@ function addShortcut(widget, settings, shortcut, title) {
   <requires lib="gtk" version="4.0"/>
 
   <object class="GtkTreeView" id="treeview">
-    <property name="height-request">100</property>
+    <property name="height-request">80</property>
     <child>
       <object class="GtkTreeViewColumn" id="accelcolumn">
         <child>
@@ -164,7 +165,8 @@ function addShortcut(widget, settings, shortcut, title) {
   column.set_title(_("Key"));
   column.add_attribute(accelerator, 'accel-mods', 0);
   column.add_attribute(accelerator, 'accel-key', 1);
-  widget.append(treeView);
+  vBox.append(treeView);
+  widget.append(vBox)
 }
 
 function addMatching(widget, settings) {
@@ -198,9 +200,13 @@ function buildImmediately(settings) {
   let box = new Gtk.Box();
   let label = new Gtk.Label();
   label.set_markup(_("When there is just one result, activate immediately"));
+  label.set_hexpand(true)
+  label.set_xalign(0);
+  label.set_yalign(0.5)
   box.append(label);
   let _switch = new Gtk.Switch({
     active: settings.get_boolean('activate-immediately'),
+    margin_top: 15,
     halign: Gtk.Align.END
   });
   _switch.connect('notify::active', function (o) {
@@ -211,6 +217,7 @@ function buildImmediately(settings) {
 
   label = new Gtk.Label();
   label.set_markup(_("Activate immediately this many milliseconds after last keystroke"));
+  label.set_xalign(0)
   // label.set_padding(0, 9);
 
   input = new Gtk.SpinButton({
@@ -322,53 +329,42 @@ function addActiveDisplay(widget, settings) {
 function buildOnboarding(settings) {
   const title = makeTitle(_("Usage tips"));
 
-  let box = new Gtk.Box();
-  let label = new Gtk.Label();
-  label.set_markup(_("Never show usage tips"));
-  // label.set_alignment(0, 0.5);
-  box.append(label);
-
-  let _switch = new Gtk.Switch({
-    active: settings.get_boolean('never-show-onboarding'),
-    halign: Gtk.Align.END
-  });
-  _switch.connect('notify::active', function (o) {
-    settings.set_boolean('never-show-onboarding', o.active);
-  });
-  box.append(_switch);
-
   const showMessages = new Gtk.Button({ label: _("Read all tips") });
   showMessages.set_margin_top(10);
   const popover = new Gtk.Popover(showMessages);
-  // popover.set_relative_to(showMessages);
+  popover.set_parent(showMessages);
   const vbox = new Gtk.Box();
+  vbox.set_orientation(Gtk.Orientation.VERTICAL);
   vbox.set_margin_start(5);
   vbox.set_margin_end(5);
   vbox.set_margin_bottom(5);
   popover.set_child(vbox);
   showMessages.connect('clicked', function () {
-    popover.show_all();
+    popover.show();
   });
 
   getOnboardingMessages(_)
     .map((msg, i) => {
       const label = new Gtk.Label();
       label.set_markup((i + 1) + '. ' + msg);
-      // label.set_alignment(0, 0.5);
-      // label.set_line_wrap(true);
+      label.set_xalign(0);
+      label.set_yalign(0.5)
+      label.set_wrap(true);
       label.set_margin_top(5);
       label.set_max_width_chars(72);
       return label;
     })
     .forEach(l => vbox.append(l));
 
-  return [title, box, showMessages];
+  return [title, showMessages];
 }
 
 function makeTitle(markup) {
   let title = new Gtk.Label({ margin_top: 20, margin_bottom: 5 });
 
   title.set_markup('<b>' + markup + '</b>');
-  //title.set_alignment(0, 0.5);
+  title.set_hexpand(true);
+  title.set_xalign(0);
+  title.set_yalign(0.5);
   return title;
 }
