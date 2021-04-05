@@ -28,7 +28,7 @@ function buildPrefsWidget() {
     Gdk.Display.get_default(),
     provider,
     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
-  GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+  scrollableArea.connect('realize', () => {
     let window = scrollableArea.get_root();
     window.default_width = 700;
     window.default_height = 900;
@@ -78,6 +78,9 @@ function buildWidgets() {
 
   let onlyOneWorkSpaceWidget = new Gtk.Box();
   addOnlyOneWorkspace(onlyOneWorkSpaceWidget, settings);
+  const workspaceTip = new Gtk.Label();
+  workspaceTip.set_markup(_("Use Ctrl+w to toggle on the fly"));
+  workspaceTip.set_xalign(0);
 
   let fadeEffectWidget = new Gtk.Box();
   addFadeEffect(fadeEffectWidget, settings);
@@ -102,6 +105,7 @@ function buildWidgets() {
       widthWidgets,
       workspaceIndicatorWidget,
       onlyOneWorkSpaceWidget,
+      workspaceTip,
       fadeEffectWidget,
       activeDisplayWidget,
       showOriginalsWidget,
@@ -113,7 +117,9 @@ function buildWidgets() {
 function addShortcut(widget, settings, shortcut, title) {
   const vBox = new Gtk.Box();
   vBox.set_orientation(Gtk.Orientation.VERTICAL);
-  vBox.append(makeTitle(title));
+  const titleLabel = makeTitle(title); 
+  titleLabel.set_margin_top(0);
+  vBox.append(titleLabel);
 
   let model = new Gtk.ListStore();
   model.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
@@ -173,6 +179,7 @@ function addMatching(widget, settings) {
   widget.append(makeTitle(_("Pattern matching algorithm")));
   let options = [_("Strict"), _("Fuzzy")];
   let input = new Gtk.ComboBoxText();
+  input.set_margin_top(10);
   options.forEach(o => input.append_text(o));
   input.set_active(settings.get_uint('matching'));
   input.connect('changed', function () {
@@ -185,6 +192,7 @@ function addOrdering(widget, settings) {
   widget.append(makeTitle(_("Ordering criteria")));
   let options = [_("Last focused"), _("Most relevant")];
   let input = new Gtk.ComboBoxText();
+  input.set_margin_top(10);
   options.forEach(o => input.append_text(o));
   input.set_active(settings.get_uint('ordering'));
   input.connect('changed', function () {
@@ -218,7 +226,6 @@ function buildImmediately(settings) {
   label = new Gtk.Label();
   label.set_markup(_("Activate immediately this many milliseconds after last keystroke"));
   label.set_xalign(0)
-  // label.set_padding(0, 9);
 
   input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
@@ -244,6 +251,7 @@ function addIconSize(widget, settings) {
       step_increment: 1
     })
   });
+  input.set_margin_top(10);
   input.set_value(settings.get_uint('icon-size'));
   input.connect('value-changed', function (button) {
     settings.set_uint('icon-size', button.get_value_as_int());
@@ -261,6 +269,7 @@ function addFontSize(widget, settings) {
       step_increment: 1
     })
   });
+  input.set_margin_top(10);
   input.set_value(settings.get_uint('font-size'));
   input.connect('value-changed', function (button) {
     settings.set_uint('font-size', button.get_value_as_int());
