@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-28 12:19+0200\n"
+"POT-Creation-Date: 2021-04-06 16:54+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,148 +20,135 @@ msgstr ""
 "X-Poedit-SearchPath-0: prefs.js\n"
 "X-Poedit-SearchPath-1: extension.js\n"
 "X-Poedit-SearchPath-2: onboardingmessages.js\n"
-"X-Poedit-SearchPath-3: onboarding.js\n"
-
-#: onboarding.js:78
-msgid "Switcher"
-msgstr ""
-
-#: onboarding.js:83
-msgid "Switcher usage tip"
-msgstr ""
-
-#: onboarding.js:88 prefs.js:314
-msgid "Never show usage tips"
-msgstr ""
-
-#: onboarding.js:93
-msgid "Ok"
-msgstr ""
 
 #: onboardingmessages.js:3
 msgid "Use Super+w (or another shortcut you configured in settings) to start the switcher. Type space separated searches, use the arrow keys to navigate, and press Space to activate."
 msgstr ""
 
 #: onboardingmessages.js:4
-msgid "There is a launcher mode too. Use Ctrl+Tab, Ctrl+Space or Ctrl+m to switch modes. If you are looking for an app that is not running, the mode switches automatically."
-msgstr ""
-
-#: onboardingmessages.js:5
-msgid "There are a number of settings you can tweak to configure how the switcher looks and acts. Go to https://extensions.gnome.org/local/ to access settings."
-msgstr ""
-
-#: onboardingmessages.js:6
 msgid "You can also click an item with the mouse/touchpad to activate."
 msgstr ""
 
-#: onboardingmessages.js:7
+#: onboardingmessages.js:5
 msgid "You can use Shift+Enter to bring the activated window to the current workspace."
 msgstr ""
 
-#: onboardingmessages.js:8
-msgid "If you want to toggle on the fly showing only windows in the current workspace or all windows, use Ctrl+w."
+#: onboardingmessages.js:6
+msgid "Use Ctrl+Enter to launch multiple apps or new instances of already open apps"
 msgstr ""
 
-#: prefs.js:35
+#: onboardingmessages.js:7
+msgid "System settings sections are also available for launching, just search for them!"
+msgstr ""
+
+#: prefs.js:53
 msgid "Hotkey to activate switcher"
 msgstr ""
 
-#: prefs.js:38
-msgid "Hotkey to activate launcher (deprecated)"
+#: prefs.js:59
+msgid "There used to be a separate launcher mode, but now launchable apps are shown in the same view"
 msgstr ""
 
-#: prefs.js:42
-msgid "Use Ctrl+Tab or Ctrl+Space to switch between switcher and launcher"
+#: prefs.js:90
+msgid "Use Ctrl+w to toggle on the fly"
 msgstr ""
 
-#: prefs.js:121
+#: prefs.js:103
+msgid "Show original language names"
+msgstr ""
+
+#: prefs.js:110
+msgid "Show executable names"
+msgstr ""
+
+#: prefs.js:189
 msgid "Key"
 msgstr ""
 
-#: prefs.js:130
+#: prefs.js:197
 msgid "Pattern matching algorithm"
 msgstr ""
 
-#: prefs.js:131
+#: prefs.js:198
 msgid "Strict"
 msgstr ""
 
-#: prefs.js:131
+#: prefs.js:198
 msgid "Fuzzy"
 msgstr ""
 
-#: prefs.js:142
+#: prefs.js:210
 msgid "Ordering criteria"
 msgstr ""
 
-#: prefs.js:143
+#: prefs.js:211
 msgid "Last focused"
 msgstr ""
 
-#: prefs.js:143
+#: prefs.js:211
 msgid "Most relevant"
 msgstr ""
 
-#: prefs.js:154
+#: prefs.js:223
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:159
+#: prefs.js:228
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:173
+#: prefs.js:246
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 
-#: prefs.js:192
+#: prefs.js:265
 msgid "Icon size (px)"
 msgstr ""
 
-#: prefs.js:209
+#: prefs.js:283
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:226
+#: prefs.js:301
 msgid "Width (%)"
 msgstr ""
 
-#: prefs.js:242
+#: prefs.js:318
 msgid "Activate by pressing a key matching the index in the list"
 msgstr ""
 
-#: prefs.js:243
+#: prefs.js:320
 msgid "Disable"
 msgstr ""
 
-#: prefs.js:243
+#: prefs.js:320
 msgid "Function keys"
 msgstr ""
 
-#: prefs.js:243
+#: prefs.js:320
 msgid "Number keys"
 msgstr ""
 
-#: prefs.js:254
+#: prefs.js:348
 msgid "Show workspace indicators"
 msgstr ""
 
-#: prefs.js:268
+#: prefs.js:357
 msgid "Show only apps in the current workspace"
 msgstr ""
 
-#: prefs.js:282
+#: prefs.js:363
 msgid "Fade Effect"
 msgstr ""
 
-#: prefs.js:296
+#: prefs.js:370
 msgid "Show Switcher on active display"
 msgstr ""
 
-#: prefs.js:310
+#: prefs.js:376
 msgid "Usage tips"
 msgstr ""
 
-#: prefs.js:327
+#: prefs.js:378
 msgid "Read all tips"
 msgstr ""

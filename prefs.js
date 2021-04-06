@@ -12,13 +12,11 @@ const getOnboardingMessages = Me.imports.onboardingmessages.messages;
 
 const { GLib, Gdk } = imports.gi;
 
-
 let entry, settings;
 
 function init() {
   Convenience.initTranslations('switcher');
 }
-
 
 function buildPrefsWidget() {
   let scrollableArea = new Gtk.ScrolledWindow();
@@ -27,7 +25,8 @@ function buildPrefsWidget() {
   Gtk.StyleContext.add_provider_for_display(
     Gdk.Display.get_default(),
     provider,
-    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+    Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+  );
   scrollableArea.connect('realize', () => {
     let window = scrollableArea.get_root();
     window.default_width = 700;
@@ -35,7 +34,7 @@ function buildPrefsWidget() {
   });
   let vWidget = new Gtk.Box({ 'css-classes': ['toplevel'] });
   vWidget.set_orientation(Gtk.Orientation.VERTICAL);
-  buildWidgets().forEach(w => vWidget.append(w));
+  buildWidgets().forEach((w) => vWidget.append(w));
   scrollableArea.set_child(vWidget);
   scrollableArea.set_size_request(800, -1);
   scrollableArea.show();
@@ -43,14 +42,23 @@ function buildPrefsWidget() {
 }
 
 function buildWidgets() {
-  Convenience.initSettings()
+  Convenience.initSettings();
   let settings = Convenience.getSettings();
 
   let switcherShortcutWidget = new Gtk.Box();
-  addShortcut(switcherShortcutWidget, settings, 'show-switcher', _("Hotkey to activate switcher"));
+  addShortcut(
+    switcherShortcutWidget,
+    settings,
+    'show-switcher',
+    _('Hotkey to activate switcher')
+  );
 
   let changeExplanation = new Gtk.Label({ margin_top: 5 });
-  changeExplanation.set_markup(_("There used to be a separate launcher mode, but now launchable apps are shown in the same view"));
+  changeExplanation.set_markup(
+    _(
+      'There used to be a separate launcher mode, but now launchable apps are shown in the same view'
+    )
+  );
 
   const immediatelyWidgets = buildImmediately(settings);
   const activateByWidgets = buildActivateByKey(settings);
@@ -79,7 +87,7 @@ function buildWidgets() {
   let onlyOneWorkSpaceWidget = new Gtk.Box();
   addOnlyOneWorkspace(onlyOneWorkSpaceWidget, settings);
   const workspaceTip = new Gtk.Label();
-  workspaceTip.set_markup(_("Use Ctrl+w to toggle on the fly"));
+  workspaceTip.set_markup(_('Use Ctrl+w to toggle on the fly'));
   workspaceTip.set_xalign(0);
 
   let fadeEffectWidget = new Gtk.Box();
@@ -89,35 +97,45 @@ function buildWidgets() {
   addActiveDisplay(activeDisplayWidget, settings);
 
   let showOriginalsWidget = new Gtk.Box();
-  addBoolean(showOriginalsWidget, settings, _("Show original language names"), 'show-original-names');
+  addBoolean(
+    showOriginalsWidget,
+    settings,
+    _('Show original language names'),
+    'show-original-names'
+  );
   let showExecutablesWidget = new Gtk.Box();
-  addBoolean(showExecutablesWidget, settings, _("Show executable names"), 'show-executables');
+  addBoolean(
+    showExecutablesWidget,
+    settings,
+    _('Show executable names'),
+    'show-executables'
+  );
 
   const onboardingWidgets = buildOnboarding(settings);
 
-  return []
-    .concat(switcherShortcutWidget,
-      changeExplanation,
-      immediatelyWidgets,
-      activateByWidgets,
-      behaviourWidget,
-      appearanceWidget,
-      widthWidgets,
-      workspaceIndicatorWidget,
-      onlyOneWorkSpaceWidget,
-      workspaceTip,
-      fadeEffectWidget,
-      activeDisplayWidget,
-      showOriginalsWidget,
-      showExecutablesWidget,
-      onboardingWidgets
-    )
+  return [].concat(
+    switcherShortcutWidget,
+    changeExplanation,
+    immediatelyWidgets,
+    activateByWidgets,
+    behaviourWidget,
+    appearanceWidget,
+    widthWidgets,
+    workspaceIndicatorWidget,
+    onlyOneWorkSpaceWidget,
+    workspaceTip,
+    fadeEffectWidget,
+    activeDisplayWidget,
+    showOriginalsWidget,
+    showExecutablesWidget,
+    onboardingWidgets
+  );
 }
 
 function addShortcut(widget, settings, shortcut, title) {
   const vBox = new Gtk.Box();
   vBox.set_orientation(Gtk.Orientation.VERTICAL);
-  const titleLabel = makeTitle(title); 
+  const titleLabel = makeTitle(title);
   titleLabel.set_margin_top(0);
   vBox.append(titleLabel);
 
@@ -168,19 +186,19 @@ function addShortcut(widget, settings, shortcut, title) {
   });
 
   let column = builder.get_object('accelcolumn');
-  column.set_title(_("Key"));
+  column.set_title(_('Key'));
   column.add_attribute(accelerator, 'accel-mods', 0);
   column.add_attribute(accelerator, 'accel-key', 1);
   vBox.append(treeView);
-  widget.append(vBox)
+  widget.append(vBox);
 }
 
 function addMatching(widget, settings) {
-  widget.append(makeTitle(_("Pattern matching algorithm")));
-  let options = [_("Strict"), _("Fuzzy")];
+  widget.append(makeTitle(_('Pattern matching algorithm')));
+  let options = [_('Strict'), _('Fuzzy')];
   let input = new Gtk.ComboBoxText();
   input.set_margin_top(10);
-  options.forEach(o => input.append_text(o));
+  options.forEach((o) => input.append_text(o));
   input.set_active(settings.get_uint('matching'));
   input.connect('changed', function () {
     settings.set_uint('matching', input.get_active());
@@ -189,11 +207,11 @@ function addMatching(widget, settings) {
 }
 
 function addOrdering(widget, settings) {
-  widget.append(makeTitle(_("Ordering criteria")));
-  let options = [_("Last focused"), _("Most relevant")];
+  widget.append(makeTitle(_('Ordering criteria')));
+  let options = [_('Last focused'), _('Most relevant')];
   let input = new Gtk.ComboBoxText();
   input.set_margin_top(10);
-  options.forEach(o => input.append_text(o));
+  options.forEach((o) => input.append_text(o));
   input.set_active(settings.get_uint('ordering'));
   input.connect('changed', function () {
     settings.set_uint('ordering', input.get_active());
@@ -202,15 +220,15 @@ function addOrdering(widget, settings) {
 }
 
 function buildImmediately(settings) {
-  const title = makeTitle(_("Immediate activation"));
+  const title = makeTitle(_('Immediate activation'));
 
   let input;
   let box = new Gtk.Box();
   let label = new Gtk.Label();
-  label.set_markup(_("When there is just one result, activate immediately"));
-  label.set_hexpand(true)
+  label.set_markup(_('When there is just one result, activate immediately'));
+  label.set_hexpand(true);
   label.set_xalign(0);
-  label.set_yalign(0.5)
+  label.set_yalign(0.5);
   box.append(label);
   let _switch = new Gtk.Switch({
     active: settings.get_boolean('activate-immediately'),
@@ -224,8 +242,10 @@ function buildImmediately(settings) {
   box.append(_switch);
 
   label = new Gtk.Label();
-  label.set_markup(_("Activate immediately this many milliseconds after last keystroke"));
-  label.set_xalign(0)
+  label.set_markup(
+    _('Activate immediately this many milliseconds after last keystroke')
+  );
+  label.set_xalign(0);
 
   input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
@@ -242,7 +262,7 @@ function buildImmediately(settings) {
 }
 
 function addIconSize(widget, settings) {
-  widget.append(makeTitle(_("Icon size (px)")));
+  widget.append(makeTitle(_('Icon size (px)')));
 
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
@@ -260,7 +280,7 @@ function addIconSize(widget, settings) {
 }
 
 function addFontSize(widget, settings) {
-  widget.append(makeTitle(_("Font size (px)")));
+  widget.append(makeTitle(_('Font size (px)')));
 
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
@@ -278,7 +298,7 @@ function addFontSize(widget, settings) {
 }
 
 function buildMaxWidth(settings) {
-  const title = makeTitle(_("Width (%)"));
+  const title = makeTitle(_('Width (%)'));
   let input = new Gtk.SpinButton({
     adjustment: new Gtk.Adjustment({
       lower: 10,
@@ -294,10 +314,12 @@ function buildMaxWidth(settings) {
 }
 
 function buildActivateByKey(settings) {
-  const title = makeTitle(_("Activate by pressing a key matching the index in the list"));
-  let options = [_("Disable"), _("Function keys"), _("Number keys")];
+  const title = makeTitle(
+    _('Activate by pressing a key matching the index in the list')
+  );
+  let options = [_('Disable'), _('Function keys'), _('Number keys')];
   let input = new Gtk.ComboBoxText();
-  options.forEach(o => input.append_text(o));
+  options.forEach((o) => input.append_text(o));
   input.set_active(settings.get_uint('activate-by-key'));
   input.connect('changed', function () {
     settings.set_uint('activate-by-key', input.get_active());
@@ -320,25 +342,40 @@ function addBoolean(widget, settings, title, key) {
 }
 
 function addWorkspaceIndicator(widget, settings) {
-  addBoolean(widget, settings, _("Show workspace indicators"), 'workspace-indicator');
+  addBoolean(
+    widget,
+    settings,
+    _('Show workspace indicators'),
+    'workspace-indicator'
+  );
 }
 
 function addOnlyOneWorkspace(widget, settings) {
-  addBoolean(widget, settings, _("Show only apps in the current workspace"), 'only-current-workspace');
+  addBoolean(
+    widget,
+    settings,
+    _('Show only apps in the current workspace'),
+    'only-current-workspace'
+  );
 }
 
 function addFadeEffect(widget, settings) {
-  addBoolean(widget, settings, _("Fade Effect"), 'fade-enable');
+  addBoolean(widget, settings, _('Fade Effect'), 'fade-enable');
 }
 
 function addActiveDisplay(widget, settings) {
-  addBoolean(widget, settings, _("Show Switcher on active display"), 'on-active-display');
+  addBoolean(
+    widget,
+    settings,
+    _('Show Switcher on active display'),
+    'on-active-display'
+  );
 }
 
 function buildOnboarding(settings) {
-  const title = makeTitle(_("Usage tips"));
+  const title = makeTitle(_('Usage tips'));
 
-  const showMessages = new Gtk.Button({ label: _("Read all tips") });
+  const showMessages = new Gtk.Button({ label: _('Read all tips') });
   showMessages.set_margin_top(10);
   const popover = new Gtk.Popover(showMessages);
   popover.set_parent(showMessages);
@@ -355,15 +392,15 @@ function buildOnboarding(settings) {
   getOnboardingMessages(_)
     .map((msg, i) => {
       const label = new Gtk.Label();
-      label.set_markup((i + 1) + '. ' + msg);
+      label.set_markup(i + 1 + '. ' + msg);
       label.set_xalign(0);
-      label.set_yalign(0.5)
+      label.set_yalign(0.5);
       label.set_wrap(true);
       label.set_margin_top(5);
       label.set_max_width_chars(72);
       return label;
     })
-    .forEach(l => vbox.append(l));
+    .forEach((l) => vbox.append(l));
 
   return [title, showMessages];
 }
