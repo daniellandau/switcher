@@ -40,6 +40,7 @@ const promiseModule = Me.imports.promise;
 
 let container,
   containers,
+  grabs,
   cursor,
   boxLayout,
   entry,
@@ -118,8 +119,11 @@ function _showUI() {
           a,
           i,
           (app, modifiers) => {
-            if (!(app.mode.name() === 'Launcher' && modifiers.control))
+            if (!(app.mode.name() === 'Launcher' && modifiers.control)) {
               cleanUIWithFade();
+            } else {
+              setTimeout(checkNewWindows, 50);
+            }
             app.mode.activate(app.app);
           },
           boxes.length > i ? boxes[i] : {}
@@ -332,19 +336,6 @@ function _showUI() {
           if (launcherAppForWindow) {
             needCleanUI = false;
             launcherAppForWindow.activate(launcherAppForWindow.app);
-            // Check windowlist periodically until a new window appears
-            function checkNewWindows() {
-              if (!container) return;
-              const oldLength = windows.length;
-              windows = switcher.apps();
-              if (oldLength < windows.length) {
-                apps = [].concat.apply([], [windows, launcherApps]);
-                cursor += 1;
-                rerunFiltersAndUpdate(entry);
-              } else {
-                setTimeout(checkNewWindows, 50);
-              }
-            }
             setTimeout(checkNewWindows, 50);
           } else {
             selected.activate(selected.app);
@@ -356,8 +347,10 @@ function _showUI() {
           selected.mode.name() === 'Launcher' &&
           control &&
           symbol !== Clutter.KEY_j
-        )
+        ) {
           needCleanUI = false;
+          setTimeout(checkNewWindows, 50);
+        }
       }
       if (needCleanUI) cleanUIWithFade();
     }
@@ -380,74 +373,16 @@ function _showUI() {
     initialHotkeyConsumed = true;
   });
 
-  containers.forEach((c) => {
-    Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+  grabs = containers.map((c) => {
+    let grab =  Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+
     c.connect('button-press-event', cleanUIWithFade);
     c.show();
+	  return grab;
   });
+	grabs.push(Main.pushModal(boxLayout, { actionMode: Shell.ActionMode.SYSTEM_MODAL}))
   global.stage.set_key_focus(entry);
 
-  // In the bottom as a function statement so the variables closed
-  // over are defined and so it's hoisted up
-  function cleanBoxes() {
-    boxes.forEach(destroyBox);
-  }
-  function destroyBox(box) {
-    box.iconBox.get_children().forEach((child) => util.detachParent(child));
-    box.iconBox.destroy();
-    boxLayout.remove_child(box.whole);
-  }
-
-  // this and the following function contain some of the same copy pasted code
-  function cleanUI() {
-    rerunFiltersAndUpdate = null;
-    if (forceUpdateAppCacheTimeoutId)
-      clearTimeout(forceUpdateAppCacheTimeoutId);
-    switcherModule.onlyCurrentWorkspaceToggled = false;
-    cleanBoxes();
-    containers.reverse().forEach((c) => {
-      Main.uiGroup.remove_actor(c);
-      Main.popModal(c);
-    });
-    boxLayout.destroy();
-    container = null;
-    containers = null;
-  }
-
-  function cleanUIWithFade() {
-    rerunFiltersAndUpdate = null;
-    if (forceUpdateAppCacheTimeoutId)
-      clearTimeout(forceUpdateAppCacheTimeoutId);
-    switcherModule.onlyCurrentWorkspaceToggled = false;
-    containers.reverse().forEach((c) => {
-      try {
-        Main.popModal(c);
-      } catch (e) {
-        print('Switcher got an error', e);
-      }
-    });
-
-    const cleanRest = function () {
-      cleanBoxes();
-      containers.reverse().forEach((c) => {
-        Main.uiGroup.remove_actor(c);
-      });
-      boxLayout.destroy();
-      container = null;
-      containers = null;
-    };
-
-    if (Convenience.getSettings().get_boolean('fade-enable')) {
-      Tweener.addTween(boxLayout, {
-        opacity: 0,
-        time: 0.35,
-        transition: 'easeOutQuad',
-        onComplete: cleanRest
-      });
-    } else {
-      cleanRest();
-    }
-  }
   let i = 0;
   let shortcutWidth = keyActivation.shortcutBoxWidth();
 
@@ -493,15 +428,6 @@ function enable() {
       () => _showUI()
     )
   );
-  keybindings.push(
-    Main.wm.addKeybinding(
-      'show-launcher',
-      Convenience.getSettings(),
-      Meta.KeyBindingFlags.NONE,
-      Shell.ActionMode.NORMAL,
-      () => _showUI()
-    )
-  );
 
   const gnomeControlCenter = new controlCenter.GnomeControlCenter();
   gnomeControlCenter.initPanelAppIDs();
@@ -509,6 +435,85 @@ function enable() {
 }
 
 function disable() {
+	cleanUIWithFade(true);
   Main.wm.removeKeybinding('show-switcher');
-  Main.wm.removeKeybinding('show-launcher');
+}
+
+function cleanBoxes() {
+  boxes.forEach(destroyBox);
+}
+
+function destroyBox(box) {
+  box.iconBox.get_children().forEach((child) => util.detachParent(child));
+  box.iconBox.destroy();
+  boxLayout.remove_child(box.whole);
+}
+
+// this and the following function contain some of the same copy pasted code
+function cleanUI() {
+  rerunFiltersAndUpdate = null;
+  if (forceUpdateAppCacheTimeoutId)
+    clearTimeout(forceUpdateAppCacheTimeoutId);
+  switcherModule.onlyCurrentWorkspaceToggled = false;
+  cleanBoxes();
+  containers.reverse().forEach((c) => {
+    Main.uiGroup.remove_actor(c);
+  });
+  grabs.reverse().forEach((c) => {
+    Main.popModal(c);
+  });
+  boxLayout.destroy();
+  container = null;
+  containers = null;
+}
+
+function cleanUIWithFade(force_immediate = false) {
+  if (!containers) return;
+  rerunFiltersAndUpdate = null;
+  if (forceUpdateAppCacheTimeoutId)
+    clearTimeout(forceUpdateAppCacheTimeoutId);
+  switcherModule.onlyCurrentWorkspaceToggled = false;
+  grabs && grabs.reverse().forEach((c) => {
+    try {
+      Main.popModal(c);
+    } catch (e) {
+      print('Switcher got an error', e);
+    }
+  });
+
+  const cleanRest = function () {
+    cleanBoxes();
+    containers.reverse().forEach((c) => {
+      Main.uiGroup.remove_actor(c);
+    });
+    boxLayout.destroy();
+    container = null;
+    containers = null;
+  };
+
+  if (!force_immediate && Convenience.getSettings().get_boolean('fade-enable')) {
+    Tweener.addTween(boxLayout, {
+      opacity: 0,
+      time: 0.35,
+      transition: 'easeOutQuad',
+      onComplete: cleanRest
+    });
+  } else {
+    cleanRest();
+  }
+}
+
+// Check windowlist periodically until a new window appears
+function checkNewWindows() {
+  if (!container) return;
+  const oldLength = windows.length;
+  windows = switcher.apps();
+  if (oldLength < windows.length) {
+    apps = [].concat.apply([], [windows, launcherApps]);
+    cursor += 1;
+    rerunFiltersAndUpdate(entry);
+    global.stage.set_key_focus(entry);
+  } else {
+    setTimeout(checkNewWindows, 50);
+  }
 }

@@ -119,7 +119,7 @@ var GnomeControlCenter = class GnomeControlCenter {
         dataDirs[i],
         'gnome-shell',
         'search-providers',
-        'gnome-control-center-search-provider.ini'
+        'org.gnome.Settings.search-provider.ini'
       ]);
       // check if the file exists and if so stop the search
       if (GLib.file_test(possibleFilePath, GLib.FileTest.EXISTS) === true) {
@@ -133,7 +133,7 @@ var GnomeControlCenter = class GnomeControlCenter {
         'Could not find Gnome Control center search provider configuration' +
         ' file in any system or user data directories: ' +
         dataDirs.join(' ');
-      throw GnomeControlCenterError(errorMessage);
+      throw new GnomeControlCenterError(errorMessage);
     }
 
     return filePath;

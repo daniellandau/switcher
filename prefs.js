@@ -19,7 +19,6 @@ function init() {
 }
 
 function buildPrefsWidget() {
-  let scrollableArea = new Gtk.ScrolledWindow();
   let provider = new Gtk.CssProvider();
   provider.load_from_path(Me.dir.get_path() + '/prefs.css');
   Gtk.StyleContext.add_provider_for_display(
@@ -27,18 +26,10 @@ function buildPrefsWidget() {
     provider,
     Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
   );
-  scrollableArea.connect('realize', () => {
-    let window = scrollableArea.get_root();
-    window.default_width = 700;
-    window.default_height = 900;
-  });
   let vWidget = new Gtk.Box({ 'css-classes': ['toplevel'] });
   vWidget.set_orientation(Gtk.Orientation.VERTICAL);
   buildWidgets().forEach((w) => vWidget.append(w));
-  scrollableArea.set_child(vWidget);
-  scrollableArea.set_size_request(800, -1);
-  scrollableArea.show();
-  return scrollableArea;
+  return vWidget;
 }
 
 function buildWidgets() {
