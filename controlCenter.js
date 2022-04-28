@@ -67,7 +67,7 @@ var GnomeControlCenter = class GnomeControlCenter {
   }
 
   initPanelAppIDs() {
-    this._proxy.GetInitialResultSetRemote([], (results, error) => {
+    this._proxy && this._proxy.GetInitialResultSetRemote([], (results, error) => {
       if (error) {
         log('Switcher got an error getting settings panels', String(error));
         return;
