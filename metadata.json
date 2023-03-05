@@ -4,8 +4,9 @@
   "settings-schema": "org.gnome.shell.extensions.switcher",
   "description": "Switch windows or launch applications quickly by typing\n\nUse the configured global hotkey (Super+w by default) to open a list of current windows. Type a part of the name or title of the application window you want to activate and hit enter or click on the item you wish to activate. You can use the arrow keys to navigate among the filtered selection and type several space separated search terms to filter further. If your search matches launchable apps, those are shown in the list too. Use Esc or click anywhere outside the switcher to cancel.\n\nYou can customize the look and feel and functionality in the preferences.",
   "shell-version": [
+    "42",
     "43"
   ],
-  "version": 37,
+  "version": 38,
   "url": "https://github.com/daniellandau/switcher"
 }
