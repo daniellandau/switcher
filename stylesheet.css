@@ -2,12 +2,8 @@
   padding: .4em;
 }
 
-.switcher-box {
-  border-top: 2px solid #343a3a;
-}
-
 .switcher-box:hover {
-  background-color: rgba(54, 56, 58, 1);
+  background-color:  #2a2a2a;
 }
 
 .switcher-box:last-child {
@@ -17,20 +13,19 @@
 .switcher-box-layout {
   font-weight: bold;
   color: #aaaaaa;
-  background-color: rgba(23, 25, 26, 0.95);
-  border: 2px solid #343a3a;
-  border-radius: 9px;
+  background-color: rgba(31, 31, 31, 0.95);
+  border: 1px solid #3e3e3e;
+  border-radius: 19px;
   margin-top: 100px;
 }
 
 .switcher-highlight {
   color: #ffffff;
-  background-color: #215d9c;
+  background-color: #333;
 }
 
 .switcher-highlight:hover {
   color: #ffffff;
-  background-color: #447dbc;
 }
 
 .switcher-entry {
