@@ -1,11 +1,6 @@
 const MainLoop = imports.mainloop;
-// const St = imports.gi.St;
 import St from 'gi://St';
-// const Clutter = imports.gi.Clutter;
 import Clutter from 'gi://Clutter';
-// const ExtensionUtils = imports.misc.extensionUtils;
-// const Me = ExtensionUtils.getCurrentExtension();
-// const Convenience = Me.imports.convenience;
 import * as Convenience from './convenience.js';
 
 const matchFuzzy = 1;

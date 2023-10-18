@@ -4,15 +4,12 @@
 'use strict';
 
 /* ------------------------------------------------------------------------- */
-// const Gio = imports.gi.Gio;
 import Gio from 'gi://Gio';
-// const GLib = imports.gi.GLib;
 import GLib from 'gi://GLib';
 
 
 /* ------------------------------------------------------------------------- */
 // use RemoteSearch dbus setup and keyfile constants
-// const RemoteSearch = imports.ui.remoteSearch;
 import * as RemoteSearch from 'resource:///org/gnome/shell/ui/remoteSearch.js';
 
 /* ------------------------------------------------------------------------- */

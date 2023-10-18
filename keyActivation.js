@@ -1,11 +1,6 @@
-// const Clutter = imports.gi.Clutter;
 import Clutter from 'gi://Clutter';
-// const Main = imports.ui.main;
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
-// const ExtensionUtils = imports.misc.extensionUtils;
-// const Me = ExtensionUtils.getCurrentExtension();
-// const Convenience = Me.imports.convenience;
 import * as Convenience from './convenience.js';
 
 const keyActivationNone         = 0;

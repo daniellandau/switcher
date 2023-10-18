@@ -15,40 +15,23 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*global imports, print */
-// const St = imports.gi.St;
 import St from 'gi://St';
-// const Clutter = imports.gi.Clutter;
 import Clutter from 'gi://Clutter';
-// const Main = imports.ui.main;
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-// const Shell = imports.gi.Shell;
 import Shell from 'gi://Shell';
-// const Meta = imports.gi.Meta;
 import Meta from 'gi://Meta';
 // const Gettext = imports.gettext;
-// const Tweener = imports.tweener.tweener;
-// import * as Tweener from 'resource:///org/gnome/shell/tweener/tweener.js';
 
-// const ExtensionUtils = imports.misc.extensionUtils;
-// const Me = ExtensionUtils.getCurrentExtension();
-// const Convenience = Me.imports.convenience;
 import * as Convenience from './convenience.js';
 
-// const keyActivation = Me.imports.keyActivation.KeyActivation;
 import * as KeyActivationModule from './keyActivation.js';
 
-// const switcherModule = Me.imports.modes.switcher;
 import * as switcherModule from './modes/switcher.js';
-// const launcher = Me.imports.modes.launcher.Launcher;
 import {Launcher as launcher} from './modes/launcher.js';
 
-// const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 import * as ModeUtilsModule from './modes/modeUtils.js';
-// import * as modeUtils from './modes/modeUtils.js';
 
-// const util = Me.imports.util;
 import * as util from './util.js';
-// const controlCenter = Me.imports.controlCenter;
 import * as controlCenter from './controlCenter.js';
 
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -59,7 +42,6 @@ const modeUtils = ModeUtilsModule.ModeUtils;
 
 window.setTimeout = util.setTimeout;
 window.clearTimeout = util.clearTimeout;
-// const promiseModule = Me.imports.promise;
 
 let container,
   containers,
@@ -283,7 +265,6 @@ function _showUI() {
       cursor = cursor > 0 ? cursor - 1 : currentlyShowingCount - 1;
       util.updateHighlight(boxes, o.text, cursor);
     } else if (symbol === Clutter.KEY_w && control) {
-      // switcherModule.onlyCurrentWorkspaceToggled = !switcherModule.onlyCurrentWorkspaceToggled;
       switcherModule.setOnlyCurrentWorkspaceToggled(!switcherModule.onlyCurrentWorkspaceToggled)
       rerunFiltersAndUpdate(o);
     } else if (symbol === Clutter.KEY_h && control) {
@@ -436,10 +417,10 @@ function _showUI() {
   setTimeout(showSingleBox, 0);
 }
 
-function _init() {
-  Gettext.domain('switcher');
-  Gettext.bindtextdomain('switcher', Me.path + '/locale');
-}
+// function _init() {
+//   Gettext.domain('switcher');
+//   Gettext.bindtextdomain('switcher', Me.path + '/locale');
+// }
 
 function _enable() {
   Convenience.initSettings();
@@ -478,7 +459,6 @@ function cleanUI() {
   rerunFiltersAndUpdate = null;
   if (forceUpdateAppCacheTimeoutId)
     clearTimeout(forceUpdateAppCacheTimeoutId);
-  // switcherModule.onlyCurrentWorkspaceToggled = false;
   switcherModule.setOnlyCurrentWorkspaceToggled(false);
   cleanBoxes();
   containers.reverse().forEach((c) => {
@@ -497,7 +477,6 @@ function cleanUIWithFade(force_immediate = false) {
   rerunFiltersAndUpdate = null;
   if (forceUpdateAppCacheTimeoutId)
     clearTimeout(forceUpdateAppCacheTimeoutId);
-  // switcherModule.onlyCurrentWorkspaceToggled = false;
   switcherModule.setOnlyCurrentWorkspaceToggled(false);
   grabs && grabs.reverse().forEach((c) => {
     try {
@@ -518,12 +497,6 @@ function cleanUIWithFade(force_immediate = false) {
   };
 
   if (!force_immediate && Convenience.getSettings().get_boolean('fade-enable')) {
-    // Tweener.addTween(boxLayout, {
-    //   opacity: 0,
-    //   time: 0.35,
-    //   transition: 'easeOutQuad',
-    //   onComplete: cleanRest
-    // });
     boxLayout.ease(
       {
         opacity: 0,

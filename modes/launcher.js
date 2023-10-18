@@ -1,20 +1,11 @@
-// const St = imports.gi.St;
 import St from 'gi://St';
-// const Clutter = imports.gi.Clutter;
 import Clutter from 'gi://Clutter';
-// const Main = imports.ui.main;
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-// const Shell = imports.gi.Shell;
 import Shell from 'gi://Shell';
-// const Meta = imports.gi.Meta;
 import Meta from 'gi://Meta';
 
-// const ExtensionUtils = imports.misc.extensionUtils;
-// const Me = ExtensionUtils.getCurrentExtension();
-// const Convenience = Me.imports.convenience;
 import * as Convenience from '../convenience.js';
 
-// const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
 import * as modeUtils from './modeUtils.js';
 
 let stats = Convenience.getJson('launcher-stats');

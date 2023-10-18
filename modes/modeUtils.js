@@ -1,31 +1,17 @@
-// const St = imports.gi.St;
 import St from 'gi://St';
-// const Clutter = imports.gi.Clutter;
 import Clutter from 'gi://Clutter';
-// const Main = imports.ui.main;
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-// const Shell = imports.gi.Shell;
 import Shell from 'gi://Shell';
-// const Meta = imports.gi.Meta;
 import Meta from 'gi://Meta';
-// const Gio = imports.gi.Gio;
 import Gio from 'gi://Gio';
-// const GLib = imports.gi.GLib;
 import GLib from 'gi://GLib';
 
-// const ExtensionUtils = imports.misc.extensionUtils;
-// const Me = ExtensionUtils.getCurrentExtension();
-// const Convenience = Me.imports.convenience;
 import * as Convenience from '../convenience.js';
 
-// const util = Me.imports.util;
 import * as util from '../util.js';
-// const controlCenter = Me.imports.controlCenter;
 import * as controlCenter from '../controlCenter.js';
-// const switcherApplication = Me.imports.switcherApplication;
 import * as switcherApplication from '../switcherApplication.js';
 
-// const keyActivation = Me.imports.keyActivation.KeyActivation;
 import * as KeyActivationModule from '../keyActivation.js';
 const keyActivation = KeyActivationModule.KeyActivation;
 

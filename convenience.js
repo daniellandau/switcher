@@ -1,6 +1,4 @@
 /*global imports, print */
-//const ExtensionUtils = imports.misc.extensionUtils;
-//const Gio = imports.gi.Gio;
 import Gio from 'gi://Gio';
 // const Gettext = imports.gettext;
 // import * as Gettext from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -8,12 +6,11 @@ import Gio from 'gi://Gio';
 // import * as Config from 'resource:///org/gnome/shell/misc/config.js';
 // import * as Config from 'resource:///org/gnome/Shell/Extensions/js/misc/config.js';
 
-// import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
-// import {Extension} from 'resource:///org/gnome/Shell/Extensions/js/extensions/extension.js';
-
+// This method can be used to import Extension or ExtensionPreferences.
+// This is done differently in the GNOME Shell process and in the preferences process.
+// Both have the lookupByUUID method, used below.
 async function importExtension() {
   if (typeof global === 'undefined') {
-    // return (await import('resource:///org/gnome/Shell/Extensions/js/extensions/extension.js')).Extension;
     return (await import('resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js')).ExtensionPreferences;
   }
   return (await import('resource:///org/gnome/shell/extensions/extension.js')).Extension;
@@ -31,7 +28,6 @@ export function getSettings() {
 // copied from https://github.com/projecthamster/shell-extension/blob/f1f1d803395bc122db1b877985e1d2462c5215a9/convenience.js#L65
 export function initSettings() {
   const extension = Extension.lookupByUUID('switcher@landau.fi');
-  console.log('extension: ' + extension);
   const schema = extension.metadata['settings-schema'];
   const GioSSS = Gio.SettingsSchemaSource;
   const schemaDir = extension.dir.get_child('schemas');
