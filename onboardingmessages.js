@@ -1,4 +1,4 @@
-function messages(_) {
+export function messages(_) {
   return [
     _("Use Super+w (or another shortcut you configured in settings) to start the switcher. Type space separated searches, use the arrow keys to navigate, and press Space to activate."),
     _("You can also click an item with the mouse/touchpad to activate."),

@@ -5,7 +5,7 @@
 
 
 /* ------------------------------------------------------------------------- */
-class SwitcherApplication {
+export class SwitcherApplication {
 
   /* ....................................................................... */
   constructor(appId, shellApp=null) {
@@ -62,7 +62,7 @@ class SwitcherApplication {
 
 
 /* ------------------------------------------------------------------------- */
-var RegularApplication = class RegularApplication extends SwitcherApplication {
+export class RegularApplication extends SwitcherApplication {
 
   /* ....................................................................... */
   get_name() {
@@ -82,7 +82,7 @@ var RegularApplication = class RegularApplication extends SwitcherApplication {
 
 
 /* ------------------------------------------------------------------------- */
-var GnomeControlApplication = class GnomeControlApplication
+export class GnomeControlApplication
   extends SwitcherApplication {
 
   /* ....................................................................... */

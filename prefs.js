@@ -1,22 +1,33 @@
 /*global imports, print */
-const Gtk = imports.gi.Gtk;
-const GObject = imports.gi.GObject;
+// const Gtk = imports.gi.Gtk;
+import Gtk from 'gi://Gtk';
+// const GObject = imports.gi.GObject;
+import GObject from 'gi://GObject';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
+// const ExtensionUtils = imports.misc.extensionUtils;
+// import * as ExtensionUtils from 'resource:///org/gnome/shell/misc/extensionUtils.js';
+// const Me = ExtensionUtils.getCurrentExtension();
+// const Convenience = Me.imports.convenience;
+import * as Convenience from './convenience.js';
 
-const Gettext = imports.gettext.domain('switcher');
-const _ = Gettext.gettext;
-const getOnboardingMessages = Me.imports.onboardingmessages.messages;
+// const Gettext = imports.gettext.domain('switcher');
+// const _ = Gettext.gettext;
+import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-const { GLib, Gdk } = imports.gi;
+// const getOnboardingMessages = Me.imports.onboardingmessages.messages;
+import * as OnboardingMessages from './onboardingmessages.js';
+const getOnboardingMessages = OnboardingMessages.messages;
+
+// const { GLib, Gdk } = imports.gi;
+import GLib from 'gi://GLib';
+import Gdk from 'gi://Gdk';
+import Adw from 'gi://Adw';
 
 let entry, settings;
 
-function init() {
-  Convenience.initTranslations('switcher');
-}
+// function init() {
+//   Convenience.initTranslations('switcher');
+// }
 
 function buildPrefsWidget() {
   let provider = new Gtk.CssProvider();
@@ -404,4 +415,25 @@ function makeTitle(markup) {
   title.set_xalign(0);
   title.set_yalign(0.5);
   return title;
+}
+
+export default class MyExtensionPreferences extends ExtensionPreferences {
+  fillPreferencesWindow(window) {
+      window._settings = this.getSettings();
+      const widgets = buildWidgets();
+
+      const page = new Adw.PreferencesPage();
+
+      const group = new Adw.PreferencesGroup({
+          title: _('Group Title'),
+      });
+
+      widgets.forEach((w) => {
+        group.add(w);
+      });
+
+      page.add(group);
+
+      window.add(page);
+  }
 }

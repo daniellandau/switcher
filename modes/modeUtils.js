@@ -1,19 +1,33 @@
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const Main = imports.ui.main;
-const Shell = imports.gi.Shell;
-const Meta = imports.gi.Meta;
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
+// const St = imports.gi.St;
+import St from 'gi://St';
+// const Clutter = imports.gi.Clutter;
+import Clutter from 'gi://Clutter';
+// const Main = imports.ui.main;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+// const Shell = imports.gi.Shell;
+import Shell from 'gi://Shell';
+// const Meta = imports.gi.Meta;
+import Meta from 'gi://Meta';
+// const Gio = imports.gi.Gio;
+import Gio from 'gi://Gio';
+// const GLib = imports.gi.GLib;
+import GLib from 'gi://GLib';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
-const util = Me.imports.util;
-const controlCenter = Me.imports.controlCenter;
-const switcherApplication = Me.imports.switcherApplication;
+// const ExtensionUtils = imports.misc.extensionUtils;
+// const Me = ExtensionUtils.getCurrentExtension();
+// const Convenience = Me.imports.convenience;
+import * as Convenience from '../convenience.js';
 
-const keyActivation = Me.imports.keyActivation.KeyActivation;
+// const util = Me.imports.util;
+import * as util from '../util.js';
+// const controlCenter = Me.imports.controlCenter;
+import * as controlCenter from '../controlCenter.js';
+// const switcherApplication = Me.imports.switcherApplication;
+import * as switcherApplication from '../switcherApplication.js';
+
+// const keyActivation = Me.imports.keyActivation.KeyActivation;
+import * as KeyActivationModule from '../keyActivation.js';
+const keyActivation = KeyActivationModule.KeyActivation;
 
 let gnomeControlCenterAppIDs = null;
 
@@ -51,7 +65,7 @@ function getGnomeControlCenterAppIDs() {
   return gnomeControlCenterAppIDs;
 }
 
-var ModeUtils = (function () {
+export var ModeUtils = (function () {
   // From _loadApps() in GNOME Shell's appDisplay.js
   let appInfos = () => {
     // get app ids for regular applications
