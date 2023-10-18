@@ -6,7 +6,6 @@ import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Ex
 import * as OnboardingMessages from './onboardingmessages.js';
 const getOnboardingMessages = OnboardingMessages.messages;
 
-// import GLib from 'gi://GLib';
 import Gdk from 'gi://Gdk';
 import Adw from 'gi://Adw';
 
