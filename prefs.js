@@ -6,11 +6,11 @@ import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Ex
 import * as OnboardingMessages from './onboardingmessages.js';
 const getOnboardingMessages = OnboardingMessages.messages;
 
-import GLib from 'gi://GLib';
+// import GLib from 'gi://GLib';
 import Gdk from 'gi://Gdk';
 import Adw from 'gi://Adw';
 
-let entry, settings;
+// let entry, settings;
 
 // function init() {
 //   Convenience.initTranslations('switcher');
@@ -18,7 +18,8 @@ let entry, settings;
 
 function buildPrefsWidget() {
   let provider = new Gtk.CssProvider();
-  provider.load_from_path(Me.dir.get_path() + '/prefs.css');
+  const extension = ExtensionPreferences.lookupByUUID('switcher@landau.fi');
+  provider.load_from_path(extension.dir.get_path() + '/prefs.css');
   Gtk.StyleContext.add_provider_for_display(
     Gdk.Display.get_default(),
     provider,
@@ -407,20 +408,17 @@ function makeTitle(markup) {
 export default class MyExtensionPreferences extends ExtensionPreferences {
   fillPreferencesWindow(window) {
       window._settings = this.getSettings();
-      const widgets = buildWidgets();
 
       const page = new Adw.PreferencesPage();
 
       const group = new Adw.PreferencesGroup({
-          title: _('Group Title'),
+          title: _('Switcher Preferences'),
       });
 
-      widgets.forEach((w) => {
-        group.add(w);
-      });
-
+      const widget = buildPrefsWidget();
+      group.add(widget);
       page.add(group);
-
       window.add(page);
+      window.set_default_size(650, 900);
   }
 }
