@@ -9,12 +9,6 @@ const getOnboardingMessages = OnboardingMessages.messages;
 import Gdk from 'gi://Gdk';
 import Adw from 'gi://Adw';
 
-// let entry, settings;
-
-// function init() {
-//   Convenience.initTranslations('switcher');
-// }
-
 function buildPrefsWidget() {
   let provider = new Gtk.CssProvider();
   const extension = ExtensionPreferences.lookupByUUID('switcher@landau.fi');
@@ -418,6 +412,6 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
       group.add(widget);
       page.add(group);
       window.add(page);
-      window.set_default_size(650, 900);
+      window.set_default_size(850, 900);
   }
 }

@@ -7,11 +7,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-
-/* ------------------------------------------------------------------------- */
-// use RemoteSearch dbus setup and keyfile constants
-import * as RemoteSearch from 'resource:///org/gnome/shell/ui/remoteSearch.js';
-
 /* ------------------------------------------------------------------------- */
 class GnomeControlCenterError extends Error {}
 
@@ -28,6 +23,37 @@ class SearchProviderConfiguration {
 }
 
 let panelAppIDs = [];
+
+// RemoteSearch doesn't export this anymore, so copied from there
+const SearchProvider2Iface = `
+<node>
+  <interface name="org.gnome.Shell.SearchProvider2">
+  <method name="GetInitialResultSet">
+      <arg type="as" direction="in" />
+      <arg type="as" direction="out" />
+  </method>
+  <method name="GetSubsearchResultSet">
+      <arg type="as" direction="in" />
+      <arg type="as" direction="in" />
+      <arg type="as" direction="out" />
+  </method>
+  <method name="GetResultMetas">
+      <arg type="as" direction="in" />
+      <arg type="aa{sv}" direction="out" />
+  </method>
+  <method name="ActivateResult">
+      <arg type="s" direction="in" />
+      <arg type="as" direction="in" />
+      <arg type="u" direction="in" />
+  </method>
+  <method name="LaunchSearch">
+      <arg type="as" direction="in" />
+      <arg type="u" direction="in" />
+  </method>
+  </interface>
+  </node>`;
+
+const SearchProvider2ProxyInfo = Gio.DBusInterfaceInfo.new_for_xml(SearchProvider2Iface);
 
 /* ------------------------------------------------------------------------- */
 export var GnomeControlCenter = class GnomeControlCenter {
@@ -194,21 +220,21 @@ export var GnomeControlCenter = class GnomeControlCenter {
                 configFilePath,
                 error.toString()
               );
-            throw GnomeControlCenterError(errorMessage);
+            throw new GnomeControlCenterError(errorMessage);
           }
         } else {
           errorMessage =
             '' +
             "Loaded search provider configuration file '%s' does not " +
             "contain '%s' configuration group".format(configFilePath, group);
-          throw GnomeControlCenterError(errorMessage);
+          throw new GnomeControlCenterError(errorMessage);
         }
       } catch (error) {
         errorMessage =
           '' +
           "Failed to load search provider configuration file '%s':" +
           ' %s'.format(configFilePath);
-        throw GnomeControlCenterError(error);
+        throw new GnomeControlCenterError(error);
       }
     } catch (error) {
       // re-throw error from _getSearchProviderConigurationFilePath
@@ -242,14 +268,8 @@ export var GnomeControlCenter = class GnomeControlCenter {
       g_flags |= Gio.DBusProxyFlags.DO_NOT_AUTO_START;
     }
 
-    // load the dbus interface for the search provider, depending on version
-    // at Gnome 3.28 is  SearchProvider2ProxyInfo is used, but technically
-    // version 1 is still distributed, so many support it for now
-    if (this._providerConfiguration.providerApiVersion >= 2) {
-      proxyInfo = RemoteSearch.SearchProvider2ProxyInfo;
-    } else {
-      proxyInfo = RemoteSearch.SearchProviderProxyInfo;
-    }
+    // load the dbus interface for the search provider
+    proxyInfo = SearchProvider2ProxyInfo;
 
     // create dbus proxy
     try {
@@ -276,7 +296,7 @@ export var GnomeControlCenter = class GnomeControlCenter {
         '' +
         'Failed to connect to Gnome Control Search Provider Dbus ' +
         'service: %s'.format(error.toString());
-      throw GnomeControlCenterError(errorMessage);
+      throw new GnomeControlCenterError(errorMessage);
     }
 
     return proxy;

@@ -27,7 +27,7 @@ import * as Convenience from './convenience.js';
 import * as KeyActivationModule from './keyActivation.js';
 
 import * as switcherModule from './modes/switcher.js';
-import {Launcher as launcher} from './modes/launcher.js';
+import {Launcher as launcher, initStats} from './modes/launcher.js';
 
 import * as ModeUtilsModule from './modes/modeUtils.js';
 
@@ -108,7 +108,6 @@ function _showUI() {
 
   const modes = [switcher, launcher];
 
-  Convenience.initSettings();
   previousEntryContent = '';
   initialHotkeyConsumed = false;
   cursor = 0;
@@ -417,13 +416,7 @@ function _showUI() {
   setTimeout(showSingleBox, 0);
 }
 
-// function _init() {
-//   Gettext.domain('switcher');
-//   Gettext.bindtextdomain('switcher', Me.path + '/locale');
-// }
-
 function _enable() {
-  Convenience.initSettings();
   keybindings.push(
     Main.wm.addKeybinding(
       'show-switcher',
@@ -528,6 +521,8 @@ function checkNewWindows() {
 export default class SwitcherExtension extends Extension {
   enable() {
     this._settings = this.getSettings();
+    Convenience.initSettings(this._settings);
+    initStats();
     _enable();
   }
 

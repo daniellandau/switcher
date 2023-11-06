@@ -1,8 +1,13 @@
 import * as Convenience from '../convenience.js';
 
-import * as modeUtils from './modeUtils.js';
+import {ModeUtils as modeUtils} from './modeUtils.js';
 
-let stats = Convenience.getJson('launcher-stats');
+
+// this needs to happen after enable, so settings is available
+let stats = null;
+export function initStats() {
+  stats = Convenience.getJson('launcher-stats');
+}
 
 export var Launcher = (function () {
   // Limit the number of displayed items
@@ -32,7 +37,7 @@ export var Launcher = (function () {
         })
         .map((app) => ({ app, mode: Launcher, activate }));
     } catch (e) {
-      print(e)
+      log('shellApps', e)
       return [];
     }
 
