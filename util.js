@@ -1,24 +1,20 @@
 const MainLoop = imports.mainloop;
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
+import * as Convenience from './convenience.js';
 
 const matchFuzzy = 1;
 const orderByRelevancy = 1;
 
 // from https://github.com/satya164/gjs-helpers
-var setTimeout = (f, ms) => {
+export var setTimeout = (f, ms) => {
   return MainLoop.timeout_add(ms, () => {
     f();
     return false; // Don't repeat
   });
 };
 
-var clearTimeout = (id) => MainLoop.source_remove(id);
+export var clearTimeout = (id) => MainLoop.source_remove(id);
 
-function debounce(f, ms) {
+export function debounce(f, ms) {
   let timeoutId = null;
   const debounced = function () {
     if (timeoutId) clearTimeout(timeoutId);
@@ -30,11 +26,11 @@ function debounce(f, ms) {
   return debounced;
 }
 
-function escapeChars(text) {
+export function escapeChars(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&');
 }
 
-function makeFilter(text) {
+export function makeFilter(text) {
   return function (app) {
     // start from zero, filters can change this up or down
     // and the scores are summed
@@ -46,7 +42,7 @@ function makeFilter(text) {
   };
 }
 
-function getCurrentWorkspace() {
+export function getCurrentWorkspace() {
   if (global.screen) {
     return global.screen.get_active_workspace_index();
   } else {
@@ -55,7 +51,7 @@ function getCurrentWorkspace() {
   }
 }
 
-function runFilter(app, fragment) {
+export function runFilter(app, fragment) {
   if (fragment == '') return true;
 
   fragment = escapeChars(fragment);
@@ -113,18 +109,18 @@ function runFilter(app, fragment) {
   return gotMatch;
 }
 
-function fixWidths(box, width, shortcutWidth) {
+export function fixWidths(box, width, shortcutWidth) {
   box.whole.set_width(width);
   if (box.shortcutBox) box.shortcutBox.set_width(shortcutWidth);
 }
 
 let latestHighLightedText = null;
 
-function reinit() {
+export function reinit() {
   latestHighLightedText = null;
 }
 
-function updateHighlight(boxes, query, cursor) {
+export function updateHighlight(boxes, query, cursor) {
   boxes.forEach((box) => {
     box.whole.remove_style_class_name('switcher-highlight');
     box.label.remove_style_pseudo_class('selected');
@@ -142,7 +138,7 @@ function updateHighlight(boxes, query, cursor) {
   }
 }
 
-function highlightText(text, query) {
+export function highlightText(text, query) {
   // Don't apply highlighting if there's no input
   if (query == '') return text.replace(/&/g, '&amp;');
 
@@ -179,7 +175,7 @@ function highlightText(text, query) {
   return result.replace(/&/g, '&amp;');
 }
 
-function detachParent(child) {
+export function detachParent(child) {
   if (child) {
     let parent = child.get_parent();
     if (parent) {
@@ -188,7 +184,7 @@ function detachParent(child) {
   }
 }
 
-function filterByText(apps, text) {
+export function filterByText(apps, text) {
   let filteredApps = apps
     .filter((app) => app.mode.filter(app.app))
     .filter(makeFilter(text));

@@ -1,9 +1,5 @@
-const Clutter = imports.gi.Clutter;
-const Main = imports.ui.main;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
+import Clutter from 'gi://Clutter';
+import * as Convenience from './convenience.js';
 
 const keyActivationNone         = 0;
 const keyActivationFunctionKeys = 1;
@@ -55,7 +51,7 @@ const numberKeySymbols = {
   }
 };
 
-var KeyActivation = (function () {
+export var KeyActivation = (function () {
   var getActivateByKey = function() {
     return Convenience.getSettings().get_uint('activate-by-key');
   };

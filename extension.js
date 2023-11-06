@@ -15,28 +15,33 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*global imports, print */
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const Main = imports.ui.main;
-const Shell = imports.gi.Shell;
-const Meta = imports.gi.Meta;
-const Gettext = imports.gettext;
-const Tweener = imports.tweener.tweener;
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import Shell from 'gi://Shell';
+import Meta from 'gi://Meta';
+// const Gettext = imports.gettext;
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
+import * as Convenience from './convenience.js';
 
-const keyActivation = Me.imports.keyActivation.KeyActivation;
-const switcherModule = Me.imports.modes.switcher;
+import * as KeyActivationModule from './keyActivation.js';
+
+import * as switcherModule from './modes/switcher.js';
+import {Launcher as launcher} from './modes/launcher.js';
+
+import * as ModeUtilsModule from './modes/modeUtils.js';
+
+import * as util from './util.js';
+import * as controlCenter from './controlCenter.js';
+
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
+
+const keyActivation = KeyActivationModule.KeyActivation;
 const switcher = switcherModule.Switcher;
-const launcher = Me.imports.modes.launcher.Launcher;
-const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
-const util = Me.imports.util;
-const controlCenter = Me.imports.controlCenter;
+const modeUtils = ModeUtilsModule.ModeUtils;
+
 window.setTimeout = util.setTimeout;
 window.clearTimeout = util.clearTimeout;
-const promiseModule = Me.imports.promise;
 
 let container,
   containers,
@@ -175,8 +180,8 @@ function _showUI() {
   containers = allMonitors.map((monitor) => {
     let tmpContainer = new St.Bin({
       reactive: true,
-      x_align: St.Align.MIDDLE,
-      y_align: St.Align.START
+      x_align: St.TextAlign.CENTER,
+      y_align: St.TextAlign.LEFT
     });
     tmpContainer.set_width(monitor.width);
     tmpContainer.set_height(monitor.height);
@@ -260,7 +265,7 @@ function _showUI() {
       cursor = cursor > 0 ? cursor - 1 : currentlyShowingCount - 1;
       util.updateHighlight(boxes, o.text, cursor);
     } else if (symbol === Clutter.KEY_w && control) {
-      switcherModule.onlyCurrentWorkspaceToggled = !switcherModule.onlyCurrentWorkspaceToggled;
+      switcherModule.setOnlyCurrentWorkspaceToggled(!switcherModule.onlyCurrentWorkspaceToggled)
       rerunFiltersAndUpdate(o);
     } else if (symbol === Clutter.KEY_h && control) {
       // Delete last character
@@ -412,12 +417,12 @@ function _showUI() {
   setTimeout(showSingleBox, 0);
 }
 
-function init() {
-  Gettext.domain('switcher');
-  Gettext.bindtextdomain('switcher', Me.path + '/locale');
-}
+// function _init() {
+//   Gettext.domain('switcher');
+//   Gettext.bindtextdomain('switcher', Me.path + '/locale');
+// }
 
-function enable() {
+function _enable() {
   Convenience.initSettings();
   keybindings.push(
     Main.wm.addKeybinding(
@@ -434,7 +439,7 @@ function enable() {
   setTimeout(() => modeUtils.shellApps(true), 100); // force update shell app cache
 }
 
-function disable() {
+function _disable() {
 	cleanUIWithFade(true);
   Main.wm.removeKeybinding('show-switcher');
 }
@@ -454,7 +459,7 @@ function cleanUI() {
   rerunFiltersAndUpdate = null;
   if (forceUpdateAppCacheTimeoutId)
     clearTimeout(forceUpdateAppCacheTimeoutId);
-  switcherModule.onlyCurrentWorkspaceToggled = false;
+  switcherModule.setOnlyCurrentWorkspaceToggled(false);
   cleanBoxes();
   containers.reverse().forEach((c) => {
     Main.uiGroup.remove_actor(c);
@@ -472,7 +477,7 @@ function cleanUIWithFade(force_immediate = false) {
   rerunFiltersAndUpdate = null;
   if (forceUpdateAppCacheTimeoutId)
     clearTimeout(forceUpdateAppCacheTimeoutId);
-  switcherModule.onlyCurrentWorkspaceToggled = false;
+  switcherModule.setOnlyCurrentWorkspaceToggled(false);
   grabs && grabs.reverse().forEach((c) => {
     try {
       Main.popModal(c);
@@ -492,12 +497,14 @@ function cleanUIWithFade(force_immediate = false) {
   };
 
   if (!force_immediate && Convenience.getSettings().get_boolean('fade-enable')) {
-    Tweener.addTween(boxLayout, {
-      opacity: 0,
-      time: 0.35,
-      transition: 'easeOutQuad',
-      onComplete: cleanRest
-    });
+    boxLayout.ease(
+      {
+        opacity: 0,
+        time: 0.35,
+        transition: Clutter.AnimationMode.EASE_OUT_QUAD,
+        onComplete: cleanRest
+      }
+    );
   } else {
     cleanRest();
   }
@@ -515,5 +522,17 @@ function checkNewWindows() {
     global.stage.set_key_focus(entry);
   } else {
     setTimeout(checkNewWindows, 50);
+  }
+}
+
+export default class SwitcherExtension extends Extension {
+  enable() {
+    this._settings = this.getSettings();
+    _enable();
+  }
+
+  disable() {
+    this._settings = null;
+    _disable();
   }
 }

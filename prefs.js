@@ -1,26 +1,24 @@
 /*global imports, print */
-const Gtk = imports.gi.Gtk;
-const GObject = imports.gi.GObject;
+import Gtk from 'gi://Gtk';
+import GObject from 'gi://GObject';
+import * as Convenience from './convenience.js';
+import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import * as OnboardingMessages from './onboardingmessages.js';
+const getOnboardingMessages = OnboardingMessages.messages;
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
+import Gdk from 'gi://Gdk';
+import Adw from 'gi://Adw';
 
-const Gettext = imports.gettext.domain('switcher');
-const _ = Gettext.gettext;
-const getOnboardingMessages = Me.imports.onboardingmessages.messages;
+// let entry, settings;
 
-const { GLib, Gdk } = imports.gi;
-
-let entry, settings;
-
-function init() {
-  Convenience.initTranslations('switcher');
-}
+// function init() {
+//   Convenience.initTranslations('switcher');
+// }
 
 function buildPrefsWidget() {
   let provider = new Gtk.CssProvider();
-  provider.load_from_path(Me.dir.get_path() + '/prefs.css');
+  const extension = ExtensionPreferences.lookupByUUID('switcher@landau.fi');
+  provider.load_from_path(extension.dir.get_path() + '/prefs.css');
   Gtk.StyleContext.add_provider_for_display(
     Gdk.Display.get_default(),
     provider,
@@ -404,4 +402,22 @@ function makeTitle(markup) {
   title.set_xalign(0);
   title.set_yalign(0.5);
   return title;
+}
+
+export default class MyExtensionPreferences extends ExtensionPreferences {
+  fillPreferencesWindow(window) {
+      window._settings = this.getSettings();
+
+      const page = new Adw.PreferencesPage();
+
+      const group = new Adw.PreferencesGroup({
+          title: _('Switcher Preferences'),
+      });
+
+      const widget = buildPrefsWidget();
+      group.add(widget);
+      page.add(group);
+      window.add(page);
+      window.set_default_size(650, 900);
+  }
 }

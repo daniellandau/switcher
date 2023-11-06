@@ -4,12 +4,13 @@
 'use strict';
 
 /* ------------------------------------------------------------------------- */
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+
 
 /* ------------------------------------------------------------------------- */
 // use RemoteSearch dbus setup and keyfile constants
-const RemoteSearch = imports.ui.remoteSearch;
+import * as RemoteSearch from 'resource:///org/gnome/shell/ui/remoteSearch.js';
 
 /* ------------------------------------------------------------------------- */
 class GnomeControlCenterError extends Error {}
@@ -29,7 +30,7 @@ class SearchProviderConfiguration {
 let panelAppIDs = [];
 
 /* ------------------------------------------------------------------------- */
-var GnomeControlCenter = class GnomeControlCenter {
+export var GnomeControlCenter = class GnomeControlCenter {
   /* ....................................................................... */
   // class constant for dbus time in milliseconds
   /// (it's 2019 and ES does not support basic 'const', terrible)

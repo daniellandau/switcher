@@ -1,19 +1,19 @@
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const Main = imports.ui.main;
-const Shell = imports.gi.Shell;
-const Meta = imports.gi.Meta;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import Shell from 'gi://Shell';
+import Meta from 'gi://Meta';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
+import * as Convenience from '../convenience.js';
 
-const util = Me.imports.util;
-const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
+import * as util from '../util.js';
+import {ModeUtils as modeUtils} from './modeUtils.js';
 
 var onlyCurrentWorkspaceToggled = false;
 
-var Switcher = (function() {
+export function setOnlyCurrentWorkspaceToggled(v) {
+  onlyCurrentWorkspaceToggled = v;
+}
+
+export var Switcher = (function() {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 15;
 

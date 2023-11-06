@@ -1,18 +1,10 @@
-const St = imports.gi.St;
-const Clutter = imports.gi.Clutter;
-const Main = imports.ui.main;
-const Shell = imports.gi.Shell;
-const Meta = imports.gi.Meta;
+import * as Convenience from '../convenience.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
-
-const modeUtils = Me.imports.modes.modeUtils.ModeUtils;
+import * as modeUtils from './modeUtils.js';
 
 let stats = Convenience.getJson('launcher-stats');
 
-var Launcher = (function () {
+export var Launcher = (function () {
   // Limit the number of displayed items
   const MAX_NUM_ITEMS = 10;
 
