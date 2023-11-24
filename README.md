@@ -20,9 +20,9 @@ Log out and back in of GNOME Shell, and you can then enable the extension with G
 
 ### How to use
 
-Use the configured hot key (<Super>w by default) to open the switcher and start
-typing a part of the name or current title of the window you want. Hit the Esc
-key to cancel and the Return key to activate the window at the top of the list.
+Use the configured hot key (<kbd>Super</kbd>+<kbd>w</kbd>by default) to open the switcher and start
+typing a part of the name or current title of the window you want. Hit the <kbd>Esc</kbd>
+key to cancel and the <kbd>Return</kbd> key to activate the window at the top of the list.
 
 
 ## Contributing
