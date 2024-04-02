@@ -141,7 +141,7 @@ export var ModeUtils = (function () {
     if (oldBox.whole) oldBox.whole.disconnect(oldBox.activationCallbackId);
     const whole =
       oldBox.whole || new St.Button({ style_class: 'switcher-box' });
-    const box = oldBox.whole ? undefined : new St.BoxLayout();
+    const box = oldBox.whole ? undefined : new St.BoxLayout({ x_expand: true });
 
     const label =
       oldBox.label ||

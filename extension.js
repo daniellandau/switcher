@@ -186,7 +186,7 @@ function _showUI() {
     tmpContainer.set_height(monitor.height);
     tmpContainer.set_position(monitor.x, monitor.y);
 
-    Main.uiGroup.add_actor(tmpContainer);
+    Main.uiGroup.add_child(tmpContainer);
     if (monitor === selectedMonitor) container = tmpContainer;
     return tmpContainer;
   });
@@ -455,7 +455,7 @@ function cleanUI() {
   switcherModule.setOnlyCurrentWorkspaceToggled(false);
   cleanBoxes();
   containers.reverse().forEach((c) => {
-    Main.uiGroup.remove_actor(c);
+    Main.uiGroup.remove_child(c);
   });
   grabs.reverse().forEach((c) => {
     Main.popModal(c);
@@ -482,7 +482,7 @@ function cleanUIWithFade(force_immediate = false) {
   const cleanRest = function () {
     cleanBoxes();
     containers.reverse().forEach((c) => {
-      Main.uiGroup.remove_actor(c);
+      Main.uiGroup.remove_child(c);
     });
     boxLayout.destroy();
     container = null;

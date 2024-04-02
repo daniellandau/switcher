@@ -179,7 +179,7 @@ export function detachParent(child) {
   if (child) {
     let parent = child.get_parent();
     if (parent) {
-      parent.remove_actor(child);
+      parent.remove_child(child);
     }
   }
 }
