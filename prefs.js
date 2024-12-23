@@ -412,6 +412,6 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
       group.add(widget);
       page.add(group);
       window.add(page);
-      window.set_default_size(850, 900);
+      window.set_default_size(1050, 900);
   }
 }
