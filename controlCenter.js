@@ -114,9 +114,21 @@ export var GnomeControlCenter = class GnomeControlCenter {
       }
       const panelMetas = results[0];
       // get app id names from panel meta information
-      panelAppIDs = panelMetas.map((panelMeta) =>
-        panelMeta['id'].deep_unpack()
-      );
+      panelAppIDs = panelMetas
+        .map((panelMeta) => {
+          const panelIdVariant = panelMeta['id'];
+          if (!panelIdVariant) {
+            return null;
+          }
+          const rawId = panelIdVariant.deep_unpack();
+          if (rawId.endsWith('.desktop')) {
+            return rawId;
+          }
+          // GNOME 49 started returning panel slugs (e.g. "keyboard")
+          // instead of desktop file ids (e.g. "gnome-keyboard-panel.desktop").
+          return `gnome-${rawId}-panel.desktop`;
+        })
+        .filter((id) => id !== null);
     }
   }
   /* ....................................................................... */
