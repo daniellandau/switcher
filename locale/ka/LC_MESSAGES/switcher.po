@@ -1,0 +1,177 @@
+# Georgian translation for switcher
+# Copyright (c) 2025 switcher's authors
+# This file is distributed under the same license as the switcher package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: switcher\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-04-06 16:54+0300\n"
+"PO-Revision-Date: 2025-12-13 09:15+0100\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.8\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: prefs.js\n"
+"X-Poedit-SearchPath-1: extension.js\n"
+"X-Poedit-SearchPath-2: onboardingmessages.js\n"
+
+#: onboardingmessages.js:3
+msgid ""
+"Use Super+w (or another shortcut you configured in settings) to start the "
+"switcher. Type space separated searches, use the arrow keys to navigate, and "
+"press Space to activate."
+msgstr ""
+"გადამრთველის გასაშვებად გამოიყენეთ Super+w (ან სხვა მალსახმობი, რომელიც "
+"მორგების ფანჯარაში მიუთითეთ). აკრიფეთ ჰარეთი გამოყოფილი საძებნი სტრიქონები, "
+"გამოიყენეთ ისრის ღილაკები ნავიგაციისთვის და დააჭირეთ ჰარეს გასააქტიურებლად."
+
+#: onboardingmessages.js:4
+msgid "You can also click an item with the mouse/touchpad to activate."
+msgstr ""
+"გასააქტიურებლად ასევე შეგიძლიათ, დააწკაპუნოთ ელემენტზე თაგუნათი/თაჩპედით."
+
+#: onboardingmessages.js:5
+msgid ""
+"You can use Shift+Enter to bring the activated window to the current "
+"workspace."
+msgstr ""
+"გააქტიურებული ფანჯრის მიმდინარე სამუშაო სივრცეში გადმოსატანად, ასევე "
+"შეგიძლიათ, გამოიყენოთ Shift+Enter."
+
+#: onboardingmessages.js:6
+msgid ""
+"Use Ctrl+Enter to launch multiple apps or new instances of already open apps"
+msgstr ""
+"უკვე ღია აპების ახალი გაშვებული ასლების შესაქმნელად გამოიყენეთ Ctrl+Enter"
+
+#: onboardingmessages.js:7
+msgid ""
+"System settings sections are also available for launching, just search for "
+"them!"
+msgstr ""
+"გასაშვებად ასევე ხელმისაწვდომის სისტემის მორგების სექციები. უბრალოდ, "
+"მოძებნეთ ისინი!"
+
+#: prefs.js:53
+msgid "Hotkey to activate switcher"
+msgstr "მალსახმობი გადამრთველის გასააქტიურებლად"
+
+#: prefs.js:59
+msgid ""
+"There used to be a separate launcher mode, but now launchable apps are shown "
+"in the same view"
+msgstr ""
+"იქ იყო ცალკე გამშვების რეჟიმი, მაგრამ ახალა გაშვებადი აპები იგივე ხედშია "
+"ნაჩვენები"
+
+#: prefs.js:90
+msgid "Use Ctrl+w to toggle on the fly"
+msgstr "მუშაობისას გადასართველად გამოიყენეთ Ctrl+w"
+
+#: prefs.js:103
+msgid "Show original language names"
+msgstr "ორიგინალი ენის სახელების ჩვენება"
+
+#: prefs.js:110
+msgid "Show executable names"
+msgstr "გამშვები ფაილის სახელების ჩვენება"
+
+#: prefs.js:189
+msgid "Key"
+msgstr "ღილაკი"
+
+#: prefs.js:197
+msgid "Pattern matching algorithm"
+msgstr "ნიმუშის დამთხვევის ალგორითმი"
+
+#: prefs.js:198
+msgid "Strict"
+msgstr "მკაცრი"
+
+#: prefs.js:198
+msgid "Fuzzy"
+msgstr "ბუნდოვანი"
+
+#: prefs.js:210
+msgid "Ordering criteria"
+msgstr "დალაგების პირობა"
+
+#: prefs.js:211
+msgid "Last focused"
+msgstr "ბოლო ფოკუსის მქონე"
+
+#: prefs.js:211
+msgid "Most relevant"
+msgstr "ყველაზე აქტუალური"
+
+#: prefs.js:223
+msgid "Immediate activation"
+msgstr "დაუყოვნებილი აქტივაცია"
+
+#: prefs.js:228
+msgid "When there is just one result, activate immediately"
+msgstr "დაუყოვნებლივ გააქტიურება, როცა არსებობს, მხოლოდ, ერთი შედეგი"
+
+#: prefs.js:246
+msgid "Activate immediately this many milliseconds after last keystroke"
+msgstr ""
+"დაუყოვნებლივი გააქტიურება ამ რაოდენობის მილიწამის შემდეგ ბოლო ღილაკის "
+"დაჭერიდან"
+
+#: prefs.js:265
+msgid "Icon size (px)"
+msgstr "ხატულას ზომა (პიქს)"
+
+#: prefs.js:283
+msgid "Font size (px)"
+msgstr "ფონტის ზომა (პიქს)"
+
+#: prefs.js:301
+msgid "Width (%)"
+msgstr "სიგანე (%)"
+
+#: prefs.js:318
+msgid "Activate by pressing a key matching the index in the list"
+msgstr "გააქტიურება იმ ღილაკზე დაჭერით, რომელიც სიაში ნომერს უდრის"
+
+#: prefs.js:320
+msgid "Disable"
+msgstr "გამორთვა"
+
+#: prefs.js:320
+msgid "Function keys"
+msgstr "ფუნქციური ღილაკები"
+
+#: prefs.js:320
+msgid "Number keys"
+msgstr "ციფრის ღილაკები"
+
+#: prefs.js:348
+msgid "Show workspace indicators"
+msgstr "სამუშაო სივრცის მაჩვენებლების ჩვენება"
+
+#: prefs.js:357
+msgid "Show only apps in the current workspace"
+msgstr "მიმდინარე სამუშაო სივრცეში, მხოლოდ, აპების ჩვენება"
+
+#: prefs.js:363
+msgid "Fade Effect"
+msgstr "მინავლების ეფექტი"
+
+#: prefs.js:370
+msgid "Show Switcher on active display"
+msgstr "გადამრთველის ჩვენება აქტიურ ეკრანზე"
+
+#: prefs.js:376
+msgid "Usage tips"
+msgstr "გამოყენების რჩევები"
+
+#: prefs.js:378
+msgid "Read all tips"
+msgstr "ყველა რჩევის წაკითხვა"
