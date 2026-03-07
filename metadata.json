@@ -6,9 +6,10 @@
   "shell-version": [
     "47",
     "48",
-    "49"
+    "49",
+    "50"
   ],
-  "version": 44,
+  "version": 45,
   "url": "https://github.com/daniellandau/switcher",
   "gettext-domain": "switcher"
 }
