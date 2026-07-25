@@ -126,6 +126,16 @@ const POWER_ACTIONS = [
       );
     },
   },
+  {                                                                             
+    id: 'power-lock',                                                           
+    label: 'Lock Screen',                                                       
+    icon: 'changes-prevent-symbolic',                                           
+    keywords: 'lock screen',                                                    
+    run() {                                                                     
+      // Use GNOME Shell's built-in screen shield directly — simplest approach  
+      Main.screenShield.lock(true);                                             
+    },                                                                          
+  },
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -241,7 +251,7 @@ export var Power = (function () {
       appObj,
       shim,                  // "app"    arg — used internally for identity
       shim,                  // "appRef" arg — used for icon + get_id()
-      action.keywords ? `${action.label} (${action.keywords})` : action.label, // display Label(keyword)
+      description,           // display Label(keyword)
       index,
       onActivate,
       oldBox,
