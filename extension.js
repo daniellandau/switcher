@@ -27,15 +27,15 @@ import * as Convenience from './convenience.js';
 import * as KeyActivationModule from './keyActivation.js';
 
 import * as switcherModule from './modes/switcher.js';
-import {Launcher as launcher, initStats} from './modes/launcher.js';
+import { Launcher as launcher, initStats } from './modes/launcher.js';
 
 import * as ModeUtilsModule from './modes/modeUtils.js';
 
 import * as util from './util.js';
 import * as controlCenter from './controlCenter.js';
 
-import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
-
+import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
+import { Power as power } from './modes/power.js';
 const keyActivation = KeyActivationModule.KeyActivation;
 const switcher = switcherModule.Switcher;
 const modeUtils = ModeUtilsModule.ModeUtils;
@@ -62,7 +62,7 @@ const enablePerfTracing = false;
 let previous = null,
   previousMessage = null;
 
-let apps = [], windows = [], allLauncherApps = [], launcherApps = [];
+let apps = [], windows = [], allLauncherApps = [], launcherApps = [], powerApps = [];
 let windowApps = new Set();
 let rerunFiltersAndUpdate = null;
 
@@ -95,7 +95,7 @@ function forceUpdateAppCacheCallback() {
     launcherApps = allLauncherApps.filter(
       (app) => !windowApps.has(app.app.get_id())
     );
-    apps = [].concat.apply([], [windows, launcherApps]);
+    apps = [].concat.apply([], [windows, launcherApps, powerApps]);
     if (rerunFiltersAndUpdate) rerunFiltersAndUpdate(entry);
   }
 }
@@ -106,7 +106,7 @@ function _showUI() {
   timeit('init');
   forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
 
-  const modes = [switcher, launcher];
+  const modes = [switcher, launcher, power];
 
   previousEntryContent = '';
   initialHotkeyConsumed = false;
@@ -206,6 +206,8 @@ function _showUI() {
   let filteredApps = windows;
 
   rerunFiltersAndUpdate = (o) => {
+    apps = [].concat(windows, launcherApps, powerApps);
+
     filteredApps = util.filterByText(apps, o.text);
     if (
       Convenience.getSettings().get_boolean('activate-immediately') &&
@@ -227,6 +229,7 @@ function _showUI() {
 
   allLauncherApps = [];
   launcherApps = [];
+  powerApps = power.apps();
 
   const debouncedActivateUnique = util.debounce(() => {
     if (filteredApps.length === 1) {
@@ -378,13 +381,13 @@ function _showUI() {
   });
 
   grabs = containers.map((c) => {
-    let grab =  Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
+    let grab = Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
 
     c.connect('button-press-event', cleanUIWithFade);
     c.show();
-	  return grab;
+    return grab;
   });
-	grabs.push(Main.pushModal(boxLayout, { actionMode: Shell.ActionMode.SYSTEM_MODAL}))
+  grabs.push(Main.pushModal(boxLayout, { actionMode: Shell.ActionMode.SYSTEM_MODAL }))
   global.stage.set_key_focus(entry);
 
   let i = 0;
@@ -399,7 +402,7 @@ function _showUI() {
       util.fixWidths(box, width, shortcutWidth);
       i += 1;
       setTimeout(showSingleBox, 0);
-    } else if (!allWindowsShown){
+    } else if (!allWindowsShown) {
       timeit('all windows now shown')
       allWindowsShown = true;
       setTimeout(function () {
@@ -408,7 +411,7 @@ function _showUI() {
         launcherApps = allLauncherApps.filter(
           (app) => !windowApps.has(app.app.get_id())
         );
-        apps = [].concat.apply([], [windows, launcherApps]);
+        apps = [].concat.apply([], [windows, launcherApps, powerApps]);
         rerunFiltersAndUpdate(entry);
       }, 10);
     }
@@ -433,7 +436,7 @@ function _enable() {
 }
 
 function _disable() {
-	cleanUIWithFade(true);
+  cleanUIWithFade(true);
   Main.wm.removeKeybinding('show-switcher');
 }
 
