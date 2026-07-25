@@ -48,7 +48,7 @@ const POWER_ACTIONS = [
     id: 'power-shutdown',
     label: 'Shutdown',
     icon: 'system-shutdown-symbolic',
-    keywords: 'shutdown power off halt',
+    keywords: 'power off',
     confirm: true,
     run() {
       callDBus(
@@ -65,7 +65,7 @@ const POWER_ACTIONS = [
     id: 'power-reboot',
     label: 'Reboot',
     icon: 'system-reboot-symbolic',
-    keywords: 'reboot restart',
+    keywords: 'restart',
     confirm: true,
     run() {
       callDBus(
@@ -82,7 +82,7 @@ const POWER_ACTIONS = [
     id: 'power-sleep',
     label: 'Sleep',
     icon: 'weather-clear-night-symbolic',
-    keywords: 'sleep suspend',
+    keywords: 'suspend',
     run() {
       callDBus(
         'system',
@@ -98,7 +98,6 @@ const POWER_ACTIONS = [
     id: 'power-hibernate',
     label: 'Hibernate',
     icon: 'drive-harddisk-symbolic',
-    keywords: 'hibernate',
     run() {
       callDBus(
         'system',
@@ -114,7 +113,7 @@ const POWER_ACTIONS = [
     id: 'power-logout',
     label: 'Log Out',
     icon: 'system-log-out-symbolic',
-    keywords: 'logout log out sign out session end',
+    keywords: 'logout signout session end',
     confirm: true,
     run() {
       callDBus(
@@ -125,16 +124,6 @@ const POWER_ACTIONS = [
         'Logout',
         new GLib.Variant('(u)', [1]),
       );
-    },
-  },
-  {
-    id: 'power-lock',
-    label: 'Lock Screen',
-    icon: 'changes-prevent-symbolic',
-    keywords: 'lock screen',
-    run() {
-      // Use GNOME Shell's built-in screen shield directly — simplest approach
-      Main.screenShield.lock(true);
     },
   },
 ];
@@ -234,7 +223,7 @@ export var Power = (function () {
    * The fuzzy filter in util.js matches against this string, so we embed
    * both the display label and the keywords.
    */
-  let description = action => `${action.label}  ${action.keywords}`;
+  let description = action => action.keywords ? `${action.label} (${action.keywords})` : action.label;
 
   /** Called by extension.js when an entry is activated. */
   let activate = action => {
@@ -252,7 +241,7 @@ export var Power = (function () {
       appObj,
       shim,                  // "app"    arg — used internally for identity
       shim,                  // "appRef" arg — used for icon + get_id()
-      action.label,         // display text — only the human-readable label
+      action.keywords ? `${action.label} (${action.keywords})` : action.label, // display Label(keyword)
       index,
       onActivate,
       oldBox,
