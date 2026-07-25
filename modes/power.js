@@ -130,7 +130,6 @@ const POWER_ACTIONS = [
     id: 'power-lock',                                                           
     label: 'Lock Screen',                                                       
     icon: 'changes-prevent-symbolic',                                           
-    keywords: 'lock screen',                                                    
     run() {                                                                     
       // Use GNOME Shell's built-in screen shield directly — simplest approach  
       Main.screenShield.lock(true);                                             
