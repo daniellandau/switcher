@@ -250,7 +250,7 @@ export var Power = (function () {
       appObj,
       shim,                  // "app"    arg — used internally for identity
       shim,                  // "appRef" arg — used for icon + get_id()
-      description,           // display Label(keyword)
+      description(action),   // display Label(keyword)
       index,
       onActivate,
       oldBox,
