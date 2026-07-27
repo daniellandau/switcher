@@ -15,27 +15,29 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*global imports, print */
-import St from 'gi://St';
-import Clutter from 'gi://Clutter';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import Shell from 'gi://Shell';
-import Meta from 'gi://Meta';
+import St from "gi://St";
+import Clutter from "gi://Clutter";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import Shell from "gi://Shell";
+import Meta from "gi://Meta";
 // const Gettext = imports.gettext;
 
-import * as Convenience from './convenience.js';
+import * as Convenience from "./convenience.js";
 
-import * as KeyActivationModule from './keyActivation.js';
+import * as KeyActivationModule from "./keyActivation.js";
 
-import * as switcherModule from './modes/switcher.js';
-import { Launcher as launcher, initStats } from './modes/launcher.js';
+import * as switcherModule from "./modes/switcher.js";
+import { Launcher as launcher, initStats } from "./modes/launcher.js";
+import { Power as power } from "./modes/power.js";
+import { Google as google } from "./modes/google.js";
 
-import * as ModeUtilsModule from './modes/modeUtils.js';
+import * as ModeUtilsModule from "./modes/modeUtils.js";
 
-import * as util from './util.js';
-import * as controlCenter from './controlCenter.js';
+import * as util from "./util.js";
+import * as controlCenter from "./controlCenter.js";
 
-import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { Power as power } from './modes/power.js';
+import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
+
 const keyActivation = KeyActivationModule.KeyActivation;
 const switcher = switcherModule.Switcher;
 const modeUtils = ModeUtilsModule.ModeUtils;
@@ -62,12 +64,16 @@ const enablePerfTracing = false;
 let previous = null,
   previousMessage = null;
 
-let apps = [], windows = [], allLauncherApps = [], launcherApps = [], powerApps = [];
+let apps = [],
+  windows = [],
+  allLauncherApps = [],
+  launcherApps = [],
+  powerApps = [];
 let windowApps = new Set();
 let rerunFiltersAndUpdate = null;
 
 function leftpad(str, n) {
-  return ('                          ' + str).slice(-n);
+  return ("                          " + str).slice(-n);
 }
 function timeit(msg) {
   if (!enablePerfTracing) return;
@@ -76,8 +82,8 @@ function timeit(msg) {
     log(
       `TIMING${leftpad(now - previous, 6)}   ${leftpad(
         previousMessage,
-        25
-      )} → ${msg}`
+        25,
+      )} → ${msg}`,
     );
   previousMessage = msg;
   previous = now;
@@ -89,11 +95,14 @@ function forceUpdateAppCacheCallback() {
   forceUpdateAppCacheTimeoutId = null;
   modeUtils.shellApps(true);
   if (modeUtils.getHasNullAppInfos()) {
-    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
+    forceUpdateAppCacheTimeoutId = setTimeout(
+      forceUpdateAppCacheCallback,
+      APP_CACHE_TIMEOUT,
+    );
   } else {
     allLauncherApps = launcher.apps();
     launcherApps = allLauncherApps.filter(
-      (app) => !windowApps.has(app.app.get_id())
+      (app) => !windowApps.has(app.app.get_id()),
     );
     apps = [].concat.apply([], [windows, launcherApps, powerApps]);
     if (rerunFiltersAndUpdate) rerunFiltersAndUpdate(entry);
@@ -101,14 +110,17 @@ function forceUpdateAppCacheCallback() {
 }
 
 function _showUI() {
-  'use strict';
+  "use strict";
   if (container) return;
-  timeit('init');
-  forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
+  timeit("init");
+  forceUpdateAppCacheTimeoutId = setTimeout(
+    forceUpdateAppCacheCallback,
+    APP_CACHE_TIMEOUT,
+  );
 
   const modes = [switcher, launcher, power];
 
-  previousEntryContent = '';
+  previousEntryContent = "";
   initialHotkeyConsumed = false;
   cursor = 0;
   util.reinit();
@@ -123,15 +135,15 @@ function _showUI() {
           a,
           i,
           (app, modifiers) => {
-            if (!(app.mode.name() === 'Launcher' && modifiers.control)) {
+            if (!(app.mode.name() === "Launcher" && modifiers.control)) {
               cleanUIWithFade();
             } else {
               setTimeout(checkNewWindows, 50);
             }
             app.mode.activate(app.app);
           },
-          boxes.length > i ? boxes[i] : {}
-        )
+          boxes.length > i ? boxes[i] : {},
+        ),
       )
       .filter((x) => x);
     if (newBoxes.length > boxes.length) {
@@ -154,18 +166,17 @@ function _showUI() {
     currentlyShowingCount = newBoxes.length;
   };
 
-  const fontSize = Convenience.getSettings().get_uint('font-size');
-  boxLayout = new St.BoxLayout({ style_class: 'switcher-box-layout' });
-  boxLayout.set_style('font-size: ' + fontSize + 'px');
+  const fontSize = Convenience.getSettings().get_uint("font-size");
+  boxLayout = new St.BoxLayout({ style_class: "switcher-box-layout" });
+  boxLayout.set_style("font-size: " + fontSize + "px");
   boxLayout.set_vertical(true);
 
   /* use "search-entry" style from overview, combining it with our own */
-  entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
+  entry = new St.Entry({ style_class: "search-entry switcher-entry" });
   boxLayout.insert_child_at_index(entry, 0);
 
-  let useActiveMonitor = Convenience.getSettings().get_boolean(
-    'on-active-display'
-  );
+  let useActiveMonitor =
+    Convenience.getSettings().get_boolean("on-active-display");
   let selectedMonitor = useActiveMonitor
     ? Main.layoutManager.currentMonitor
     : Main.layoutManager.primaryMonitor;
@@ -173,14 +184,14 @@ function _showUI() {
   const width =
     selectedMonitor.width *
     0.01 *
-    Convenience.getSettings().get_uint('max-width-percentage');
+    Convenience.getSettings().get_uint("max-width-percentage");
   entry.set_width(width);
 
   containers = allMonitors.map((monitor) => {
     let tmpContainer = new St.Bin({
       reactive: true,
       x_align: St.TextAlign.CENTER,
-      y_align: St.TextAlign.LEFT
+      y_align: St.TextAlign.LEFT,
     });
     tmpContainer.set_width(monitor.width);
     tmpContainer.set_height(monitor.height);
@@ -193,7 +204,7 @@ function _showUI() {
   Main.layoutManager.addTopChrome(boxLayout);
   boxLayout.x = selectedMonitor.x + (container.width - width) / 2;
   boxLayout.y = selectedMonitor.y;
-  timeit('added actor');
+  timeit("added actor");
 
   windows = switcher.apps();
   if (windows.length >= 2) cursor = 1;
@@ -208,12 +219,17 @@ function _showUI() {
   rerunFiltersAndUpdate = (o) => {
     apps = [].concat(windows, launcherApps, powerApps);
 
-    filteredApps = util.filterByText(apps, o.text);
-    if (
-      Convenience.getSettings().get_boolean('activate-immediately') &&
-      filteredApps.length === 1
-    ) {
-      debouncedActivateUnique();
+    // Prefix-triggered Google search mode
+    if (google.isGoogleSearch(o.text)) {
+      filteredApps = google.apps(o.text);
+    } else {
+      filteredApps = util.filterByText(apps, o.text);
+      if (
+        Convenience.getSettings().get_boolean("activate-immediately") &&
+        filteredApps.length === 1
+      ) {
+        debouncedActivateUnique();
+      }
     }
 
     updateBoxes(filteredApps);
@@ -225,7 +241,7 @@ function _showUI() {
   };
 
   rerunFiltersAndUpdate(entry);
-  timeit('filters rerun');
+  timeit("filters rerun");
 
   allLauncherApps = [];
   launcherApps = [];
@@ -236,10 +252,10 @@ function _showUI() {
       cleanUIWithFade();
       filteredApps[cursor].activate(filteredApps[cursor].app);
     }
-  }, Convenience.getSettings().get_uint('activate-after-ms'));
+  }, Convenience.getSettings().get_uint("activate-after-ms"));
 
   // handle what we can on key press and the rest on key release
-  keyPress = entry.connect('key-press-event', (o, e) => {
+  keyPress = entry.connect("key-press-event", (o, e) => {
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
     const symbol = e.get_key_symbol();
@@ -267,7 +283,9 @@ function _showUI() {
       cursor = cursor > 0 ? cursor - 1 : currentlyShowingCount - 1;
       util.updateHighlight(boxes, o.text, cursor);
     } else if (symbol === Clutter.KEY_w && control) {
-      switcherModule.setOnlyCurrentWorkspaceToggled(!switcherModule.onlyCurrentWorkspaceToggled)
+      switcherModule.setOnlyCurrentWorkspaceToggled(
+        !switcherModule.onlyCurrentWorkspaceToggled,
+      );
       rerunFiltersAndUpdate(o);
     } else if (symbol === Clutter.KEY_h && control) {
       // Delete last character
@@ -279,10 +297,13 @@ function _showUI() {
     }
   });
 
-  keyRelease = entry.connect('key-release-event', (o, e) => {
+  keyRelease = entry.connect("key-release-event", (o, e) => {
     if (forceUpdateAppCacheTimeoutId)
       clearTimeout(forceUpdateAppCacheTimeoutId);
-    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
+    forceUpdateAppCacheTimeoutId = setTimeout(
+      forceUpdateAppCacheCallback,
+      APP_CACHE_TIMEOUT,
+    );
     const entryContent = o.text;
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
@@ -307,7 +328,7 @@ function _showUI() {
     // Exit on repeat press
     else if (
       keybindings.includes(
-        global.display.get_keybinding_action(e.get_key_code(), e.get_state())
+        global.display.get_keybinding_action(e.get_key_code(), e.get_state()),
       ) &&
       initialHotkeyConsumed
     ) {
@@ -324,21 +345,21 @@ function _showUI() {
       if (filteredApps.length > 0) {
         const selected = filteredApps[cursor];
         // If shift pressed and we are in switcher mode, bring the window in our current workspace.
-        if (selected.mode.name() === 'Switcher' && shift)
+        if (selected.mode.name() === "Switcher" && shift)
           selected.app.change_workspace_by_index(
             util.getCurrentWorkspace(),
-            true
+            true,
           );
         if (
-          selected.mode.name() === 'Switcher' &&
+          selected.mode.name() === "Switcher" &&
           control &&
           symbol !== Clutter.KEY_j
         ) {
           const app = Shell.WindowTracker.get_default().get_window_app(
-            selected.app
+            selected.app,
           );
           const launcherAppForWindow = allLauncherApps.find(
-            (x) => x.app.get_id() === app.get_id()
+            (x) => x.app.get_id() === app.get_id(),
           );
           if (launcherAppForWindow) {
             needCleanUI = false;
@@ -351,7 +372,7 @@ function _showUI() {
           selected.activate(selected.app);
         }
         if (
-          selected.mode.name() === 'Launcher' &&
+          selected.mode.name() === "Launcher" &&
           control &&
           symbol !== Clutter.KEY_j
         ) {
@@ -383,11 +404,13 @@ function _showUI() {
   grabs = containers.map((c) => {
     let grab = Main.pushModal(c, { actionMode: Shell.ActionMode.SYSTEM_MODAL });
 
-    c.connect('button-press-event', cleanUIWithFade);
+    c.connect("button-press-event", cleanUIWithFade);
     c.show();
     return grab;
   });
-  grabs.push(Main.pushModal(boxLayout, { actionMode: Shell.ActionMode.SYSTEM_MODAL }))
+  grabs.push(
+    Main.pushModal(boxLayout, { actionMode: Shell.ActionMode.SYSTEM_MODAL }),
+  );
   global.stage.set_key_focus(entry);
 
   let i = 0;
@@ -403,13 +426,13 @@ function _showUI() {
       i += 1;
       setTimeout(showSingleBox, 0);
     } else if (!allWindowsShown) {
-      timeit('all windows now shown')
+      timeit("all windows now shown");
       allWindowsShown = true;
       setTimeout(function () {
-        timeit('this should be 10ms after the last one')
+        timeit("this should be 10ms after the last one");
         allLauncherApps = launcher.apps();
         launcherApps = allLauncherApps.filter(
-          (app) => !windowApps.has(app.app.get_id())
+          (app) => !windowApps.has(app.app.get_id()),
         );
         apps = [].concat.apply([], [windows, launcherApps, powerApps]);
         rerunFiltersAndUpdate(entry);
@@ -422,12 +445,12 @@ function _showUI() {
 function _enable() {
   keybindings.push(
     Main.wm.addKeybinding(
-      'show-switcher',
+      "show-switcher",
       Convenience.getSettings(),
       Meta.KeyBindingFlags.NONE,
       Shell.ActionMode.NORMAL,
-      () => _showUI()
-    )
+      () => _showUI(),
+    ),
   );
 
   const gnomeControlCenter = new controlCenter.GnomeControlCenter();
@@ -437,7 +460,7 @@ function _enable() {
 
 function _disable() {
   cleanUIWithFade(true);
-  Main.wm.removeKeybinding('show-switcher');
+  Main.wm.removeKeybinding("show-switcher");
 }
 
 function cleanBoxes() {
@@ -453,8 +476,7 @@ function destroyBox(box) {
 // this and the following function contain some of the same copy pasted code
 function cleanUI() {
   rerunFiltersAndUpdate = null;
-  if (forceUpdateAppCacheTimeoutId)
-    clearTimeout(forceUpdateAppCacheTimeoutId);
+  if (forceUpdateAppCacheTimeoutId) clearTimeout(forceUpdateAppCacheTimeoutId);
   switcherModule.setOnlyCurrentWorkspaceToggled(false);
   cleanBoxes();
   containers.reverse().forEach((c) => {
@@ -471,16 +493,16 @@ function cleanUI() {
 function cleanUIWithFade(force_immediate = false) {
   if (!containers) return;
   rerunFiltersAndUpdate = null;
-  if (forceUpdateAppCacheTimeoutId)
-    clearTimeout(forceUpdateAppCacheTimeoutId);
+  if (forceUpdateAppCacheTimeoutId) clearTimeout(forceUpdateAppCacheTimeoutId);
   switcherModule.setOnlyCurrentWorkspaceToggled(false);
-  grabs && grabs.reverse().forEach((c) => {
-    try {
-      Main.popModal(c);
-    } catch (e) {
-      print('Switcher got an error', e);
-    }
-  });
+  grabs &&
+    grabs.reverse().forEach((c) => {
+      try {
+        Main.popModal(c);
+      } catch (e) {
+        print("Switcher got an error", e);
+      }
+    });
 
   const cleanRest = function () {
     cleanBoxes();
@@ -492,15 +514,16 @@ function cleanUIWithFade(force_immediate = false) {
     containers = null;
   };
 
-  if (!force_immediate && Convenience.getSettings().get_boolean('fade-enable')) {
-    boxLayout.ease(
-      {
-        opacity: 0,
-        time: 0.35,
-        transition: Clutter.AnimationMode.EASE_OUT_QUAD,
-        onComplete: cleanRest
-      }
-    );
+  if (
+    !force_immediate &&
+    Convenience.getSettings().get_boolean("fade-enable")
+  ) {
+    boxLayout.ease({
+      opacity: 0,
+      time: 0.35,
+      transition: Clutter.AnimationMode.EASE_OUT_QUAD,
+      onComplete: cleanRest,
+    });
   } else {
     cleanRest();
   }
@@ -534,3 +557,5 @@ export default class SwitcherExtension extends Extension {
     _disable();
   }
 }
+
+
