@@ -126,14 +126,14 @@ const POWER_ACTIONS = [
       );
     },
   },
-  {                                                                             
-    id: 'power-lock',                                                           
-    label: 'Lock Screen',                                                       
-    icon: 'changes-prevent-symbolic',                                           
-    run() {                                                                     
+  {
+    id: 'power-lock',
+    label: 'Lock Screen',
+    icon: 'changes-prevent-symbolic',
+    run() {
       // Use GNOME Shell's built-in screen shield directly — simplest approach  
-      Main.screenShield.lock(true);                                             
-    },                                                                          
+      Main.screenShield.lock(true);
+    },
   },
 ];
 

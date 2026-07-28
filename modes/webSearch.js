@@ -226,11 +226,13 @@ export var WebSearch = (function () {
 
   let makeBox = (appObj, index, onActivate, oldBox) => {
     const shim = makeAppShim(appObj.app.provider);
-    return modeUtils.makeBox(
+    const result = modeUtils.makeBox(
       appObj, shim, shim,
       description(appObj.app),
       index, onActivate, oldBox,
     );
+    result.isWebSearch = true;
+    return result;
   };
 
   return {

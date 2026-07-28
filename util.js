@@ -35,9 +35,9 @@ export function makeFilter(text) {
     // start from zero, filters can change this up or down
     // and the scores are summed
     app.app.score = 0;
-    app.app.cachedDescription = app.mode
-      .description(app.app)
-      .toLowerCase();
+    app.app.cachedDescription = escapeChars(
+      app.mode.description(app.app).toLowerCase()
+    );
     return text.split(' ').every((fragment) => runFilter(app.app, fragment));
   };
 }
@@ -85,8 +85,8 @@ export function runFilter(app, fragment) {
     // matches at beginning word boundaries are better than in the middle of words
     const wordPrefixFactor =
       match.index == 0 ||
-      (match.index != 0 &&
-        [' ', '[', '('].includes(filteredDescription.charAt(match.index - 1)))
+        (match.index != 0 &&
+          [' ', '[', '('].includes(filteredDescription.charAt(match.index - 1)))
         ? 1.2
         : 0.0;
 
@@ -125,8 +125,11 @@ export function updateHighlight(boxes, query, cursor) {
     box.whole.remove_style_class_name('switcher-highlight');
     box.label.remove_style_pseudo_class('selected');
 
-    const highlightedText = highlightText(box.label.get_text(), query);
-    box.label.clutter_text.set_markup(highlightedText);
+    // Skip blue underline highlighting for web search results (generated text)
+    if (!box.isWebSearch) {
+      const highlightedText = highlightText(box.label.get_text(), query);
+      box.label.clutter_text.set_markup(highlightedText);
+    }
   });
 
   if (boxes.length > cursor) {
