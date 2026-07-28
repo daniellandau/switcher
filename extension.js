@@ -29,7 +29,7 @@ import * as KeyActivationModule from "./keyActivation.js";
 import * as switcherModule from "./modes/switcher.js";
 import { Launcher as launcher, initStats } from "./modes/launcher.js";
 import { Power as power } from "./modes/power.js";
-import { Google as google } from "./modes/google.js";
+import { WebSearch as webSearch } from "./modes/webSearch.js";
 
 import * as ModeUtilsModule from "./modes/modeUtils.js";
 
@@ -219,9 +219,9 @@ function _showUI() {
   rerunFiltersAndUpdate = (o) => {
     apps = [].concat(windows, launcherApps, powerApps);
 
-    // Prefix-triggered Google search mode
-    if (google.isGoogleSearch(o.text)) {
-      filteredApps = google.apps(o.text);
+    // Prefix-triggered web search mode (dynamic providers)
+    if (webSearch.isWebSearch(o.text)) {
+      filteredApps = webSearch.apps(o.text);
     } else {
       filteredApps = util.filterByText(apps, o.text);
       if (

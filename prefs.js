@@ -2,12 +2,15 @@
 import Gtk from 'gi://Gtk';
 import GObject from 'gi://GObject';
 import * as Convenience from './convenience.js';
-import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 import * as OnboardingMessages from './onboardingmessages.js';
 const getOnboardingMessages = OnboardingMessages.messages;
 
 import Gdk from 'gi://Gdk';
 import Adw from 'gi://Adw';
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
+import Soup from 'gi://Soup?version=3.0';
 
 function buildPrefsWidget() {
   let provider = new Gtk.CssProvider();
@@ -360,7 +363,7 @@ function buildOnboarding(settings) {
 
   const showMessages = new Gtk.Button({ label: _('Read all tips') });
   showMessages.set_margin_top(10);
-  const popover = new Gtk.Popover();
+  const popover = new Gtk.Popover(showMessages);
   popover.set_parent(showMessages);
   const vbox = new Gtk.Box();
   vbox.set_orientation(Gtk.Orientation.VERTICAL);
@@ -398,20 +401,401 @@ function makeTitle(markup) {
   return title;
 }
 
-export default class MyExtensionPreferences extends ExtensionPreferences {
-  async fillPreferencesWindow(window) {
-      window._settings = this.getSettings();
+/* -------------------------------------------------------------------------- */
+/* Web Search Preferences                                                      */
+/* -------------------------------------------------------------------------- */
 
-      const page = new Adw.PreferencesPage();
+const DEFAULT_PROVIDERS_JSON = '[{"keyword":"g","title":"Google","url":"https://www.google.com/search?q={q}","icon":"g.png","enabled":true},{"keyword":"gi","title":"Google Images","url":"https://www.google.com/search?tbm=isch&q={q}","icon":"gi.png","enabled":true},{"keyword":"yt","title":"YouTube","url":"https://www.youtube.com/results?search_query={q}","icon":"yt.png","enabled":true},{"keyword":"so","title":"Stack Overflow","url":"https://stackoverflow.com/search?q={q}","icon":"so.png","enabled":true},{"keyword":"wiki","title":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?search={q}","icon":"wiki.png","enabled":true},{"keyword":"ddg","title":"DuckDuckGo","url":"https://duckduckgo.com/?q={q}","icon":"ddg.png","enabled":true},{"keyword":"gh","title":"GitHub","url":"https://github.com/search?q={q}","icon":"gh.png","enabled":true},{"keyword":"maps","title":"Google Maps","url":"https://www.google.com/maps/search/{q}","icon":"maps.png","enabled":true},{"keyword":"r","title":"Reddit","url":"https://www.reddit.com/search/?q={q}","icon":"r.png","enabled":true},{"keyword":"amz","title":"Amazon","url":"https://www.amazon.com/s?k={q}","icon":"amz.png","enabled":true}]';
 
-      const group = new Adw.PreferencesGroup({
-          title: _('Switcher Preferences'),
-      });
-
-      const widget = buildPrefsWidget();
-      group.add(widget);
-      page.add(group);
-      window.add(page);
-      window.set_default_size(1050, 900);
+function getProvidersFromSettings(settings) {
+  try {
+    return JSON.parse(settings.get_string('web-search-providers'));
+  } catch (e) {
+    return JSON.parse(DEFAULT_PROVIDERS_JSON);
   }
 }
+
+function saveProviders(settings, providers) {
+  settings.set_string('web-search-providers', JSON.stringify(providers));
+}
+
+function extractDomain(url) {
+  const match = url.match(/^https?:\/\/([^\/]+)/);
+  if (!match) return null;
+  return match[1].replace(/^www\./, '');
+}
+
+function fetchFavicon(url, outputPath, callback) {
+  try {
+    const session = new Soup.Session();
+    const message = Soup.Message.new('GET', url);
+    session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, null, (source, result) => {
+      try {
+        const bytes = session.send_and_read_finish(result);
+        if (message.get_status() === 200 && bytes) {
+          const data = bytes.get_data();
+          if (data && data.length > 0) {
+            const outFile = Gio.File.new_for_path(outputPath);
+            const parentDir = outFile.get_parent();
+            if (parentDir && !parentDir.query_exists(null)) {
+              GLib.mkdir_with_parents(parentDir.get_path(), 0o755);
+            }
+            outFile.replace_contents(data, null, false,
+              Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+            if (callback) callback(true);
+            return;
+          }
+        }
+        if (callback) callback(false);
+      } catch (e) {
+        log(`Switcher – favicon fetch failed: ${e}`);
+        if (callback) callback(false);
+      }
+    });
+  } catch (e) {
+    log(`Switcher – favicon session failed: ${e}`);
+    if (callback) callback(false);
+  }
+}
+
+function fetchFaviconForProvider(provider, extensionDir, callback) {
+  const domain = extractDomain(provider.url);
+  if (!domain) {
+    if (callback) callback(false);
+    return;
+  }
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  const iconsDir = GLib.build_filenamev([extensionDir, 'icons']);
+  const outputPath = GLib.build_filenamev([iconsDir, `${provider.keyword}.png`]);
+  fetchFavicon(faviconUrl, outputPath, callback);
+}
+
+function buildWebSearchGroup(settings, extensionDir) {
+  const group = new Adw.PreferencesGroup({
+    title: _('Web Searches'),
+    description: _('Type "<keyword> <query>" to search. Example: "yt funny cats" → YouTube search'),
+  });
+
+  /* ── Master toggle ──────────────────────────────────────── */
+  const masterBox = new Gtk.Box({ spacing: 10, margin_top: 5, margin_bottom: 10 });
+  const masterLabel = new Gtk.Label({
+    label: _('Enable Web Searches'),
+    hexpand: true,
+    xalign: 0,
+  });
+  masterLabel.add_css_class('heading');
+  const masterSwitch = new Gtk.Switch({
+    active: settings.get_boolean('web-search-enabled'),
+    valign: Gtk.Align.CENTER,
+  });
+  masterSwitch.connect('notify::active', (sw) => {
+    settings.set_boolean('web-search-enabled', sw.active);
+    listBox.set_sensitive(sw.active);
+    buttonBox.set_sensitive(sw.active);
+  });
+  masterBox.append(masterLabel);
+  masterBox.append(masterSwitch);
+  group.add(masterBox);
+
+  /* ── Provider list ──────────────────────────────────────── */
+  const scrolled = new Gtk.ScrolledWindow({
+    hscrollbar_policy: Gtk.PolicyType.NEVER,
+    vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
+    min_content_height: 200,
+    max_content_height: 350,
+  });
+
+  const listBox = new Gtk.ListBox({
+    selection_mode: Gtk.SelectionMode.SINGLE,
+    css_classes: ['boxed-list'],
+  });
+  listBox.set_sensitive(settings.get_boolean('web-search-enabled'));
+  scrolled.set_child(listBox);
+  group.add(scrolled);
+
+  function rebuildList() {
+    // Remove all rows
+    let child = listBox.get_first_child();
+    while (child) {
+      const next = child.get_next_sibling();
+      listBox.remove(child);
+      child = next;
+    }
+    const providers = getProvidersFromSettings(settings);
+    providers.forEach((provider, idx) => {
+      const row = new Gtk.ListBoxRow({ activatable: true });
+      const box = new Gtk.Box({ spacing: 10, margin_top: 6, margin_bottom: 6, margin_start: 10, margin_end: 10 });
+
+      // Favicon
+      const iconPath = GLib.build_filenamev([extensionDir, 'icons', `${provider.keyword}.png`]);
+      const iconFile = Gio.File.new_for_path(iconPath);
+      if (iconFile.query_exists(null)) {
+        const icon = new Gtk.Image({
+          file: iconPath,
+          pixel_size: 20,
+        });
+        box.append(icon);
+      }
+
+      // Keyword
+      const kwLabel = new Gtk.Label({
+        label: provider.keyword,
+        width_chars: 8,
+        xalign: 0,
+        css_classes: ['monospace'],
+      });
+      box.append(kwLabel);
+
+      // Title
+      const titleLabel = new Gtk.Label({
+        label: provider.title,
+        hexpand: true,
+        xalign: 0,
+      });
+      box.append(titleLabel);
+
+      // Enabled switch
+      const sw = new Gtk.Switch({
+        active: provider.enabled,
+        valign: Gtk.Align.CENTER,
+      });
+      sw.connect('notify::active', (toggle) => {
+        const provs = getProvidersFromSettings(settings);
+        if (provs[idx]) {
+          provs[idx].enabled = toggle.active;
+          saveProviders(settings, provs);
+        }
+      });
+      box.append(sw);
+
+      row.set_child(box);
+      row._providerIndex = idx;
+      listBox.append(row);
+    });
+  }
+
+  rebuildList();
+
+  /* ── Action buttons ─────────────────────────────────────── */
+  const buttonBox = new Gtk.Box({ spacing: 8, margin_top: 10, homogeneous: true });
+  buttonBox.set_sensitive(settings.get_boolean('web-search-enabled'));
+
+  const addBtn = new Gtk.Button({ label: _('Add') });
+  addBtn.add_css_class('suggested-action');
+  addBtn.connect('clicked', () => {
+    showProviderDialog(null, -1, settings, extensionDir, () => rebuildList());
+  });
+  buttonBox.append(addBtn);
+
+  const editBtn = new Gtk.Button({ label: _('Edit') });
+  editBtn.connect('clicked', () => {
+    const row = listBox.get_selected_row();
+    if (!row) return;
+    const idx = row._providerIndex;
+    const providers = getProvidersFromSettings(settings);
+    if (providers[idx]) {
+      showProviderDialog(providers[idx], idx, settings, extensionDir, () => rebuildList());
+    }
+  });
+  buttonBox.append(editBtn);
+
+  const deleteBtn = new Gtk.Button({ label: _('Delete') });
+  deleteBtn.add_css_class('destructive-action');
+  deleteBtn.connect('clicked', () => {
+    const row = listBox.get_selected_row();
+    if (!row) return;
+    const idx = row._providerIndex;
+    const providers = getProvidersFromSettings(settings);
+    if (providers[idx]) {
+      // Delete the cached favicon
+      try {
+        const iconPath = GLib.build_filenamev([extensionDir, 'icons', `${providers[idx].keyword}.png`]);
+        const iconFile = Gio.File.new_for_path(iconPath);
+        if (iconFile.query_exists(null)) iconFile.delete(null);
+      } catch (e) { /* ignore */ }
+      providers.splice(idx, 1);
+      saveProviders(settings, providers);
+      rebuildList();
+    }
+  });
+  buttonBox.append(deleteBtn);
+
+  const resetBtn = new Gtk.Button({ label: _('Reset Defaults') });
+  resetBtn.connect('clicked', () => {
+    settings.set_string('web-search-providers', DEFAULT_PROVIDERS_JSON);
+    rebuildList();
+    // Fetch all default favicons
+    const providers = getProvidersFromSettings(settings);
+    providers.forEach(p => fetchFaviconForProvider(p, extensionDir, () => rebuildList()));
+  });
+  buttonBox.append(resetBtn);
+
+  group.add(buttonBox);
+
+  // Fetch favicons for any providers that don't have one yet
+  const providers = getProvidersFromSettings(settings);
+  providers.forEach(p => {
+    const iconPath = GLib.build_filenamev([extensionDir, 'icons', `${p.keyword}.png`]);
+    const iconFile = Gio.File.new_for_path(iconPath);
+    if (!iconFile.query_exists(null)) {
+      fetchFaviconForProvider(p, extensionDir, () => rebuildList());
+    }
+  });
+
+  return group;
+}
+
+function showProviderDialog(provider, index, settings, extensionDir, onSave) {
+  const isEdit = provider !== null;
+  const win = new Gtk.Window({
+    title: isEdit ? _('Edit Search Provider') : _('Add Search Provider'),
+    modal: true,
+    default_width: 450,
+    default_height: 350,
+    resizable: false,
+  });
+
+  const mainBox = new Gtk.Box({
+    orientation: Gtk.Orientation.VERTICAL,
+    spacing: 12,
+    margin_top: 20,
+    margin_bottom: 20,
+    margin_start: 20,
+    margin_end: 20,
+  });
+
+  // Helper text
+  const helpLabel = new Gtk.Label({
+    label: _('Use {q} in the URL as the placeholder for the search query.\nExample: https://www.google.com/search?q={q}'),
+    xalign: 0,
+    wrap: true,
+    css_classes: ['dim-label'],
+  });
+  mainBox.append(helpLabel);
+
+  // Title
+  const titleBox = new Gtk.Box({ spacing: 10 });
+  titleBox.append(new Gtk.Label({ label: _('Title'), width_chars: 12, xalign: 0 }));
+  const titleEntry = new Gtk.Entry({ hexpand: true, text: isEdit ? provider.title : '' });
+  titleEntry.set_placeholder_text('e.g. YouTube');
+  titleBox.append(titleEntry);
+  mainBox.append(titleBox);
+
+  // URL
+  const urlBox = new Gtk.Box({ spacing: 10 });
+  urlBox.append(new Gtk.Label({ label: _('URL'), width_chars: 12, xalign: 0 }));
+  const urlEntry = new Gtk.Entry({ hexpand: true, text: isEdit ? provider.url : '' });
+  urlEntry.set_placeholder_text('https://example.com/search?q={q}');
+  urlBox.append(urlEntry);
+  mainBox.append(urlBox);
+
+  // Keyword
+  const kwBox = new Gtk.Box({ spacing: 10 });
+  kwBox.append(new Gtk.Label({ label: _('Keyword'), width_chars: 12, xalign: 0 }));
+  const kwEntry = new Gtk.Entry({ hexpand: true, text: isEdit ? provider.keyword : '' });
+  kwEntry.set_placeholder_text('e.g. yt');
+  kwBox.append(kwEntry);
+  mainBox.append(kwBox);
+
+  // Enabled
+  const enabledBox = new Gtk.Box({ spacing: 10 });
+  enabledBox.append(new Gtk.Label({ label: _('Enabled'), width_chars: 12, xalign: 0 }));
+  const enabledSwitch = new Gtk.Switch({
+    active: isEdit ? provider.enabled : true,
+    valign: Gtk.Align.CENTER,
+  });
+  enabledBox.append(enabledSwitch);
+  mainBox.append(enabledBox);
+
+  // Status label for favicon fetch
+  const statusLabel = new Gtk.Label({ label: '', xalign: 0 });
+  mainBox.append(statusLabel);
+
+  // Buttons
+  const btnBox = new Gtk.Box({ spacing: 10, halign: Gtk.Align.END, margin_top: 10 });
+  const cancelBtn = new Gtk.Button({ label: _('Cancel') });
+  cancelBtn.connect('clicked', () => win.close());
+  btnBox.append(cancelBtn);
+
+  const saveBtn = new Gtk.Button({ label: _('Save') });
+  saveBtn.add_css_class('suggested-action');
+  saveBtn.connect('clicked', () => {
+    const title = titleEntry.get_text().trim();
+    const url = urlEntry.get_text().trim();
+    const keyword = kwEntry.get_text().trim().toLowerCase();
+    const enabled = enabledSwitch.active;
+
+    if (!title || !url || !keyword) {
+      statusLabel.set_markup('<span foreground="red">All fields are required.</span>');
+      return;
+    }
+    if (!url.includes('{q}')) {
+      statusLabel.set_markup('<span foreground="red">URL must contain {q} placeholder.</span>');
+      return;
+    }
+
+    const providers = getProvidersFromSettings(settings);
+    // Check for duplicate keyword (skip self when editing)
+    const duplicate = providers.find((p, i) => p.keyword === keyword && i !== index);
+    if (duplicate) {
+      statusLabel.set_markup(`<span foreground="red">Keyword "${keyword}" already exists.</span>`);
+      return;
+    }
+
+    const newProvider = { keyword, title, url, icon: `${keyword}.png`, enabled };
+
+    if (isEdit) {
+      // If keyword changed, delete old favicon
+      if (provider.keyword !== keyword) {
+        try {
+          const oldPath = GLib.build_filenamev([extensionDir, 'icons', `${provider.keyword}.png`]);
+          const oldFile = Gio.File.new_for_path(oldPath);
+          if (oldFile.query_exists(null)) oldFile.delete(null);
+        } catch (e) { /* ignore */ }
+      }
+      providers[index] = newProvider;
+    } else {
+      providers.push(newProvider);
+    }
+    saveProviders(settings, providers);
+
+    // Fetch favicon
+    statusLabel.set_text(_('Fetching favicon…'));
+    saveBtn.set_sensitive(false);
+    fetchFaviconForProvider(newProvider, extensionDir, (success) => {
+      if (onSave) onSave();
+      win.close();
+    });
+  });
+  btnBox.append(saveBtn);
+  mainBox.append(btnBox);
+
+  win.set_child(mainBox);
+  win.present();
+}
+
+export default class MyExtensionPreferences extends ExtensionPreferences {
+  fillPreferencesWindow(window) {
+    window._settings = this.getSettings();
+
+    const page = new Adw.PreferencesPage();
+
+    const group = new Adw.PreferencesGroup({
+      title: _('Switcher Preferences'),
+    });
+
+    const widget = buildPrefsWidget();
+    group.add(widget);
+    page.add(group);
+
+    // Web Search settings group
+    const extensionDir = this.dir.get_path();
+    Convenience.initSettings(window._settings);
+    const webSearchGroup = buildWebSearchGroup(window._settings, extensionDir);
+    page.add(webSearchGroup);
+
+    window.add(page);
+    window.set_default_size(850, 1100);
+  }
+}
+
