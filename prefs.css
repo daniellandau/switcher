@@ -1,3 +1,8 @@
 .toplevel {
     margin: 10px;
 }
+
+/* Dimmed button appearance for inactive actions */
+.dim-button {
+    opacity: 0.55;
+}

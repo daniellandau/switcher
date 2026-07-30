@@ -588,6 +588,10 @@ function buildWebSearchGroup(settings, extensionDir) {
   buttonBox.append(addBtn);
 
   const editBtn = new Gtk.Button({ label: _('Edit') });
+  // Edit/Delete should be disabled when no row is selected to indicate
+  // they are not applicable.
+  editBtn.set_sensitive(false);
+  editBtn.add_css_class('dim-button');
   editBtn.connect('clicked', () => {
     const row = listBox.get_selected_row();
     if (!row) return;
@@ -600,7 +604,9 @@ function buildWebSearchGroup(settings, extensionDir) {
   buttonBox.append(editBtn);
 
   const deleteBtn = new Gtk.Button({ label: _('Delete') });
+  deleteBtn.set_sensitive(false);
   deleteBtn.add_css_class('destructive-action');
+  deleteBtn.add_css_class('dim-button');
   deleteBtn.connect('clicked', () => {
     const row = listBox.get_selected_row();
     if (!row) return;
@@ -619,6 +625,21 @@ function buildWebSearchGroup(settings, extensionDir) {
     }
   });
   buttonBox.append(deleteBtn);
+
+  // Toggle sensitivity of edit/delete based on list selection
+  listBox.connect('row-selected', () => {
+    const row = listBox.get_selected_row();
+    const has = !!row;
+    editBtn.set_sensitive(has);
+    deleteBtn.set_sensitive(has);
+    if (has) {
+      editBtn.remove_css_class('dim-button');
+      deleteBtn.remove_css_class('dim-button');
+    } else {
+      editBtn.add_css_class('dim-button');
+      deleteBtn.add_css_class('dim-button');
+    }
+  });
 
   const resetBtn = new Gtk.Button({ label: _('Reset Defaults') });
   resetBtn.connect('clicked', () => {
