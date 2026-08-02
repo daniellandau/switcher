@@ -1,6 +1,5 @@
 // Web search mode for the Switcher extension
 // Provides: Dynamic web search via "<keyword> <query>" prefix
-// Replaces the old hardcoded google.js
 
 import St from 'gi://St';
 import Gio from 'gi://Gio';
