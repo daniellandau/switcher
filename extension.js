@@ -95,10 +95,7 @@ function forceUpdateAppCacheCallback() {
   forceUpdateAppCacheTimeoutId = null;
   modeUtils.shellApps(true);
   if (modeUtils.getHasNullAppInfos()) {
-    forceUpdateAppCacheTimeoutId = setTimeout(
-      forceUpdateAppCacheCallback,
-      APP_CACHE_TIMEOUT
-    );
+    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback,APP_CACHE_TIMEOUT);
   } else {
     allLauncherApps = launcher.apps();
     launcherApps = allLauncherApps.filter(
