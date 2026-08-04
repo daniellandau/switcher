@@ -480,7 +480,7 @@ function fetchFaviconForProvider(provider, callback) {
 function buildWebSearchGroup(settings) {
   const group = new Adw.PreferencesGroup({
     title: _('Web Searches'),
-    description: _('Type "<keyword> <query>" to search. Example: "yt funny cats" → YouTube search'),
+    description: _('Type "<keyword> <query>" to search. Example: "ddg funny cats" → DuckDuckGo search'),
   });
 
   /* ── Master toggle ──────────────────────────────────────── */
@@ -694,7 +694,7 @@ function showProviderDialog(provider, index, settings, onSave) {
 
   // Helper text
   const helpLabel = new Gtk.Label({
-    label: _('Use {q} in the URL as the placeholder for the search query.\nExample: https://www.google.com/search?q={q}'),
+    label: _('Use {q} in the URL as the placeholder for the search query.\nExample: https://duckduckgo.com/?q={q}'),
     xalign: 0,
     wrap: true,
     css_classes: ['dim-label'],
@@ -705,7 +705,7 @@ function showProviderDialog(provider, index, settings, onSave) {
   const titleBox = new Gtk.Box({ spacing: 10 });
   titleBox.append(new Gtk.Label({ label: _('Title'), width_chars: 12, xalign: 0 }));
   const titleEntry = new Gtk.Entry({ hexpand: true, text: isEdit ? provider.title : '' });
-  titleEntry.set_placeholder_text('e.g. YouTube');
+  titleEntry.set_placeholder_text(_('e.g. DuckDuckGo'));
   titleBox.append(titleEntry);
   mainBox.append(titleBox);
 
@@ -713,7 +713,7 @@ function showProviderDialog(provider, index, settings, onSave) {
   const urlBox = new Gtk.Box({ spacing: 10 });
   urlBox.append(new Gtk.Label({ label: _('URL'), width_chars: 12, xalign: 0 }));
   const urlEntry = new Gtk.Entry({ hexpand: true, text: isEdit ? provider.url : '' });
-  urlEntry.set_placeholder_text('https://example.com/search?q={q}');
+  urlEntry.set_placeholder_text(_('https://duckduckgo.com/?q={q}'));
   urlBox.append(urlEntry);
   mainBox.append(urlBox);
 
@@ -721,7 +721,7 @@ function showProviderDialog(provider, index, settings, onSave) {
   const kwBox = new Gtk.Box({ spacing: 10 });
   kwBox.append(new Gtk.Label({ label: _('Keyword'), width_chars: 12, xalign: 0 }));
   const kwEntry = new Gtk.Entry({ hexpand: true, text: isEdit ? provider.keyword : '' });
-  kwEntry.set_placeholder_text('e.g. yt');
+  kwEntry.set_placeholder_text(_('e.g. ddg'));
   kwBox.append(kwEntry);
   mainBox.append(kwBox);
 
