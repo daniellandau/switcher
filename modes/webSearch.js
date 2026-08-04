@@ -10,24 +10,8 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { ModeUtils as modeUtils } from './modeUtils.js';
 import * as Convenience from '../convenience.js';
 
-/* -------------------------------------------------------------------------- */
-/* Extension directory                                                         */
-/* -------------------------------------------------------------------------- */
-
-let _extensionDir = null;
-
-function getExtensionDir() {
-  if (_extensionDir) return _extensionDir;
-  // import.meta.url → file:///…/modes/webSearch.js  →  go up one level
-  const moduleDir = GLib.path_get_dirname(
-    GLib.filename_from_uri(import.meta.url)[0],
-  );
-  _extensionDir = GLib.path_get_dirname(moduleDir);
-  return _extensionDir;
-}
-
 function getIconsDir() {
-  return GLib.build_filenamev([getExtensionDir(), 'icons']);
+  return GLib.build_filenamev([GLib.get_user_cache_dir(), 'switcher', 'icons']);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -419,6 +419,14 @@ function saveProviders(settings, providers) {
   settings.set_string('web-search-providers', JSON.stringify(providers));
 }
 
+function getIconsDir() {
+  return GLib.build_filenamev([GLib.get_user_cache_dir(), 'switcher', 'icons']);
+}
+
+function getIconPath(keyword) {
+  return GLib.build_filenamev([getIconsDir(), `${keyword}.png`]);
+}
+
 function extractDomain(url) {
   const match = url.match(/^https?:\/\/([^\/]+)/);
   if (!match) return null;
@@ -458,19 +466,18 @@ function fetchFavicon(url, outputPath, callback) {
   }
 }
 
-function fetchFaviconForProvider(provider, extensionDir, callback) {
+function fetchFaviconForProvider(provider, callback) {
   const domain = extractDomain(provider.url);
   if (!domain) {
     if (callback) callback(false);
     return;
   }
   const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-  const iconsDir = GLib.build_filenamev([extensionDir, 'icons']);
-  const outputPath = GLib.build_filenamev([iconsDir, `${provider.keyword}.png`]);
+  const outputPath = getIconPath(provider.keyword);
   fetchFavicon(faviconUrl, outputPath, callback);
 }
 
-function buildWebSearchGroup(settings, extensionDir) {
+function buildWebSearchGroup(settings) {
   const group = new Adw.PreferencesGroup({
     title: _('Web Searches'),
     description: _('Type "<keyword> <query>" to search. Example: "yt funny cats" → YouTube search'),
@@ -527,7 +534,7 @@ function buildWebSearchGroup(settings, extensionDir) {
       const box = new Gtk.Box({ spacing: 10, margin_top: 6, margin_bottom: 6, margin_start: 10, margin_end: 10 });
 
       // Favicon
-      const iconPath = GLib.build_filenamev([extensionDir, 'icons', `${provider.keyword}.png`]);
+      const iconPath = getIconPath(provider.keyword);
       const iconFile = Gio.File.new_for_path(iconPath);
       if (iconFile.query_exists(null)) {
         const icon = new Gtk.Image({
@@ -583,7 +590,7 @@ function buildWebSearchGroup(settings, extensionDir) {
   const addBtn = new Gtk.Button({ label: _('Add') });
   addBtn.add_css_class('suggested-action');
   addBtn.connect('clicked', () => {
-    showProviderDialog(null, -1, settings, extensionDir, () => rebuildList());
+    showProviderDialog(null, -1, settings, () => rebuildList());
   });
   buttonBox.append(addBtn);
 
@@ -598,7 +605,7 @@ function buildWebSearchGroup(settings, extensionDir) {
     const idx = row._providerIndex;
     const providers = getProvidersFromSettings(settings);
     if (providers[idx]) {
-      showProviderDialog(providers[idx], idx, settings, extensionDir, () => rebuildList());
+      showProviderDialog(providers[idx], idx, settings, () => rebuildList());
     }
   });
   buttonBox.append(editBtn);
@@ -615,7 +622,7 @@ function buildWebSearchGroup(settings, extensionDir) {
     if (providers[idx]) {
       // Delete the cached favicon
       try {
-        const iconPath = GLib.build_filenamev([extensionDir, 'icons', `${providers[idx].keyword}.png`]);
+        const iconPath = getIconPath(providers[idx].keyword);
         const iconFile = Gio.File.new_for_path(iconPath);
         if (iconFile.query_exists(null)) iconFile.delete(null);
       } catch (e) { /* ignore */ }
@@ -647,7 +654,7 @@ function buildWebSearchGroup(settings, extensionDir) {
     rebuildList();
     // Fetch all default favicons
     const providers = getProvidersFromSettings(settings);
-    providers.forEach(p => fetchFaviconForProvider(p, extensionDir, () => rebuildList()));
+    providers.forEach(p => fetchFaviconForProvider(p, () => rebuildList()));
   });
   buttonBox.append(resetBtn);
 
@@ -656,17 +663,17 @@ function buildWebSearchGroup(settings, extensionDir) {
   // Fetch favicons for any providers that don't have one yet
   const providers = getProvidersFromSettings(settings);
   providers.forEach(p => {
-    const iconPath = GLib.build_filenamev([extensionDir, 'icons', `${p.keyword}.png`]);
+    const iconPath = getIconPath(p.keyword);
     const iconFile = Gio.File.new_for_path(iconPath);
     if (!iconFile.query_exists(null)) {
-      fetchFaviconForProvider(p, extensionDir, () => rebuildList());
+      fetchFaviconForProvider(p, () => rebuildList());
     }
   });
 
   return group;
 }
 
-function showProviderDialog(provider, index, settings, extensionDir, onSave) {
+function showProviderDialog(provider, index, settings, onSave) {
   const isEdit = provider !== null;
   const win = new Gtk.Window({
     title: isEdit ? _('Edit Search Provider') : _('Add Search Provider'),
@@ -769,7 +776,7 @@ function showProviderDialog(provider, index, settings, extensionDir, onSave) {
       // If keyword changed, delete old favicon
       if (provider.keyword !== keyword) {
         try {
-          const oldPath = GLib.build_filenamev([extensionDir, 'icons', `${provider.keyword}.png`]);
+          const oldPath = getIconPath(provider.keyword);
           const oldFile = Gio.File.new_for_path(oldPath);
           if (oldFile.query_exists(null)) oldFile.delete(null);
         } catch (e) { /* ignore */ }
@@ -783,7 +790,7 @@ function showProviderDialog(provider, index, settings, extensionDir, onSave) {
     // Fetch favicon
     statusLabel.set_text(_('Fetching favicon…'));
     saveBtn.set_sensitive(false);
-    fetchFaviconForProvider(newProvider, extensionDir, (success) => {
+    fetchFaviconForProvider(newProvider, (success) => {
       if (onSave) onSave();
       win.close();
     });
@@ -810,9 +817,8 @@ export default class MyExtensionPreferences extends ExtensionPreferences {
     page.add(group);
 
     // Web Search settings group
-    const extensionDir = this.dir.get_path();
     Convenience.initSettings(window._settings);
-    const webSearchGroup = buildWebSearchGroup(window._settings, extensionDir);
+    const webSearchGroup = buildWebSearchGroup(window._settings);
     page.add(webSearchGroup);
 
     window.add(page);
