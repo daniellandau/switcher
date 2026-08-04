@@ -9,10 +9,7 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import { ModeUtils as modeUtils } from './modeUtils.js';
 import * as Convenience from '../convenience.js';
-
-function getIconsDir() {
-  return GLib.build_filenamev([GLib.get_user_cache_dir(), 'switcher', 'icons']);
-}
+import { getIconsDir } from '../webSearchUtils.js';
 
 /* -------------------------------------------------------------------------- */
 /* Provider management                                                         */
