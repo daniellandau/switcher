@@ -148,8 +148,9 @@ function loadFavicon(provider, size) {
   } catch (e) {
     // fall through to fallback
   }
-  // No favicon cached – return an empty placeholder (no icon)
+  // No favicon cached – return a search symbol as default
   return new St.Icon({
+    icon_name: 'system-search-symbolic',
     icon_size: size,
     style_class: 'popup-menu-icon',
   });

@@ -475,16 +475,22 @@ function buildWebSearchGroup(settings) {
       const row = new Gtk.ListBoxRow({ activatable: true });
       const box = new Gtk.Box({ spacing: 10, margin_top: 6, margin_bottom: 6, margin_start: 10, margin_end: 10 });
 
-      // Favicon
+      // Favicon (fallback to search icon)
       const iconPath = getIconPath(provider.keyword);
       const iconFile = Gio.File.new_for_path(iconPath);
+      let icon;
       if (iconFile.query_exists(null)) {
-        const icon = new Gtk.Image({
+        icon = new Gtk.Image({
           file: iconPath,
           pixel_size: 20,
         });
-        box.append(icon);
+      } else {
+        icon = new Gtk.Image({
+          icon_name: 'system-search-symbolic',
+          pixel_size: 20,
+        });
       }
+      box.append(icon);
 
       // Keyword
       const kwLabel = new Gtk.Label({
@@ -594,23 +600,10 @@ function buildWebSearchGroup(settings) {
   resetBtn.connect('clicked', () => {
     settings.set_string('web-search-providers', DEFAULT_PROVIDERS_JSON);
     rebuildList();
-    // Fetch all default favicons
-    const providers = getProvidersFromSettings(settings);
-    providers.forEach(p => fetchFaviconForProvider(p, () => rebuildList()));
   });
   buttonBox.append(resetBtn);
 
   group.add(buttonBox);
-
-  // Fetch favicons for any providers that don't have one yet
-  const providers = getProvidersFromSettings(settings);
-  providers.forEach(p => {
-    const iconPath = getIconPath(p.keyword);
-    const iconFile = Gio.File.new_for_path(iconPath);
-    if (!iconFile.query_exists(null)) {
-      fetchFaviconForProvider(p, () => rebuildList());
-    }
-  });
 
   return group;
 }
@@ -677,6 +670,71 @@ function showProviderDialog(provider, index, settings, onSave) {
   enabledBox.append(enabledSwitch);
   mainBox.append(enabledBox);
 
+  // Favicon preview + fetch button
+  const faviconBox = new Gtk.Box({ spacing: 10 });
+  faviconBox.append(new Gtk.Label({ label: _('Favicon'), width_chars: 12, xalign: 0 }));
+
+  // Show current icon preview (favicon or search fallback)
+  const faviconPreview = new Gtk.Image({ pixel_size: 24 });
+  function updateFaviconPreview() {
+    const kw = kwEntry.get_text().trim().toLowerCase();
+    if (kw) {
+      const path = getIconPath(kw);
+      const file = Gio.File.new_for_path(path);
+      if (file.query_exists(null)) {
+        faviconPreview.set_from_file(path);
+        return;
+      }
+    }
+    faviconPreview.set_from_icon_name('system-search-symbolic');
+  }
+  updateFaviconPreview();
+  faviconBox.append(faviconPreview);
+
+  const fetchBtn = new Gtk.Button({ label: _('Fetch Favicon') });
+  // Start dimmed; enable only when URL is filled
+  const hasUrl = isEdit && provider.url;
+  fetchBtn.set_sensitive(!!hasUrl);
+  if (!hasUrl) fetchBtn.add_css_class('dim-button');
+  urlEntry.connect('changed', () => {
+    const filled = urlEntry.get_text().trim().length > 0;
+    fetchBtn.set_sensitive(filled);
+    if (filled) {
+      fetchBtn.remove_css_class('dim-button');
+    } else {
+      fetchBtn.add_css_class('dim-button');
+    }
+  });
+
+  const fetchSpinner = new Gtk.Spinner();
+  fetchBtn.connect('clicked', () => {
+    const url = urlEntry.get_text().trim();
+    const kw = kwEntry.get_text().trim().toLowerCase();
+    if (!url || !kw) {
+      statusLabel.set_markup('<span foreground="red">Enter a URL and keyword first.</span>');
+      return;
+    }
+    const tmpProvider = { keyword: kw, url };
+    fetchBtn.set_sensitive(false);
+    fetchBtn.set_child(fetchSpinner);
+    fetchSpinner.start();
+    statusLabel.set_text(_('Fetching favicon…'));
+    fetchFaviconForProvider(tmpProvider, (success) => {
+      fetchSpinner.stop();
+      fetchBtn.set_child(null);
+      fetchBtn.set_label(_('Fetch Favicon'));
+      fetchBtn.set_sensitive(true);
+      if (success) {
+        statusLabel.set_markup('<span foreground="green">Favicon fetched!</span>');
+        updateFaviconPreview();
+      } else {
+        statusLabel.set_markup('<span foreground="red">Could not fetch favicon.</span>');
+      }
+    });
+  });
+  faviconBox.append(fetchBtn);
+  mainBox.append(faviconBox);
+
   // Status label for favicon fetch
   const statusLabel = new Gtk.Label({ label: '', xalign: 0 });
   mainBox.append(statusLabel);
@@ -729,13 +787,8 @@ function showProviderDialog(provider, index, settings, onSave) {
     }
     saveProviders(settings, providers);
 
-    // Fetch favicon
-    statusLabel.set_text(_('Fetching favicon…'));
-    saveBtn.set_sensitive(false);
-    fetchFaviconForProvider(newProvider, (success) => {
-      if (onSave) onSave();
-      win.close();
-    });
+    if (onSave) onSave();
+    win.close();
   });
   btnBox.append(saveBtn);
   mainBox.append(btnBox);
