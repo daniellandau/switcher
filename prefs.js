@@ -405,13 +405,24 @@ function makeTitle(markup) {
 /* Web Search Preferences                                                      */
 /* -------------------------------------------------------------------------- */
 
-const DEFAULT_PROVIDERS_JSON = '[{"keyword":"g","title":"Google","url":"https://www.google.com/search?q={q}","icon":"g.png","enabled":true},{"keyword":"gi","title":"Google Images","url":"https://www.google.com/search?tbm=isch&q={q}","icon":"gi.png","enabled":true},{"keyword":"yt","title":"YouTube","url":"https://www.youtube.com/results?search_query={q}","icon":"yt.png","enabled":true},{"keyword":"so","title":"Stack Overflow","url":"https://stackoverflow.com/search?q={q}","icon":"so.png","enabled":true},{"keyword":"wiki","title":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?search={q}","icon":"wiki.png","enabled":true},{"keyword":"ddg","title":"DuckDuckGo","url":"https://duckduckgo.com/?q={q}","icon":"ddg.png","enabled":true},{"keyword":"gh","title":"GitHub","url":"https://github.com/search?q={q}","icon":"gh.png","enabled":true},{"keyword":"maps","title":"Google Maps","url":"https://www.google.com/maps/search/{q}","icon":"maps.png","enabled":true},{"keyword":"r","title":"Reddit","url":"https://www.reddit.com/search/?q={q}","icon":"r.png","enabled":true},{"keyword":"amz","title":"Amazon","url":"https://www.amazon.com/s?k={q}","icon":"amz.png","enabled":true}]';
+const DEFAULT_PROVIDERS = [
+  { keyword: 'g',    title: 'Google',         url: 'https://www.google.com/search?q={q}',            icon: 'g.png',    enabled: true },
+  { keyword: 'gi',   title: 'Google Images',  url: 'https://www.google.com/search?tbm=isch&q={q}',   icon: 'gi.png',   enabled: true },
+  { keyword: 'yt',   title: 'YouTube',        url: 'https://www.youtube.com/results?search_query={q}',icon: 'yt.png',   enabled: true },
+  { keyword: 'so',   title: 'Stack Overflow', url: 'https://stackoverflow.com/search?q={q}',         icon: 'so.png',   enabled: true },
+  { keyword: 'wiki', title: 'Wikipedia',      url: 'https://en.wikipedia.org/w/index.php?search={q}', icon: 'wiki.png', enabled: true },
+  { keyword: 'ddg',  title: 'DuckDuckGo',     url: 'https://duckduckgo.com/?q={q}',                   icon: 'ddg.png',  enabled: true },
+  { keyword: 'gh',   title: 'GitHub',         url: 'https://github.com/search?q={q}',                 icon: 'gh.png',   enabled: true },
+  { keyword: 'maps', title: 'Google Maps',    url: 'https://www.google.com/maps/search/{q}',          icon: 'maps.png', enabled: true },
+  { keyword: 'r',    title: 'Reddit',         url: 'https://www.reddit.com/search/?q={q}',            icon: 'r.png',    enabled: true },
+  { keyword: 'amz',  title: 'Amazon',         url: 'https://www.amazon.com/s?k={q}',                  icon: 'amz.png',  enabled: true },
+];
 
 function getProvidersFromSettings(settings) {
   try {
     return JSON.parse(settings.get_string('web-search-providers'));
   } catch (e) {
-    return JSON.parse(DEFAULT_PROVIDERS_JSON);
+    return structuredClone(DEFAULT_PROVIDERS);
   }
 }
 
@@ -439,12 +450,69 @@ function buildWebSearchGroup(settings) {
   });
   masterSwitch.connect('notify::active', (sw) => {
     settings.set_boolean('web-search-enabled', sw.active);
+    warnBox.set_sensitive(sw.active);
     listBox.set_sensitive(sw.active);
     buttonBox.set_sensitive(sw.active);
   });
   masterBox.append(masterLabel);
   masterBox.append(masterSwitch);
   group.add(masterBox);
+
+  /* ── Missing-icons warning banner ──────────────────────── */
+  const warnBox = new Gtk.Box({ spacing: 10, margin_top: 4, margin_bottom: 8 });
+  warnBox.set_sensitive(settings.get_boolean('web-search-enabled'));
+
+  const warnIcon = new Gtk.Image({ icon_name: 'dialog-warning-symbolic', pixel_size: 16 });
+  warnBox.append(warnIcon);
+
+  const warnLabel = new Gtk.Label({
+    label: _('Some providers are missing icons.'),
+    hexpand: true,
+    xalign: 0,
+  });
+  warnLabel.add_css_class('dim-label');
+  warnBox.append(warnLabel);
+
+  const fetchAllBtn = new Gtk.Button({ label: _('Fetch All Icons') });
+  const fetchAllSpinner = new Gtk.Spinner();
+  fetchAllBtn.connect('clicked', () => {
+    const providers = getProvidersFromSettings(settings);
+    const missing = providers.filter(p => {
+      const f = Gio.File.new_for_path(getIconPath(p.keyword));
+      return !f.query_exists(null);
+    });
+    if (missing.length === 0) return;
+
+    fetchAllBtn.set_sensitive(false);
+    fetchAllBtn.set_child(fetchAllSpinner);
+    fetchAllSpinner.start();
+
+    let remaining = missing.length;
+    missing.forEach(provider => {
+      fetchFaviconForProvider(provider, (_success) => {
+        remaining--;
+        if (remaining <= 0) {
+          fetchAllSpinner.stop();
+          fetchAllBtn.set_child(null);
+          fetchAllBtn.set_label(_('Fetch All Icons'));
+          fetchAllBtn.set_sensitive(true);
+          rebuildList();
+        }
+      });
+    });
+  });
+  warnBox.append(fetchAllBtn);
+  group.add(warnBox);
+
+  /** Show/hide the warning banner based on missing icons */
+  function updateWarnBanner() {
+    const providers = getProvidersFromSettings(settings);
+    const hasMissing = providers.some(p => {
+      const f = Gio.File.new_for_path(getIconPath(p.keyword));
+      return !f.query_exists(null);
+    });
+    warnBox.set_visible(hasMissing);
+  }
 
   /* ── Provider list ──────────────────────────────────────── */
   const scrolled = new Gtk.ScrolledWindow({
@@ -527,6 +595,9 @@ function buildWebSearchGroup(settings) {
       row._providerIndex = idx;
       listBox.append(row);
     });
+
+    // Refresh the warning banner after rebuilding the list
+    updateWarnBanner();
   }
 
   rebuildList();
@@ -598,7 +669,7 @@ function buildWebSearchGroup(settings) {
 
   const resetBtn = new Gtk.Button({ label: _('Reset Defaults') });
   resetBtn.connect('clicked', () => {
-    settings.set_string('web-search-providers', DEFAULT_PROVIDERS_JSON);
+    settings.set_string('web-search-providers', JSON.stringify(DEFAULT_PROVIDERS));
     rebuildList();
   });
   buttonBox.append(resetBtn);
