@@ -215,17 +215,15 @@ function _showUI() {
   rerunFiltersAndUpdate = (o) => {
     apps = [].concat(windows, launcherApps, powerApps);
 
+    const isWebSearch = webSearch.isWebSearch(o.text);
     // Prefix-triggered web search mode (dynamic providers)
-    if (webSearch.isWebSearch(o.text)) {
-      filteredApps = webSearch.apps(o.text);
-    } else {
-      filteredApps = util.filterByText(apps, o.text);
-      if (
-        Convenience.getSettings().get_boolean('activate-immediately') &&
+    filteredApps = [].concat(webSearch.apps(o.text), util.filterByText(apps, o.text));
+    if (
+      Convenience.getSettings().get_boolean('activate-immediately') &&
+        !isWebSearch &&
         filteredApps.length === 1
-      ) {
-        debouncedActivateUnique();
-      }
+    ) {
+      debouncedActivateUnique();
     }
 
     updateBoxes(filteredApps);
