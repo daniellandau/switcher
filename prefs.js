@@ -436,7 +436,7 @@ function buildWebSearchGroup(settings) {
     description: _('Type "<keyword> <query>" to search. Example: "ddg funny cats" → DuckDuckGo search'),
   });
 
-  /* ── Master toggle ──────────────────────────────────────── */
+  /* Master toggle */
   const masterBox = new Gtk.Box({ spacing: 10, margin_top: 5, margin_bottom: 10 });
   const masterLabel = new Gtk.Label({
     label: _('Enable Web Searches'),
@@ -458,7 +458,7 @@ function buildWebSearchGroup(settings) {
   masterBox.append(masterSwitch);
   group.add(masterBox);
 
-  /* ── Missing-icons warning banner ──────────────────────── */
+  /* Missing-icons warning banner */
   const warnBox = new Gtk.Box({ spacing: 10, margin_top: 4, margin_bottom: 8 });
   warnBox.set_sensitive(settings.get_boolean('web-search-enabled'));
 
@@ -514,7 +514,7 @@ function buildWebSearchGroup(settings) {
     warnBox.set_visible(hasMissing);
   }
 
-  /* ── Provider list ──────────────────────────────────────── */
+  /* Provider list */
   const scrolled = new Gtk.ScrolledWindow({
     hscrollbar_policy: Gtk.PolicyType.NEVER,
     vscrollbar_policy: Gtk.PolicyType.AUTOMATIC,
@@ -602,7 +602,7 @@ function buildWebSearchGroup(settings) {
 
   rebuildList();
 
-  /* ── Action buttons ─────────────────────────────────────── */
+  /* Action buttons */
   const buttonBox = new Gtk.Box({ spacing: 8, margin_top: 10, homogeneous: true });
   buttonBox.set_sensitive(settings.get_boolean('web-search-enabled'));
 
