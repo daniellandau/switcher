@@ -7,18 +7,63 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-06 16:54+0300\n"
-"PO-Revision-Date: 2021-04-06 17:00+0300\n"
+"POT-Creation-Date: 2026-08-09 09:16+0300\n"
+"PO-Revision-Date: 2026-08-09 09:34+0300\n"
 "Last-Translator: Daniel Landau <daniel@landau.fi>\n"
 "Language-Team: \n"
 "Language: fi_FI\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.1\n"
-"X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.9\n"
+"X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
+
+#: modes/power.js:50
+msgid "Shutdown"
+msgstr "Sammuta"
+
+#: modes/power.js:53
+msgid "power off"
+msgstr "virta pois"
+
+#: modes/power.js:69
+msgid "Reboot"
+msgstr "Uudelleenkäynnistä"
+
+#: modes/power.js:72
+msgid "restart"
+msgstr "reboottaa"
+
+#: modes/power.js:88
+msgid "Sleep"
+msgstr "Valmiustila"
+
+#: modes/power.js:91
+msgid "suspend"
+msgstr "lepotila nuku"
+
+#: modes/power.js:106
+msgid "Hibernate"
+msgstr "Horrostila"
+
+#: modes/power.js:122
+msgid "Log Out"
+msgstr "Kirjaudu ulos"
+
+#: modes/power.js:125
+msgid "logout signout session end"
+msgstr "uloskirjautuminen"
+
+#: modes/power.js:141
+msgid "Lock Screen"
+msgstr "Lukitse näyttö"
+
+#: modes/webSearch.js:205
+#, javascript-format
+msgid "Search %s for: \"%s\""
+msgstr "Etsi käyttäen %s: \"%s"
 
 #: onboardingmessages.js:3
 msgid ""
@@ -56,11 +101,11 @@ msgstr ""
 "Järjestelmäasetusten osiot ovat myös laukaistavissa, kirjoita niiden nimiä "
 "hakulaatikkoon!"
 
-#: prefs.js:53
+#: prefs.js:39
 msgid "Hotkey to activate switcher"
 msgstr "Pikanäppäin vaihtajan aktivoimiseen"
 
-#: prefs.js:59
+#: prefs.js:45
 msgid ""
 "There used to be a separate launcher mode, but now launchable apps are shown "
 "in the same view"
@@ -68,111 +113,234 @@ msgstr ""
 "Vaihtajassa oli ennen erillinen käynnistinmoodi, mutta nykyään "
 "käynnistettävät applikaatiot näkyvät samassa näkymässä"
 
-#: prefs.js:90
+#: prefs.js:76
 msgid "Use Ctrl+w to toggle on the fly"
 msgstr "Paina Ctrl+w vaihtaaksesi lennosta"
 
-#: prefs.js:103
+#: prefs.js:89
 msgid "Show original language names"
 msgstr "Näytä alkukieliset nimet"
 
-#: prefs.js:110
+#: prefs.js:96
 msgid "Show executable names"
 msgstr "Näytä binäärien nimet"
 
-#: prefs.js:189
+#: prefs.js:175
 msgid "Key"
 msgstr "Näppäin"
 
-#: prefs.js:197
+#: prefs.js:183
 msgid "Pattern matching algorithm"
 msgstr "Hahmonnusalgoritmi"
 
-#: prefs.js:198
+#: prefs.js:184
 msgid "Strict"
 msgstr "Tarkka"
 
-#: prefs.js:198
+#: prefs.js:184
 msgid "Fuzzy"
 msgstr "Sumea"
 
-#: prefs.js:210
+#: prefs.js:196
 msgid "Ordering criteria"
 msgstr "Järjestys"
 
-#: prefs.js:211
+#: prefs.js:197
 msgid "Last focused"
 msgstr "Viimeksi käytetty ensin"
 
-#: prefs.js:211
+#: prefs.js:197
 msgid "Most relevant"
 msgstr "Oleellisin ensin"
 
-#: prefs.js:223
+#: prefs.js:209
 msgid "Immediate activation"
 msgstr "Välitön aktivointi"
 
-#: prefs.js:228
+#: prefs.js:214
 msgid "When there is just one result, activate immediately"
 msgstr "Kun tuloksia on vain yksi, aktivoi välittömästi"
 
-#: prefs.js:246
+#: prefs.js:232
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 "Aktivoi välittömästi näin monta millisekuntia viimeisen näppäinpainalluksen "
 "jälkeen"
 
-#: prefs.js:265
+#: prefs.js:251
 msgid "Icon size (px)"
 msgstr "Ikonin koko (px)"
 
-#: prefs.js:283
+#: prefs.js:269
 msgid "Font size (px)"
 msgstr "Fonttikoko (px)"
 
-#: prefs.js:301
+#: prefs.js:287
 msgid "Width (%)"
 msgstr "Leveys (%)"
 
-#: prefs.js:318
+#: prefs.js:304
 msgid "Activate by pressing a key matching the index in the list"
 msgstr "Aktivoi painamalla järjestysnumeroa vastaavaa näppäintä"
 
-#: prefs.js:320
+#: prefs.js:306
 msgid "Disable"
 msgstr "Pois käytöstä"
 
-#: prefs.js:320
+#: prefs.js:306
 msgid "Function keys"
 msgstr "Funktionäppäimet"
 
-#: prefs.js:320
+#: prefs.js:306
 msgid "Number keys"
 msgstr "Numeronäppäimet"
 
-#: prefs.js:348
+#: prefs.js:334
 msgid "Show workspace indicators"
 msgstr "Näytä työtilaindikaattori"
 
-#: prefs.js:357
+#: prefs.js:343
 msgid "Show only apps in the current workspace"
 msgstr "Näytä vain nykyisellä työpöydällä olevat sovellukset"
 
-#: prefs.js:363
+#: prefs.js:349
 msgid "Fade Effect"
 msgstr "Fade-efekti"
 
-#: prefs.js:370
+#: prefs.js:356
 msgid "Show Switcher on active display"
 msgstr "Näytä vaihtaja aktiivisella näytöllä"
 
-#: prefs.js:376
+#: prefs.js:362
 msgid "Usage tips"
 msgstr "Käyttövinkit"
 
-#: prefs.js:378
+#: prefs.js:364
 msgid "Read all tips"
 msgstr "Lue kaikki vinkit"
+
+#: prefs.js:435
+msgid "Web Searches"
+msgstr "Verkkohaut"
+
+#: prefs.js:436
+msgid ""
+"Type \"<keyword> <query>\" to search. Example: \"ddg funny cats\" → "
+"DuckDuckGo search"
+msgstr ""
+"Kirjoita \"<avainsana> <haku>\" hakeaksesi. Esimerkiksi: \"ddg hauskoja "
+"kissakuvia\" → DuckDuckGo haku"
+
+#: prefs.js:442
+msgid "Enable Web Searches"
+msgstr "Esimerkki verkkohakuja"
+
+#: prefs.js:469
+msgid "Some providers are missing icons."
+msgstr "Joiltakin hakumoottoreilta puuttuu ikoneja."
+
+#: prefs.js:476 prefs.js:497
+msgid "Fetch All Icons from Google"
+msgstr "Hae kaikki ikonit Googlesta"
+
+#: prefs.js:609
+msgid "Add"
+msgstr "Lisää"
+
+#: prefs.js:616
+msgid "Edit"
+msgstr "Muokkaa"
+
+#: prefs.js:632
+msgid "Delete"
+msgstr "Poista"
+
+#: prefs.js:670
+msgid "Reset Defaults"
+msgstr "Palauta oletusvalinnat"
+
+#: prefs.js:685
+msgid "Edit Search Provider"
+msgstr "Muokkaa hakumoottoria"
+
+#: prefs.js:685
+msgid "Add Search Provider"
+msgstr "Lisää hakumoottori"
+
+#: prefs.js:703
+msgid ""
+"Use {q} in the URL as the placeholder for the search query.\n"
+"Example: https://duckduckgo.com/?q={q}"
+msgstr ""
+"Käytä {q} URLissa merkitsemään paikkaa, mihin hakuehto tulee.\n"
+"Esimerkiksi: https://duckduckgo.com/?q={q}"
+
+#: prefs.js:712
+msgid "Title"
+msgstr "Otsikko"
+
+#: prefs.js:714
+msgid "e.g. DuckDuckGo"
+msgstr "esimerkiksi DuckDuckGo"
+
+#: prefs.js:720
+msgid "URL"
+msgstr "URL"
+
+#: prefs.js:722
+msgid "https://duckduckgo.com/?q={q}"
+msgstr "https://duckduckgo.com/?q={q}"
+
+#: prefs.js:728
+msgid "Keyword"
+msgstr "Avainsana"
+
+#: prefs.js:730
+msgid "e.g. ddg"
+msgstr "esimerkiksi ddg"
+
+#: prefs.js:736
+msgid "Enabled"
+msgstr "Käytössä"
+
+#: prefs.js:746
+msgid "Favicon"
+msgstr "Favicon"
+
+#: prefs.js:765 prefs.js:796
+msgid "Fetch Favicon"
+msgstr "Hae Favicon"
+
+#: prefs.js:792
+msgid "Fetching favicon…"
+msgstr "Faviconia haetaan…"
+
+#: prefs.js:815
+msgid "Cancel"
+msgstr "Peruuta"
+
+#: prefs.js:819
+msgid "Save"
+msgstr "Tallenna"
+
+#: prefs.js:828
+msgid "<span foreground=\"red\">All fields are required.</span>"
+msgstr "<span foreground=\"red\">Kaikki kentät tarvitaan.</span>"
+
+#: prefs.js:832
+msgid "<span foreground=\"red\">URL must contain {q} placeholder.</span>"
+msgstr ""
+"<span foreground=\"red\">URLissa tulee olla {q} merkitsemään hakuehdon "
+"paikka.</span>"
+
+#: prefs.js:840
+#, javascript-format
+msgid "<span foreground=\"red\">Keyword \"%s\" already exists.</span>"
+msgstr "<span foreground=\"red\">Avainsana \"%s\" on jo olemassa.</span>"
+
+#: prefs.js:883
+msgid "Switcher Preferences"
+msgstr "Vaihtajan asetukset"
 
 #~ msgid "Switcher"
 #~ msgstr "Vaihtaja"
