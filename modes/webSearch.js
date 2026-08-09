@@ -6,6 +6,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import { ModeUtils as modeUtils } from './modeUtils.js';
 import * as Convenience from '../convenience.js';
@@ -201,7 +202,7 @@ export var WebSearch = (function () {
   let filter = () => true;
 
   let description = (app) =>
-    `Search ${app.provider.title} for: "${app.query}"`;
+      _('Search %s for: "%s"').format(app.provider.title, app.query);
 
   let activate = (app) => openSearch(app.provider, app.query);
 

@@ -825,11 +825,11 @@ function showProviderDialog(provider, index, settings, onSave) {
     const enabled = enabledSwitch.active;
 
     if (!title || !url || !keyword) {
-      statusLabel.set_markup('<span foreground="red">All fields are required.</span>');
+      statusLabel.set_markup(_('<span foreground="red">All fields are required.</span>'));
       return;
     }
     if (!url.includes('{q}')) {
-      statusLabel.set_markup('<span foreground="red">URL must contain {q} placeholder.</span>');
+      statusLabel.set_markup(_('<span foreground="red">URL must contain {q} placeholder.</span>'));
       return;
     }
 
@@ -837,7 +837,7 @@ function showProviderDialog(provider, index, settings, onSave) {
     // Check for duplicate keyword (skip self when editing)
     const duplicate = providers.find((p, i) => p.keyword === keyword && i !== index);
     if (duplicate) {
-      statusLabel.set_markup(`<span foreground="red">Keyword "${keyword}" already exists.</span>`);
+      statusLabel.set_markup(_('<span foreground="red">Keyword "%s" already exists.</span>').format(keyword));
       return;
     }
 
