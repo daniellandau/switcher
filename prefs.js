@@ -473,7 +473,7 @@ function buildWebSearchGroup(settings) {
   warnLabel.add_css_class('dim-label');
   warnBox.append(warnLabel);
 
-  const fetchAllBtn = new Gtk.Button({ label: _('Fetch All Icons') });
+  const fetchAllBtn = new Gtk.Button({ label: _('Fetch All Icons from Google') });
   const fetchAllSpinner = new Gtk.Spinner();
   fetchAllBtn.connect('clicked', () => {
     const providers = getProvidersFromSettings(settings);
@@ -494,7 +494,7 @@ function buildWebSearchGroup(settings) {
         if (remaining <= 0) {
           fetchAllSpinner.stop();
           fetchAllBtn.set_child(null);
-          fetchAllBtn.set_label(_('Fetch All Icons'));
+          fetchAllBtn.set_label(_('Fetch All Icons from Google'));
           fetchAllBtn.set_sensitive(true);
           rebuildList();
         }
