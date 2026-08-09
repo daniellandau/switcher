@@ -24,12 +24,13 @@
 }
 
 .switcher-highlight {
-  color: -st-accent-fg-color;
-  background-color: -st-accent-color;
+  color: #ffffff;
+  background-color: #215d9c;
 }
 
 .switcher-highlight:hover {
   color: #ffffff;
+  background-color: #447dbc;
 }
 
 .switcher-entry {
