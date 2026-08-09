@@ -97,5 +97,13 @@
           <default>false</default>
           <summary>Should names of executables be shown?</summary>
         </key>
+        <key type="b" name="web-search-enabled">
+          <default>true</default>
+          <summary>Whether web search providers feature is enabled</summary>
+        </key>
+        <key type="s" name="web-search-providers">
+          <default><![CDATA['[{"keyword":"ddg","title":"DuckDuckGo","url":"https://duckduckgo.com/?q={q}","icon":"ddg.png","enabled":true},{"keyword":"gh","title":"GitHub","url":"https://github.com/search?q={q}","icon":"gh.png","enabled":true},{"keyword":"so","title":"Stack Overflow","url":"https://stackoverflow.com/search?q={q}","icon":"so.png","enabled":true},{"keyword":"wiki","title":"Wikipedia","url":"https://en.wikipedia.org/w/index.php?search={q}","icon":"wiki.png","enabled":true},{"keyword":"r","title":"Reddit","url":"https://www.reddit.com/search/?q={q}","icon":"r.png","enabled":true},{"keyword":"amz","title":"Amazon","url":"https://www.amazon.com/s?k={q}","icon":"amz.png","enabled":true},{"keyword":"g","title":"Google","url":"https://www.google.com/search?q={q}","icon":"g.png","enabled":true},{"keyword":"gi","title":"Google Images","url":"https://www.google.com/search?tbm=isch&q={q}","icon":"gi.png","enabled":true},{"keyword":"yt","title":"YouTube","url":"https://www.youtube.com/results?search_query={q}","icon":"yt.png","enabled":true},{"keyword":"maps","title":"Google Maps","url":"https://www.google.com/maps/search/{q}","icon":"maps.png","enabled":true}]']]></default>
+          <summary>JSON array of web search provider objects</summary>
+        </key>
     </schema>
 </schemalist>

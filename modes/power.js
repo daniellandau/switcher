@@ -7,8 +7,10 @@ import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as ModalDialog from 'resource:///org/gnome/shell/ui/modalDialog.js';
+import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
 
 import { ModeUtils as modeUtils } from './modeUtils.js';
+import * as Convenience from '../convenience.js';
 
 /* -------------------------------------------------------------------------- */
 /* D-Bus helpers                                                               */
@@ -47,8 +49,10 @@ const POWER_ACTIONS = [
   {
     id: 'power-shutdown',
     label: 'Shutdown',
+    label_translated: () => _('Shutdown'),
     icon: 'system-shutdown-symbolic',
     keywords: 'power off',
+    keywords_translated: () => _('power off'),
     confirm: true,
     run() {
       callDBus(
@@ -64,8 +68,10 @@ const POWER_ACTIONS = [
   {
     id: 'power-reboot',
     label: 'Reboot',
+    label_translated: () => _('Reboot'),
     icon: 'system-reboot-symbolic',
     keywords: 'restart',
+    keywords_translated: () => _('restart'),
     confirm: true,
     run() {
       callDBus(
@@ -81,8 +87,10 @@ const POWER_ACTIONS = [
   {
     id: 'power-sleep',
     label: 'Sleep',
+    label_translated: () => _('Sleep'),
     icon: 'weather-clear-night-symbolic',
     keywords: 'suspend',
+    keywords_translated: () => _('suspend'),
     run() {
       callDBus(
         'system',
@@ -97,6 +105,7 @@ const POWER_ACTIONS = [
   {
     id: 'power-hibernate',
     label: 'Hibernate',
+    label_translated: () => _('Hibernate'),
     icon: 'drive-harddisk-symbolic',
     run() {
       callDBus(
@@ -112,8 +121,10 @@ const POWER_ACTIONS = [
   {
     id: 'power-logout',
     label: 'Log Out',
+    label_translated: () => _('Log Out'),
     icon: 'system-log-out-symbolic',
     keywords: 'logout signout session end',
+    keywords_translated: () => _('logout signout session end'),
     confirm: true,
     run() {
       callDBus(
@@ -126,14 +137,15 @@ const POWER_ACTIONS = [
       );
     },
   },
-  {                                                                             
-    id: 'power-lock',                                                           
-    label: 'Lock Screen',                                                       
-    icon: 'changes-prevent-symbolic',                                           
-    run() {                                                                     
+  {
+    id: 'power-lock',
+    label: 'Lock Screen',
+    label_translated: () => _('Lock Screen'),
+    icon: 'changes-prevent-symbolic',
+    run() {
       // Use GNOME Shell's built-in screen shield directly — simplest approach  
-      Main.screenShield.lock(true);                                             
-    },                                                                          
+      Main.screenShield.lock(true);
+    },
   },
 ];
 
@@ -232,7 +244,14 @@ export var Power = (function () {
    * The fuzzy filter in util.js matches against this string, so we embed
    * both the display label and the keywords.
    */
-  let description = action => action.keywords ? `${action.label} (${action.keywords})` : action.label;
+  let description = action => {
+    const original = action.keywords ? `${action.label} (${action.keywords})` : action.label;
+    const translated = action.keywords ? `${action.label_translated()} (${action.keywords_translated()})` : action.label_translated();
+    if (!Convenience.getSettings().get_boolean('show-original-names'))
+      return translated
+    else
+      return `${translated} [${original}]`;
+  }
 
   /** Called by extension.js when an entry is activated. */
   let activate = action => {

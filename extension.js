@@ -20,7 +20,6 @@ import Clutter from 'gi://Clutter';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import Shell from 'gi://Shell';
 import Meta from 'gi://Meta';
-// const Gettext = imports.gettext;
 
 import * as Convenience from './convenience.js';
 
@@ -28,6 +27,8 @@ import * as KeyActivationModule from './keyActivation.js';
 
 import * as switcherModule from './modes/switcher.js';
 import { Launcher as launcher, initStats } from './modes/launcher.js';
+import { Power as power } from './modes/power.js';
+import { WebSearch as webSearch } from './modes/webSearch.js';
 
 import * as ModeUtilsModule from './modes/modeUtils.js';
 
@@ -35,7 +36,7 @@ import * as util from './util.js';
 import * as controlCenter from './controlCenter.js';
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { Power as power } from './modes/power.js';
+
 const keyActivation = KeyActivationModule.KeyActivation;
 const switcher = switcherModule.Switcher;
 const modeUtils = ModeUtilsModule.ModeUtils;
@@ -62,7 +63,11 @@ const enablePerfTracing = false;
 let previous = null,
   previousMessage = null;
 
-let apps = [], windows = [], allLauncherApps = [], launcherApps = [], powerApps = [];
+let apps = [],
+  windows = [],
+  allLauncherApps = [],
+  launcherApps = [],
+  powerApps = [];
 let windowApps = new Set();
 let rerunFiltersAndUpdate = null;
 
@@ -89,7 +94,7 @@ function forceUpdateAppCacheCallback() {
   forceUpdateAppCacheTimeoutId = null;
   modeUtils.shellApps(true);
   if (modeUtils.getHasNullAppInfos()) {
-    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
+    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback,APP_CACHE_TIMEOUT);
   } else {
     allLauncherApps = launcher.apps();
     launcherApps = allLauncherApps.filter(
@@ -104,7 +109,10 @@ function _showUI() {
   'use strict';
   if (container) return;
   timeit('init');
-  forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
+  forceUpdateAppCacheTimeoutId = setTimeout(
+    forceUpdateAppCacheCallback,
+    APP_CACHE_TIMEOUT
+  );
 
   const modes = [switcher, launcher, power];
 
@@ -163,9 +171,8 @@ function _showUI() {
   entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
   boxLayout.insert_child_at_index(entry, 0);
 
-  let useActiveMonitor = Convenience.getSettings().get_boolean(
-    'on-active-display'
-  );
+  let useActiveMonitor =
+    Convenience.getSettings().get_boolean('on-active-display');
   let selectedMonitor = useActiveMonitor
     ? Main.layoutManager.currentMonitor
     : Main.layoutManager.primaryMonitor;
@@ -208,10 +215,13 @@ function _showUI() {
   rerunFiltersAndUpdate = (o) => {
     apps = [].concat(windows, launcherApps, powerApps);
 
-    filteredApps = util.filterByText(apps, o.text);
+    const isWebSearch = webSearch.isWebSearch(o.text);
+    // Prefix-triggered web search mode (dynamic providers)
+    filteredApps = [].concat(webSearch.apps(o.text), util.filterByText(apps, o.text));
     if (
       Convenience.getSettings().get_boolean('activate-immediately') &&
-      filteredApps.length === 1
+        !isWebSearch &&
+        filteredApps.length === 1
     ) {
       debouncedActivateUnique();
     }
@@ -267,7 +277,9 @@ function _showUI() {
       cursor = cursor > 0 ? cursor - 1 : currentlyShowingCount - 1;
       util.updateHighlight(boxes, o.text, cursor);
     } else if (symbol === Clutter.KEY_w && control) {
-      switcherModule.setOnlyCurrentWorkspaceToggled(!switcherModule.onlyCurrentWorkspaceToggled)
+      switcherModule.setOnlyCurrentWorkspaceToggled(
+        !switcherModule.onlyCurrentWorkspaceToggled
+      );
       rerunFiltersAndUpdate(o);
     } else if (symbol === Clutter.KEY_h && control) {
       // Delete last character
@@ -282,7 +294,10 @@ function _showUI() {
   keyRelease = entry.connect('key-release-event', (o, e) => {
     if (forceUpdateAppCacheTimeoutId)
       clearTimeout(forceUpdateAppCacheTimeoutId);
-    forceUpdateAppCacheTimeoutId = setTimeout(forceUpdateAppCacheCallback, APP_CACHE_TIMEOUT);
+    forceUpdateAppCacheTimeoutId = setTimeout(
+      forceUpdateAppCacheCallback,
+      APP_CACHE_TIMEOUT
+    );
     const entryContent = o.text;
     const control = (e.get_state() & Clutter.ModifierType.CONTROL_MASK) !== 0;
     const shift = (e.get_state() & Clutter.ModifierType.SHIFT_MASK) !== 0;
@@ -387,7 +402,9 @@ function _showUI() {
     c.show();
     return grab;
   });
-  grabs.push(Main.pushModal(boxLayout, { actionMode: Shell.ActionMode.SYSTEM_MODAL }))
+  grabs.push(
+    Main.pushModal(boxLayout, { actionMode: Shell.ActionMode.SYSTEM_MODAL })
+  );
   global.stage.set_key_focus(entry);
 
   let i = 0;
@@ -403,10 +420,10 @@ function _showUI() {
       i += 1;
       setTimeout(showSingleBox, 0);
     } else if (!allWindowsShown) {
-      timeit('all windows now shown')
+      timeit('all windows now shown');
       allWindowsShown = true;
       setTimeout(function () {
-        timeit('this should be 10ms after the last one')
+        timeit('this should be 10ms after the last one');
         allLauncherApps = launcher.apps();
         launcherApps = allLauncherApps.filter(
           (app) => !windowApps.has(app.app.get_id())
@@ -453,8 +470,7 @@ function destroyBox(box) {
 // this and the following function contain some of the same copy pasted code
 function cleanUI() {
   rerunFiltersAndUpdate = null;
-  if (forceUpdateAppCacheTimeoutId)
-    clearTimeout(forceUpdateAppCacheTimeoutId);
+  if (forceUpdateAppCacheTimeoutId) clearTimeout(forceUpdateAppCacheTimeoutId);
   switcherModule.setOnlyCurrentWorkspaceToggled(false);
   cleanBoxes();
   containers.reverse().forEach((c) => {
@@ -471,16 +487,16 @@ function cleanUI() {
 function cleanUIWithFade(force_immediate = false) {
   if (!containers) return;
   rerunFiltersAndUpdate = null;
-  if (forceUpdateAppCacheTimeoutId)
-    clearTimeout(forceUpdateAppCacheTimeoutId);
+  if (forceUpdateAppCacheTimeoutId) clearTimeout(forceUpdateAppCacheTimeoutId);
   switcherModule.setOnlyCurrentWorkspaceToggled(false);
-  grabs && grabs.reverse().forEach((c) => {
-    try {
-      Main.popModal(c);
-    } catch (e) {
-      print('Switcher got an error', e);
-    }
-  });
+  grabs &&
+    grabs.reverse().forEach((c) => {
+      try {
+        Main.popModal(c);
+      } catch (e) {
+        print('Switcher got an error', e);
+      }
+    });
 
   const cleanRest = function () {
     cleanBoxes();
@@ -492,15 +508,16 @@ function cleanUIWithFade(force_immediate = false) {
     containers = null;
   };
 
-  if (!force_immediate && Convenience.getSettings().get_boolean('fade-enable')) {
-    boxLayout.ease(
-      {
-        opacity: 0,
-        time: 0.35,
-        transition: Clutter.AnimationMode.EASE_OUT_QUAD,
-        onComplete: cleanRest
-      }
-    );
+  if (
+    !force_immediate &&
+    Convenience.getSettings().get_boolean('fade-enable')
+  ) {
+    boxLayout.ease({
+      opacity: 0,
+      time: 0.35,
+      transition: Clutter.AnimationMode.EASE_OUT_QUAD,
+      onComplete: cleanRest
+    });
   } else {
     cleanRest();
   }

@@ -8,18 +8,64 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-06 16:54+0300\n"
+"POT-Creation-Date: 2026-08-09 10:06+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.1\n"
+"X-Generator: Poedit 3.9\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: prefs.js\n"
 "X-Poedit-SearchPath-1: extension.js\n"
 "X-Poedit-SearchPath-2: onboardingmessages.js\n"
+"X-Poedit-SearchPath-3: modes\n"
+
+#: modes/power.js:52
+msgid "Shutdown"
+msgstr ""
+
+#: modes/power.js:55
+msgid "power off"
+msgstr ""
+
+#: modes/power.js:71
+msgid "Reboot"
+msgstr ""
+
+#: modes/power.js:74
+msgid "restart"
+msgstr ""
+
+#: modes/power.js:90
+msgid "Sleep"
+msgstr ""
+
+#: modes/power.js:93
+msgid "suspend"
+msgstr ""
+
+#: modes/power.js:108
+msgid "Hibernate"
+msgstr ""
+
+#: modes/power.js:124
+msgid "Log Out"
+msgstr ""
+
+#: modes/power.js:127
+msgid "logout signout session end"
+msgstr ""
+
+#: modes/power.js:143
+msgid "Lock Screen"
+msgstr ""
+
+#: modes/webSearch.js:205
+#, javascript-format
+msgid "Search %s for: \"%s\""
+msgstr ""
 
 #: onboardingmessages.js:3
 msgid "Use Super+w (or another shortcut you configured in settings) to start the switcher. Type space separated searches, use the arrow keys to navigate, and press Space to activate."
@@ -41,114 +87,229 @@ msgstr ""
 msgid "System settings sections are also available for launching, just search for them!"
 msgstr ""
 
-#: prefs.js:53
+#: prefs.js:39
 msgid "Hotkey to activate switcher"
 msgstr ""
 
-#: prefs.js:59
+#: prefs.js:45
 msgid "There used to be a separate launcher mode, but now launchable apps are shown in the same view"
 msgstr ""
 
-#: prefs.js:90
+#: prefs.js:76
 msgid "Use Ctrl+w to toggle on the fly"
 msgstr ""
 
-#: prefs.js:103
+#: prefs.js:89
 msgid "Show original language names"
 msgstr ""
 
-#: prefs.js:110
+#: prefs.js:96
 msgid "Show executable names"
 msgstr ""
 
-#: prefs.js:189
+#: prefs.js:175
 msgid "Key"
 msgstr ""
 
-#: prefs.js:197
+#: prefs.js:183
 msgid "Pattern matching algorithm"
 msgstr ""
 
-#: prefs.js:198
+#: prefs.js:184
 msgid "Strict"
 msgstr ""
 
-#: prefs.js:198
+#: prefs.js:184
 msgid "Fuzzy"
 msgstr ""
 
-#: prefs.js:210
+#: prefs.js:196
 msgid "Ordering criteria"
 msgstr ""
 
-#: prefs.js:211
+#: prefs.js:197
 msgid "Last focused"
 msgstr ""
 
-#: prefs.js:211
+#: prefs.js:197
 msgid "Most relevant"
 msgstr ""
 
-#: prefs.js:223
+#: prefs.js:209
 msgid "Immediate activation"
 msgstr ""
 
-#: prefs.js:228
+#: prefs.js:214
 msgid "When there is just one result, activate immediately"
 msgstr ""
 
-#: prefs.js:246
+#: prefs.js:232
 msgid "Activate immediately this many milliseconds after last keystroke"
 msgstr ""
 
-#: prefs.js:265
+#: prefs.js:251
 msgid "Icon size (px)"
 msgstr ""
 
-#: prefs.js:283
+#: prefs.js:269
 msgid "Font size (px)"
 msgstr ""
 
-#: prefs.js:301
+#: prefs.js:287
 msgid "Width (%)"
 msgstr ""
 
-#: prefs.js:318
+#: prefs.js:304
 msgid "Activate by pressing a key matching the index in the list"
 msgstr ""
 
-#: prefs.js:320
+#: prefs.js:306
 msgid "Disable"
 msgstr ""
 
-#: prefs.js:320
+#: prefs.js:306
 msgid "Function keys"
 msgstr ""
 
-#: prefs.js:320
+#: prefs.js:306
 msgid "Number keys"
 msgstr ""
 
-#: prefs.js:348
+#: prefs.js:334
 msgid "Show workspace indicators"
 msgstr ""
 
-#: prefs.js:357
+#: prefs.js:343
 msgid "Show only apps in the current workspace"
 msgstr ""
 
-#: prefs.js:363
+#: prefs.js:349
 msgid "Fade Effect"
 msgstr ""
 
-#: prefs.js:370
+#: prefs.js:356
 msgid "Show Switcher on active display"
 msgstr ""
 
-#: prefs.js:376
+#: prefs.js:362
 msgid "Usage tips"
 msgstr ""
 
-#: prefs.js:378
+#: prefs.js:364
 msgid "Read all tips"
+msgstr ""
+
+#: prefs.js:435
+msgid "Web Searches"
+msgstr ""
+
+#: prefs.js:436
+msgid "Type \"<keyword> <query>\" to search. Example: \"ddg funny cats\" → DuckDuckGo search"
+msgstr ""
+
+#: prefs.js:442
+msgid "Enable Web Searches"
+msgstr ""
+
+#: prefs.js:469
+msgid "Some providers are missing icons."
+msgstr ""
+
+#: prefs.js:476 prefs.js:497
+msgid "Fetch All Icons from Google"
+msgstr ""
+
+#: prefs.js:609
+msgid "Add"
+msgstr ""
+
+#: prefs.js:616
+msgid "Edit"
+msgstr ""
+
+#: prefs.js:632
+msgid "Delete"
+msgstr ""
+
+#: prefs.js:670
+msgid "Reset Defaults"
+msgstr ""
+
+#: prefs.js:685
+msgid "Edit Search Provider"
+msgstr ""
+
+#: prefs.js:685
+msgid "Add Search Provider"
+msgstr ""
+
+#: prefs.js:703
+msgid ""
+"Use {q} in the URL as the placeholder for the search query.\n"
+"Example: https://duckduckgo.com/?q={q}"
+msgstr ""
+
+#: prefs.js:712
+msgid "Title"
+msgstr ""
+
+#: prefs.js:714
+msgid "e.g. DuckDuckGo"
+msgstr ""
+
+#: prefs.js:720
+msgid "URL"
+msgstr ""
+
+#: prefs.js:722
+msgid "https://duckduckgo.com/?q={q}"
+msgstr ""
+
+#: prefs.js:728
+msgid "Keyword"
+msgstr ""
+
+#: prefs.js:730
+msgid "e.g. ddg"
+msgstr ""
+
+#: prefs.js:736
+msgid "Enabled"
+msgstr ""
+
+#: prefs.js:746
+msgid "Favicon"
+msgstr ""
+
+#: prefs.js:765 prefs.js:796
+msgid "Fetch Favicon"
+msgstr ""
+
+#: prefs.js:792
+msgid "Fetching favicon…"
+msgstr ""
+
+#: prefs.js:815
+msgid "Cancel"
+msgstr ""
+
+#: prefs.js:819
+msgid "Save"
+msgstr ""
+
+#: prefs.js:828
+msgid "<span foreground=\"red\">All fields are required.</span>"
+msgstr ""
+
+#: prefs.js:832
+msgid "<span foreground=\"red\">URL must contain {q} placeholder.</span>"
+msgstr ""
+
+#: prefs.js:840
+#, javascript-format
+msgid "<span foreground=\"red\">Keyword \"%s\" already exists.</span>"
+msgstr ""
+
+#: prefs.js:883
+msgid "Switcher Preferences"
 msgstr ""
