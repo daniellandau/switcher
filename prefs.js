@@ -422,7 +422,7 @@ function getProvidersFromSettings(settings) {
   try {
     return JSON.parse(settings.get_string('web-search-providers'));
   } catch (e) {
-    return structuredClone(DEFAULT_PROVIDERS);
+    return [];
   }
 }
 
