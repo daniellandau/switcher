@@ -363,7 +363,7 @@ function buildOnboarding(settings) {
 
   const showMessages = new Gtk.Button({ label: _('Read all tips') });
   showMessages.set_margin_top(10);
-  const popover = new Gtk.Popover(showMessages);
+  const popover = new Gtk.Popover();
   popover.set_parent(showMessages);
   const vbox = new Gtk.Box();
   vbox.set_orientation(Gtk.Orientation.VERTICAL);
