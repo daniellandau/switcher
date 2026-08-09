@@ -10,7 +10,7 @@ import {gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js'
 
 import { ModeUtils as modeUtils } from './modeUtils.js';
 import * as Convenience from '../convenience.js';
-import { getIconsDir } from '../webSearchUtils.js';
+import { getIconPath } from '../webSearchUtils.js';
 
 /* -------------------------------------------------------------------------- */
 /* Provider management                                                         */
@@ -134,10 +134,7 @@ function openSearch(provider, query) {
  */
 function loadFavicon(provider, size) {
   try {
-    const iconPath = GLib.build_filenamev([
-      getIconsDir(),
-      `${provider.keyword}.png`,
-    ]);
+    const iconPath = getIconPath(provider.keyword);
     const file = Gio.File.new_for_path(iconPath);
     if (file.query_exists(null)) {
       return new St.Icon({
