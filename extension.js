@@ -164,8 +164,12 @@ function _showUI() {
 
   const fontSize = Convenience.getSettings().get_uint('font-size');
   boxLayout = new St.BoxLayout({ style_class: 'switcher-box-layout' });
+  if (typeof boxLayout.set_orientation === 'function') {
+    boxLayout.set_orientation(Clutter.Orientation.VERTICAL);
+  } else {
+    boxLayout.set_vertical(true);
+  }
   boxLayout.set_style('font-size: ' + fontSize + 'px');
-  boxLayout.set_vertical(true);
 
   /* use "search-entry" style from overview, combining it with our own */
   entry = new St.Entry({ style_class: 'search-entry switcher-entry' });
